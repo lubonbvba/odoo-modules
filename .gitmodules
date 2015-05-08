@@ -1,0 +1,6 @@
+[submodule "companyweb"]
+	path = companyweb
+	url = https://github.com/OCA/l10n-belgium.git
+[submodule "account-financial-reporting"]
+	path = account-financial-reporting
+	url = https://github.com/OCA/account-financial-reporting.git

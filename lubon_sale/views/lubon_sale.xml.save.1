@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <openerp>
+    <data>
+        <record model="ir.ui.view" id="lubon_sale_form_view">
+            <field name="name">lubon_sale.sale</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+		<field name="pricelist_id" position="after">
+			<field name="has_discount"/>
+		</field>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']"
+                  position="after">
+                    <field name="discount"/>
+                </xpath>
+                <notebook position="inside">
+		  <page string="Comments">
+                    <field name="quote_text">
+		    </field>
+                  </page>
+                </notebook>
+            </field>
+        </record>
+sale.view_order_line_form2
+        <record model="ir.ui.view" id="lubon_sale_line_form_view">
+            <field name="name">lubon_sale.sale</field>
+            <field name="model">sale.order.line</field>
+            <field name="inherit_id" ref="sale."/>
+            <field name="arch" type="xml">
+                <field name="pricelist_id" position="after">
+                        <field name="has_discount"/>
+                </field>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']"
+                  position="after">
+                    <field name="discount"/>
+                </xpath>
+                <notebook position="inside">
+                  <page string="Comments">
+                    <field name="quote_text">
+                    </field>
+                  </page>
+                </notebook>
+            </field>
+        </record>
+
+
+
+    </data> 
+</openerp>

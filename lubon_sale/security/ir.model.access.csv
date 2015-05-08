@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_lubon_sale_lubon_sale,lubon_sale.lubon_sale,model_lubon_sale_lubon_sale,,1,0,0,0

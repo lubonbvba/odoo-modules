@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!-- window action -->
+        <!--
+            The following tag is an action definition for a "window action",
+            that is an action opening a view or a set of views
+        -->
+        <record model="ir.actions.act_window" id="move_line_action">
+            <field name="name">Courses</field>
+            <field name="res_model">account.move.line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first course
+                </p>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="invoice_action">
+            <field name="name">Invoices</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- top level menu: no parent -->
+        <menuitem id="main_lubon_debug_menu" name="Debug"/>
+        <!-- A first level in the left side menu is needed
+             before using action= attribute -->
+        <menuitem id="lubon_debug_menu" name="Debug"
+                  parent="main_lubon_debug_menu"/>
+        <!-- the following menuitem should appear *after*
+             its parent lubon_debug_menu and *after* its
+             action move_line_action -->
+        <menuitem id="moves_menu" name="Moves" parent="lubon_debug_menu"
+                  action="move_line_action"/>
+        <menuitem id="invoicess_menu" name="Invoices" parent="lubon_debug_menu"
+                  action="invoice_action"/>
+
+
+        <!-- Full id location:
+             action="lubon_debug.move_line_action"
+             It is not required when it is the same module -->
+    </data>
+</openerp>
+
+
