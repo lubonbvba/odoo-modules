@@ -21,11 +21,6 @@
                 </notebook>
                 <notebook position="inside">
                     <page string="Lubon">
-                        <group string="X values">
-                            <field name="x_rate_tm"/>
-                            <field name="x_rate_day"/>
-                            <field name="x_travel"/>
-                        </group>
 			<group string="Rate settings">
                             <field name="rate_hr"/>
                             <field name="rate_day"/>
@@ -34,11 +29,22 @@
                         <group string="Specific e-mail settings">
                             <field name="mail_invoice"/>
                             <field name="mail_reminder"/>
+                            <field name="formal_communication"/>
                         </group>
                     </page>
                 </notebook>
             </field>
         </record>
+        <record model="ir.ui.view" id="lubon_partner_title_form_view">
+            <field name="name">lubon_partner.title</field>
+            <field name="model">res.partner.title</field>
+            <field name="inherit_id" ref="base.view_partner_title_form"/>
+            <field name="arch" type="xml">
+                <group>
+                    <field name="formal_saluation"/>
+                    <field name="casual_saluation"/>
+                </group>
+            </field>
+        </record>
     </data>
 </openerp>
-

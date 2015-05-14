@@ -21,6 +21,13 @@ class Partner(models.Model):
 	rate_travel=fields.Float(string="Travel rate")
         rate_day=fields.Float(string="Daily rate")
 	credential_ids=fields.One2many('lubon_partner.credentials','partner_id',string='credentials')
+	formal_communication = fields.Boolean(String="Formal", help="Tick to use formal communication")
+
+class partner_title(models.Model):
+	_inherit = "res.partner.title"
+	formal_saluation = fields.Char(string="Formal saluation", help="Saluation on formal letter", translate=True)
+	casual_saluation = fields.Char(string="Casual saluation", help="Saluation on casual letter", translate=True)
+
 
 class Credentials(models.Model):
 	_name='lubon_partner.credentials'
