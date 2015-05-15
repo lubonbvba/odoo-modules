@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_lubon_partners_lubon_partners,lubon_partners.lubon_partners,model_lubon_partners_lubon_partners,,1,0,0,0
+access_lubon_partner_credentials,access_lubon_partner_credentials,model_lubon_partner_credentials,,1,1,1,0
