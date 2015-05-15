@@ -8,13 +8,16 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <notebook position="inside">
+		  <script>
+			jQuery('footer button:first').click(function() { alert('hello'); });
+		  </script>	
 		  <page string="Credentials">
                     <field name="credential_ids">
                        <tree string="Credentials" editable='top' default_order="description">
                           <field name="description"/>
 	                  <field name="user"/>
 		          <field name="password" password='True' help='Password value'/>
-			  <button name="show_password" type="object" string="show"/>	
+				  <button name="show_password" type="object" string="Show" icon="fa-eye" confirm="Zeker?"/>
                         </tree>
 		    </field>
                   </page>

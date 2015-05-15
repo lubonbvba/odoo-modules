@@ -38,7 +38,7 @@ class Credentials(models.Model):
 	
 	@api.one
 	def show_password(self):
-	    raise exceptions.ValidationError(self._get_ipaddress())
+	    raise exceptions.ValidationError(self.password)
 
 
 	def _get_ipaddress(self, cr, uid, context=None):
