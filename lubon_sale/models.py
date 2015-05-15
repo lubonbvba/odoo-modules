@@ -35,9 +35,9 @@ class sale_order_line(models.Model):
 #	    ipdb.set_trace()	
 	    self.discount = self.discount
 	    # Can optionally return a warning and domains
-	    return {
-        	'warning': {
-	            'title': "Something bad happened",
-	            'message': "It was very bad indeed",
-	        }
-	    }
+#	    return {
+#        	'warning': {
+#	            'title': "Something bad happened",
+#	            'message': "It was very bad indeed",
+#	        }
+#	    }
