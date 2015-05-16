@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+
 <openerp>
     <data>
         <!-- window action -->
@@ -25,6 +27,21 @@
             <field name="domain">[["type","=",'delivery']]</field>
 
         </record>
+        <record model="ir.actions.act_window" id="qlan_tenants_action">
+            <field name="name">AD Tenants</field>
+            <field name="res_model">lubon_qlan.tenants</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--field name="domain">[["type","=",'delivery']]</field -->
+        </record>
+        <record model="ir.actions.act_window" id="qlan_contracts_action">
+            <field name="name">Contracts</field>
+            <field name="res_model">account.analytic.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--field name="domain">[["type","=",'delivery']]</field -->
+        </record>
+
 
         <!-- top level menu: no parent -->
         <menuitem id="main_lubon_qlan_menu" name="Qlan" sequence="0"/>
@@ -43,9 +60,9 @@
                   action="invoice_action"/ -->
 
         <menuitem id="adtenants_menu" name="AD Tenants" parent="lubon_qlan_tenants_menu"
-                  action="qlan_sites_action"/>
+                  action="qlan_tenants_action"/>
         <menuitem id="contracts_menu" name="Contracten" parent="lubon_qlan_tenants_menu"
-                  action="qlan_sites_action"/>
+                  action="qlan_contracts_action"/>
 
 
         <!-- Full id location:
