@@ -18,6 +18,81 @@
                 </p>
             </field>
         </record -->
+        <record model="ir.ui.view" id="tenants_tree_view">
+            <field name="name">tenants.tree</field>
+            <field name="model">lubon_qlan.tenants</field>
+            <field name="arch" type="xml">
+                <tree string="Tenants Tree">
+                    <field name="code"/>
+                    <field name="tenant_name"/>
+                    <field name="upn"/>
+                    <field name="is_telephony"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="tenants_form_view">
+            <field name="name">tenants.form</field>
+            <field name="model">lubon_qlan.tenants</field>
+            <field name="arch" type="xml">
+                <form string="Tenants form">
+                  <header>
+                    <button name="button" string="But text"/>
+                  </header>
+                  <sheet>  
+                    <group col="3">
+                      <group string="Admin">
+                        <field name="code"/>
+                        <field name="tenant_name"/>
+                        <field name="upn"/>
+                      </group>
+                      <group string="Telephony">
+                        <field name="is_telephony"/>
+                        <field name="pbx_password"/>
+                      </group>
+                      <group string="Security" col="3">
+                        <field name="qtest_password"/>
+                        <button name="qtest_show" string="Show"/>
+                        <field name="qadm_password"/>
+                        <button name="qadm_show" string="Show"/>
+                      </group>
+                    </group>
+                    <notebook>
+                      <page string="AD Accounts">
+                          <field name="adaccounts_ids">
+                            <tree string="Accounts" editable="bottom">
+                              <field name="name"/>
+                              <field name="samaccountname"/>                              
+                              <field name="logonname"/>
+                              <!-- field name="tenant_id"/ -->
+                              <!-- field name="main_partner" invisible="False"/ -->
+                              <field name="validcustomers_ids" invisible="True"/>
+                              <!--field name="person_id" domain="[['type','=','contact' ]]"/-->
+                              <field name="person_id" domain="[('type','=','contact'),('parent_id.id','in', validcustomers_ids[0][2])]"/>
+                            </tree>
+                          </field>
+                      </page>
+                      <page string="AD Groups">
+                      </page>
+                      <page string="Servers">
+                      </page>
+                      <page string="Contracts">
+                        <field name="contract_ids"/>
+                      </page>
+                      <!-- page string="Customer ids">
+                        <field name="validcustomers"/>
+                      </page>
+                      <page string="Customers">
+                        <field name="validcustomers_ids"/>
+                      </page -->
+                      <page string="Sales orders">
+                      </page>
+                  </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                </div>    
+                </form>
+            </field>
+        </record>
 
         <record model="ir.actions.act_window" id="qlan_sites_action">
             <field name="name">Sites</field>

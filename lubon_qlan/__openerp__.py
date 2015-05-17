@@ -7,7 +7,7 @@
         """,
 
     'description': """
-        Long description of module's purpose
+        This module is custom made to manage the data center operations of qlan
     """,
 
     'author': "Lubon bvba",
@@ -27,7 +27,7 @@
         'security/ir.model.access.csv',
         'templates.xml',
         'views/lubon_qlan.xml',
-	'models.py'
+#	    'lubon_qlan.py',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_lubon_qlan_tenants,access_lubon_qlan_tenants,model_lubon_qlan_tenants,,1,0,0,0
+access_lubon_qlan_tenants,access_lubon_qlan_tenants,model_lubon_qlan_tenants,,1,1,1,1
+access_lubon_qlan_adaccounts,access_lubon_qlan_adaccounts,model_lubon_qlan_adaccounts,,1,1,1,1
