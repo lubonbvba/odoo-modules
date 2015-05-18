@@ -100,7 +100,6 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[["type","=",'delivery']]</field>
-
         </record>
         <record model="ir.actions.act_window" id="qlan_tenants_action">
             <field name="name">AD Tenants</field>
@@ -116,7 +115,13 @@
             <field name="view_mode">tree,form</field>
             <!--field name="domain">[["type","=",'delivery']]</field -->
         </record>
-
+        <record model="ir.actions.act_window" id="qlan_adaccounts_action">
+            <field name="name">AD Accounts</field>
+            <field name="res_model">lubon_qlan.adaccounts</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--field name="domain">[["type","=",'delivery']]</field -->
+        </record>
 
         <!-- top level menu: no parent -->
         <menuitem id="main_lubon_qlan_menu" name="Qlan" sequence="0"/>
@@ -136,9 +141,15 @@
 
         <menuitem id="adtenants_menu" name="AD Tenants" parent="lubon_qlan_tenants_menu"
                   action="qlan_tenants_action"/>
-        <menuitem id="contracts_menu" name="Contracten" parent="lubon_qlan_tenants_menu"
+        <menuitem id="contracts_menu" name="Contracts" parent="lubon_qlan_tenants_menu"
                   action="qlan_contracts_action"/>
+        
 
+        <menuitem id="lubon_qlan_configuration_menu" name="Configuration"
+                  parent="main_lubon_qlan_menu"/>
+        <menuitem id="lubon_qlan_tables_menu" name="Tables" parent="lubon_qlan_configuration_menu"/>
+        <menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tables_menu"
+                  action="qlan_adaccounts_action"/>
 
         <!-- Full id location:
              action="lubon_debug.move_line_action"
