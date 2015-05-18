@@ -18,6 +18,118 @@
                 </p>
             </field>
         </record -->
+
+        <record model="ir.ui.view" id="sites_tree_view">
+            <field name="name">sites.tree</field>
+            <field name="model">lubon_qlan.sites</field>
+            <field name="arch" type="xml">
+                <tree string="Sites Tree">
+                    <field name="name"  />
+                    <field name="alfacode" />
+                    <field name="code" />
+                    <field name="ipv4"/>
+                    <field name="main_contact"/>			
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="sites_search_view">
+            <field name="name">sites.search</field>
+            <field name="model">lubon_qlan.sites</field>
+            <field name="arch" type="xml">
+                <search>
+                        <field name="alfacode"/>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="ipv4"/>
+                        <field name="main_contact"/>
+                    <filter name="my_sytes" string="My Sites"
+                            domain="[('main_contact', '=', uid)]"/>
+                    <group string="Group By">
+                        <filter name="by_responsible" string="Responsible"
+                                context="{'group_by': 'main_contact'}"/>
+                    </group>
+
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="sites_form_view">
+            <field name="name">sites.form</field>
+            <field name="model">lubon_qlan.sites</field>
+            <field name="arch" type="xml">
+                <form string="Sites form">
+                  <header>
+                    <button name="button" string="Sites"/>
+                  </header>
+                  <sheet>
+                    <group cols="6">
+                      <group string="Admin">
+                        <field name="name" placeholder="Lubon"/>
+                        <field name="alfacode" placeholder="LUB"/>
+                        <field name="code" placeholder="C0000-001"/>
+			<field name="main_contact"/>
+		      </group>
+		      <group string="Network info">
+                        <field name="ipv4" placeholder="10.253.0.0/16"/>
+                        <field name="ipv6"/>
+		      </group>
+		     </group>
+		      <notebook>
+			<page string="Vlan info">
+	     			<field name="vlan_ids">
+					<tree string="vlans" editable="bottom">
+						<field name="name"/>
+						<field name="vlan_tag"/>
+						<field name="ipv4"/>
+						<field name="ipv4_gw"/>
+						<field name="dns"/>
+						<field name="ipv6"/>
+						<field name="ipv6_gw"/>
+					</tree>
+				</field>
+			</page>
+                       <page string="ISP Info">
+                                <field name="isp_ids">
+                                        <tree string="ISP" editable="bottom">
+                                                <field name="name"/>
+                                                <field name="ip_type"/>
+                                                <field name="ip_address"/>
+                                                <field name="ip_login"/>
+                                                <field name="ip_password"/>
+                                                <field name="ip_dns"/>
+                                                <field name="ip_dns_reverse"/>
+                                                <field name="account"/>
+                                                <field name="account_login"/>
+                                                <field name="account_password"/>
+                                        </tree>
+                                </field>
+                        </page>
+                       <page string="LAN IP info">
+                                <field name="ip_ids">
+                                        <tree string="IP" editable="bottom">
+						<field name="vlan_id" widget="selection" domain="[('site_id','=',site_id)]"/>
+						<field name="name"/>
+                                                <field name="ip"/>
+                                                <field name="ip_type"/>
+                                                <field name="mac"/>
+						<!-- field name="lubon_qlan.ip.site_id.id"/ -->
+						<field name="site_id" invisible="True"/>
+                                        </tree>
+                                </field>
+                        </page>
+                        <page string="Contract">
+                                <field name="contract_ids" create="False"/>
+			</page>
+		      </notebook>		
+	           </sheet>
+		</form>
+		</field>
+		</record>
+
+  
+
+
         <record model="ir.ui.view" id="tenants_tree_view">
             <field name="name">tenants.tree</field>
             <field name="model">lubon_qlan.tenants</field>
@@ -94,17 +206,21 @@
             </field>
         </record>
 
-        <record model="ir.actions.act_window" id="qlan_sites_action">
+        <record model="ir.actions.act_window" id="zzqlan_sites_action">
             <field name="name">Sites</field>
-            <field name="res_model">res.partner</field>
+            <field name="res_model">lubon_qlan.sites</field>
+	    <!-- field name="views">sites_tree_view"</field -->
+            <!-- field name="view_ids" ref="sites_tree_view"/ -->
+	    <!-- field name="view_id" ref="sites_form_view"/-->
+	    <!-- field name="view_id">1490</field -->
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[["type","=",'delivery']]</field>
+            <!-- field name="domain">[["type","=",'site']]</field-->
         </record>
         <record model="ir.actions.act_window" id="qlan_tenants_action">
             <field name="name">AD Tenants</field>
             <field name="res_model">lubon_qlan.tenants</field>
-            <field name="view_type">form</field>
+            <!-- field name="view_type">form</field -->
             <field name="view_mode">tree,form</field>
             <!--field name="domain">[["type","=",'delivery']]</field -->
         </record>
@@ -135,7 +251,7 @@
              its parent lubon_debug_menu and *after* its
              action move_line_action -->
         <menuitem id="sites_menu" name="Sites" parent="lubon_qlan_sites_menu"
-                  action="qlan_sites_action"/>
+                  action="zzqlan_sites_action"/>
         <!-- menuitem id="invoicess_menu" name="Invoices" parent="lubon_debug_menu"
                   action="invoice_action"/ -->
 
