@@ -16,6 +16,7 @@ class lubon_qlan_tenants(models.Model):
 	pbx_password=fields.Char(string="Pbx password")
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
 	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id')
+        credential_ids=fields.One2many('lubon_partner.credentials','tenant_id')
 
 	validcustomers_ids=fields.Many2many('res.partner', string="Customers", compute="_getvalidcustomer_ids")
 	def _getvalidcustomer_ids(self):
@@ -77,6 +78,11 @@ class lubon_qlan_isp(models.Model):
 	site_id=fields.Many2one('lubon_qlan.sites')
 
 
+class lubon_qlan_credentials(models.Model):
+        _inherit='lubon_partner.credentials'
+        site_id=fields.Many2one('lubon_qlan.sites')
+        tenant_id=fields.Many2one('lubon_qlan.tenants')
+
 
 class lubon_qlan_sites(models.Model):
 	_name='lubon_qlan.sites'
@@ -89,8 +95,10 @@ class lubon_qlan_sites(models.Model):
 	vlan_ids=fields.One2many('lubon_qlan.vlan','site_id')
 	isp_ids=fields.One2many('lubon_qlan.isp','site_id')
         ip_ids=fields.One2many('lubon_qlan.ip','site_id')
+	credential_ids=fields.One2many('lubon_partner.credentials','site_id')
 	main_contact=fields.Many2one('res.partner', string="Main contact", domain="[['type','=','contact'],['is_company','=',False]]")
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
+
 
 
 

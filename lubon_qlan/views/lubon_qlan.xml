@@ -121,6 +121,15 @@
                         <page string="Contract">
                                 <field name="contract_ids" create="False"/>
 			</page>
+                        <page string="Credentials">
+                                <field name="credential_ids">
+			                <tree string="Credentials Tree" editable="bottom">
+						<field name="description" placeholder="Description of the account"/>
+	        	     	  	    	<field name="user" placeholder="User name (if applicable)"/>
+		                	    	<field name="password" placeholder="Secret" class="pass-reveal"/>
+					</tree>
+				</field>
+                        </page>
 		      </notebook>		
 	           </sheet>
 		</form>
@@ -190,10 +199,18 @@
                       <page string="Contracts">
                         <field name="contract_ids"/>
                       </page>
-                      <!-- page string="Customer ids">
-                        <field name="validcustomers"/>
-                      </page>
-                      <page string="Customers">
+                        <page string="Credentials">
+                                <field name="credential_ids">
+                                        <tree string="Credentials Tree" editable="bottom">
+                                                <field name="description" placeholder="Description of the account"/>
+                                                <field name="user" placeholder="User name (if applicable)"/>
+                                                <field name="password" password="True"/>
+                                        </tree>
+                                </field>
+                        </page>
+
+
+                      <!--page string="Customers">
                         <field name="validcustomers_ids"/>
                       </page -->
                       <page string="Sales orders">

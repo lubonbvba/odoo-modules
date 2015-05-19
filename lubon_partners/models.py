@@ -32,7 +32,7 @@ class partner_title(models.Model):
 class Credentials(models.Model):
 	_name='lubon_partner.credentials'
 	description = fields.Char(string="Description", required=True)
-        user = fields.Char(string="User", required=True)
+        user = fields.Char(string="User")
         password = fields.Char(string="Password", type='password')
 	partner_id = fields.Many2one('res.partner',  ondelete='set null', string="Partner", index=True)
 	
