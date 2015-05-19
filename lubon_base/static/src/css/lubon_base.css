@@ -8,3 +8,11 @@ min-width: 50%;
 max-width: 80%;
 margin: 0 auto;
 }
+
+.passreveal {
+background-color: yellow;
+color: red;
+border: 10px solid blue;
+}
+
+

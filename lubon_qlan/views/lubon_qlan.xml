@@ -126,7 +126,7 @@
 			                <tree string="Credentials Tree" editable="bottom">
 						<field name="description" placeholder="Description of the account"/>
 	        	     	  	    	<field name="user" placeholder="User name (if applicable)"/>
-		                	    	<field name="password" placeholder="Secret" class="pass-reveal"/>
+		                	    	<field name="password" placeholder="Secret" class="passreveal"/>
 					</tree>
 				</field>
                         </page>
