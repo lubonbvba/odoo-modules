@@ -65,7 +65,7 @@
                   <sheet>
                     <group cols="6">
                       <group string="Admin">
-                        <field name="name" placeholder="Lubon"/>
+                        <field name="name" placeholder="Lubon" widget="char2"/>
                         <field name="alfacode" placeholder="LUB"/>
                         <field name="code" placeholder="C0000-001"/>
 			<field name="main_contact"/>
@@ -118,18 +118,33 @@
                                         </tree>
                                 </field>
                         </page>
+                        <page string="Security">
+			<group col="4">
+                                <field name="ssid_private"/>
+                                <field name="ssid_public"/>
+                                <field name="wifikey_private"/>
+                                <field name="wifikey_public"/>
+			</group>
+                        </page>
                         <page string="Contract">
                                 <field name="contract_ids" create="False"/>
 			</page>
                         <page string="Credentials">
-                                <field name="credential_ids">
-			                <tree string="Credentials Tree" editable="bottom">
-						<field name="description" placeholder="Description of the account"/>
-	        	     	  	    	<field name="user" placeholder="User name (if applicable)"/>
-		                	    	<field name="password" placeholder="Secret" class="passreveal"/>
-					</tree>
-				</field>
+                                <field name="credential_ids"/>
                         </page>
+                        <page string="Assets">
+                                <field name="quant_ids">
+                                        <tree string="Quants Tree" editable="bottom">
+                                                <field name="name" placeholder="Description of the account"/>
+                                        </tree>
+                                </field>
+                        </page>
+                        <page string="Site config">
+                                <group>
+                                        <field name="location_ids" widget="many2many_tags"/>
+                                </group>
+                        </page>
+
 		      </notebook>		
 	           </sheet>
 		</form>
@@ -165,6 +180,8 @@
                         <field name="code"/>
                         <field name="tenant_name"/>
                         <field name="upn"/>
+			<field name="validcustomers_ids" widget="many2many_tags"/>
+
                       </group>
                       <group string="Telephony">
                         <field name="is_telephony"/>
@@ -179,15 +196,14 @@
                     </group>
                     <notebook>
                       <page string="AD Accounts">
-                          <field name="adaccounts_ids">
+                          <field name="adaccounts_ids" context="{'default_tenant_id' : active_id }">
                             <tree string="Accounts" editable="bottom">
                               <field name="name"/>
                               <field name="samaccountname"/>                              
                               <field name="logonname"/>
-                              <!-- field name="tenant_id"/ -->
+                              <field name="tenant_id" invisible="True"/>
                               <!-- field name="main_partner" invisible="False"/ -->
-                              <field name="validcustomers_ids" invisible="True"/>
-                              <!--field name="person_id" domain="[['type','=','contact' ]]"/-->
+                              <field name="validcustomers_ids" invisible="True" />
                               <field name="person_id" domain="[('type','=','contact'),('parent_id.id','in', validcustomers_ids[0][2])]"/>
                             </tree>
                           </field>
@@ -200,13 +216,7 @@
                         <field name="contract_ids"/>
                       </page>
                         <page string="Credentials">
-                                <field name="credential_ids">
-                                        <tree string="Credentials Tree" editable="bottom">
-                                                <field name="description" placeholder="Description of the account"/>
-                                                <field name="user" placeholder="User name (if applicable)"/>
-                                                <field name="password" password="True"/>
-                                        </tree>
-                                </field>
+                                <field name="credential_ids"/>
                         </page>
 
 
@@ -255,7 +265,21 @@
             <field name="view_mode">tree,form</field>
             <!--field name="domain">[["type","=",'delivery']]</field -->
         </record>
+        <record model="ir.actions.act_window" id="qlan_messages_action">
+            <field name="name">Messages</field>
+            <field name="res_model">mail.message</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--field name="domain">[["type","=",'delivery']]</field -->
+        </record>
 
+
+        <record model="ir.actions.act_window" id="qlan_credentials_action">
+            <field name="name">Credentials</field>
+            <field name="res_model">lubon_credentials.credentials</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
         <!-- top level menu: no parent -->
         <menuitem id="main_lubon_qlan_menu" name="Qlan" sequence="0"/>
         <!-- A first level in the left side menu is needed
@@ -283,6 +307,16 @@
         <menuitem id="lubon_qlan_tables_menu" name="Tables" parent="lubon_qlan_configuration_menu"/>
         <menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tables_menu"
                   action="qlan_adaccounts_action"/>
+        <menuitem id="lubon_qlan_messages_menu" name="Messages" parent="lubon_qlan_tables_menu"
+                  action="qlan_messages_action"/>
+
+
+        <menuitem id="lubon_qlan_credentials_menu" name="Credentials" parent="lubon_qlan_tables_menu"
+                  action="qlan_credentials_action"/>
+
+
+
+
 
         <!-- Full id location:
              action="lubon_debug.move_line_action"

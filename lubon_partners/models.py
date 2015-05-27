@@ -20,7 +20,7 @@ class Partner(models.Model):
 	rate_hr=fields.Float(string="Hourly rate")
 	rate_travel=fields.Float(string="Travel rate")
         rate_day=fields.Float(string="Daily rate")
-	credential_ids=fields.One2many('lubon_partner.credentials','partner_id',string='credentials')
+#	credential_ids=fields.One2many('lubon_credentials.credentials','partner_id',string='credentials')
 	formal_communication = fields.Boolean(String="Formal", help="Tick to use formal communication")
 
 class partner_title(models.Model):
@@ -30,17 +30,6 @@ class partner_title(models.Model):
 
 
 class Credentials(models.Model):
-	_name='lubon_partner.credentials'
-	description = fields.Char(string="Description", required=True)
-        user = fields.Char(string="User")
-        password = fields.Char(string="Password", type='password')
+	_inherit='lubon_credentials.credentials'
 	partner_id = fields.Many2one('res.partner',  ondelete='set null', string="Partner", index=True)
 	
-	@api.one
-	def show_password(self):
-	    raise exceptions.ValidationError(self.password)
-	    return True
-
-
-	def _get_ipaddress(self, cr, uid, context=None):
-        	return request.httprequest.environ['REMOTE_ADDR'] 

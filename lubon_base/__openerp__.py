@@ -25,6 +25,8 @@
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
+#	'static/src/js/lubon_base.js',
+	'static/src/css/lubon_base.css',
         'templates.xml',
 	'views/lubon_base.xml'
     ],

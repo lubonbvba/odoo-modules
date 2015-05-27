@@ -16,7 +16,7 @@ class lubon_qlan_tenants(models.Model):
 	pbx_password=fields.Char(string="Pbx password")
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
 	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id')
-        credential_ids=fields.One2many('lubon_partner.credentials','tenant_id')
+        credential_ids=fields.One2many('lubon_credentials.credentials','tenant_id')
 
 	validcustomers_ids=fields.Many2many('res.partner', string="Customers", compute="_getvalidcustomer_ids")
 	def _getvalidcustomer_ids(self):
@@ -34,10 +34,20 @@ class lubon_qlan_adaccounts(models.Model):
 	tenant_id=fields.Many2one('lubon_qlan.tenants', required=True)
 	person_id=fields.Many2one('res.partner', string="Related person")
 
-	validcustomers_ids=fields.Many2many('res.partner', compute='_getvalidcustomer_ids')
+	validcustomers_ids=fields.Many2many('res.partner', compute='_getvalidcustomer_ids',)
+
+	@api.onchange('tenant_id')
 	@api.one
 	def _getvalidcustomer_ids(self):
 		self.validcustomers_ids=self.tenant_id.validcustomers_ids
+
+        @api.onchange('person_id')
+        @api.one
+        def _getpersonname(self):
+           self.name=self.person_id.name
+
+
+
 
 
 class lubon_qlan_vlan(models.Model):
@@ -63,6 +73,8 @@ class lubon_qlan_ip(models.Model):
         site_id=fields.Many2one('lubon_qlan.sites')
 
 
+
+
 class lubon_qlan_isp(models.Model):
         _name='lubon_qlan.isp'
 	name=fields.Char(string="Provider")
@@ -79,7 +91,7 @@ class lubon_qlan_isp(models.Model):
 
 
 class lubon_qlan_credentials(models.Model):
-        _inherit='lubon_partner.credentials'
+        _inherit='lubon_credentials.credentials'
         site_id=fields.Many2one('lubon_qlan.sites')
         tenant_id=fields.Many2one('lubon_qlan.tenants')
 
@@ -91,14 +103,30 @@ class lubon_qlan_sites(models.Model):
         code=fields.Char()
 	ipv4=fields.Char(string="IPv4 net")
         ipv6=fields.Char(string="IPv6 net")
+	ssid_private=fields.Char(string="Private SSID", help="SSID for use by employees")
+        ssid_public=fields.Char(string="Public SSID", help="SSID for use by guests")
+	wifikey_private=fields.Char(string="Private key", help="Key private network")
+        wifikey_public=fields.Char(string="Public key", help="Key public network")
 
 	vlan_ids=fields.One2many('lubon_qlan.vlan','site_id')
 	isp_ids=fields.One2many('lubon_qlan.isp','site_id')
         ip_ids=fields.One2many('lubon_qlan.ip','site_id')
-	credential_ids=fields.One2many('lubon_partner.credentials','site_id')
+	credential_ids=fields.One2many('lubon_credentials.credentials','site_id')
 	main_contact=fields.Many2one('res.partner', string="Main contact", domain="[['type','=','contact'],['is_company','=',False]]")
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
+	location_ids=fields.One2many('stock.location', 'site_id')
+	quant_ids=fields.One2many('stock.quant','site_id')
 
 
+class stock_location(models.Model):
+        _inherit="stock.location"
+        site_id=fields.Many2one('lubon_qlan.sites')
 
+class stock_quant(models.Model):
+	_inherit="stock.quant"
+        site_id=fields.Many2one('lubon_qlan.sites')
 
+        @api.onchange('location_id')
+#	@api.one
+        def _get_site_id(self):
+		self.site_id=self.location_id.site_id
