@@ -165,6 +165,7 @@
                     <field name="tenant_name"/>
                     <field name="upn"/>
                     <field name="is_telephony"/>
+                    <field name="ip"/>
                 </tree>
             </field>
         </record>
@@ -196,6 +197,7 @@
                         <button name="qtest_show" string="Show"/>
                         <field name="qadm_password"/>
                         <button name="qadm_show" string="Show"/>
+	                <field name="is_telephony"/>
                       </group>
                     </group>
                     <notebook>
@@ -237,6 +239,33 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="adaccounts_import_tree_view">
+            <field name="name">adaccounts_import.tree</field>
+            <field name="model">lubon_qlan.adaccounts_import</field>
+            <field name="arch" type="xml">
+                <tree string="Ad accounts Tree">
+                    <field name="samaccountname"/>
+                    <field name="tenant"/>
+                    <field name="logonname"/>
+                    <field name="product"/>
+		    <field name="smspasscode"/>
+		    <field name="exchange"/>
+                    <field name="citrix"/>
+                    <field name="rdp"/>
+                    <field name="office"/>
+                    <field name="msofficestd"/>
+                    <field name="msofficeproplus"/>
+                    <field name="msexchstd"/>
+                    <field name="msexchplus"/>
+                    <field name="enabled"/>
+                    <field name="id"/>
+                </tree>
+            </field>
+        </record>
+
+
+
+
         <record model="ir.actions.act_window" id="zzqlan_sites_action">
             <field name="name">Sites</field>
             <field name="res_model">lubon_qlan.sites</field>
@@ -269,6 +298,14 @@
             <field name="view_mode">tree,form</field>
             <!--field name="domain">[["type","=",'delivery']]</field -->
         </record>
+        <record model="ir.actions.act_window" id="qlan_adaccounts_import_action">
+            <field name="name">AD Accounts Import</field>
+            <field name="res_model">lubon_qlan.adaccounts_import</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--field name="domain">[["type","=",'delivery']]</field -->
+        </record>
+
         <record model="ir.actions.act_window" id="qlan_messages_action">
             <field name="name">Messages</field>
             <field name="res_model">mail.message</field>
@@ -311,6 +348,9 @@
         <menuitem id="lubon_qlan_tables_menu" name="Tables" parent="lubon_qlan_configuration_menu"/>
         <menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tables_menu"
                   action="qlan_adaccounts_action"/>
+        <menuitem id="lubon_qlan_adaccounts_import_menu" name="AD Accounts import" parent="lubon_qlan_tables_menu"
+                  action="qlan_adaccounts_import_action"/>
+
         <menuitem id="lubon_qlan_messages_menu" name="Messages" parent="lubon_qlan_tables_menu"
                   action="qlan_messages_action"/>
 

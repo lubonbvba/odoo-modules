@@ -11,15 +11,18 @@ class lubon_qlan_tenants(models.Model):
 	qadm_password = fields.Char(help="Password for qadm@upn user")
 	qtest_password = fields.Char()
 	upn = fields.Char()
-	ip = fields.Char()
+	ip = fields.Char(string='DC IP', help='Datacenter IP range')
 	is_telephony=fields.Boolean()
 	pbx_password=fields.Char(string="Pbx password")
+       	ip_ids=fields.One2many('lubon_qlan.ip','tenant_id')
+        vlan_ids=fields.One2many('lubon_qlan.vlan','tenant_id')
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
 	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id')
         credential_ids=fields.One2many('lubon_credentials.credentials','tenant_id')
 	filemaker_site_id=fields.Char(string='Filemaker site')
 	validcustomers_ids=fields.Many2many('res.partner', string="Customers", compute="_getvalidcustomer_ids")
         main_contact=fields.Many2one('res.partner', string="Main contact", domain="[['type','=','contact'],['is_company','=',False]]")
+#	qlan_adaccounts_import_ids=fields.One2many('lubon_qlan_adaccounts_import','tenant')
 	def _getvalidcustomer_ids(self):
 		for rec in self.contract_ids:
 			self.validcustomers_ids=self.validcustomers_ids + rec.partner_id
@@ -47,6 +50,22 @@ class lubon_qlan_adaccounts(models.Model):
         def _getpersonname(self):
            self.name=self.person_id.name
 
+class lubon_qlan_adaccounts_import(models.TransientModel):
+        _name='lubon_qlan.adaccounts_import'
+        samaccountname=fields.Char(required=True)
+        logonname=fields.Char()
+        tenant=fields.Char()
+        product=fields.Char()
+	smspasscode=fields.Char()
+	exchange=fields.Char()
+	citrix=fields.Char()
+	rdp=fields.Char()
+	office=fields.Char()
+	msofficestd=fields.Char()
+	msofficeproplus=fields.Char()
+	msexchstd=fields.Char()
+	msexchplus=fields.Char()
+	enabled=fields.Boolean()
 
 
 
@@ -62,7 +81,9 @@ class lubon_qlan_vlan(models.Model):
         ipv6_gw=fields.Char(string="IPv6 GW")
 	dns=fields.Char(string="DNS",help="DNS Servers, comma separated")
 	site_id=fields.Many2one('lubon_qlan.sites')
+        tenant_id=fields.Many2one('lubon_qlan.tenants')
         ip_ids=fields.One2many('lubon_qlan.ip','site_id')
+
 
 class lubon_qlan_ip(models.Model):
         _name='lubon_qlan.ip'
@@ -72,6 +93,7 @@ class lubon_qlan_ip(models.Model):
 	ip_type=fields.Selection([("fixed","Fixed"),("dhcp","DHCP Reservation")])
         ip=fields.Integer()
         site_id=fields.Many2one('lubon_qlan.sites')
+        tenant_id=fields.Many2one('lubon_qlan.tenants')
 
 
 
@@ -89,6 +111,7 @@ class lubon_qlan_isp(models.Model):
 	account_login=fields.Char(help="ISP controlpanel login")
 	account_password=fields.Char()
 	site_id=fields.Many2one('lubon_qlan.sites')
+        tenant_id=fields.Many2one('lubon_qlan.tenants')
 
 
 class lubon_qlan_credentials(models.Model):
