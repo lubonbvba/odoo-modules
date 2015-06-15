@@ -28,7 +28,8 @@
                     <field name="alfacode" />
                     <field name="code" />
                     <field name="ipv4"/>
-                    <field name="main_contact"/>			
+                    <field name="filemaker_site_id"/>
+                    <field name="main_contact"/>
                 </tree>
             </field>
         </record>
@@ -69,6 +70,7 @@
                         <field name="alfacode" placeholder="LUB"/>
                         <field name="code" placeholder="C0000-001"/>
 			<field name="main_contact"/>
+                    <field name="filemaker_site_id"/>
 		      </group>
 		      <group string="Network info">
                         <field name="ipv4" placeholder="10.253.0.0/16"/>
@@ -180,7 +182,9 @@
                         <field name="code"/>
                         <field name="tenant_name"/>
                         <field name="upn"/>
+	                <field name="filemaker_site_id"/>
 			<field name="validcustomers_ids" widget="many2many_tags"/>
+                        <field name="main_contact"/>
 
                       </group>
                       <group string="Telephony">

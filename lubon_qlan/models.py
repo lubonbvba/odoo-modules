@@ -17,8 +17,9 @@ class lubon_qlan_tenants(models.Model):
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
 	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id')
         credential_ids=fields.One2many('lubon_credentials.credentials','tenant_id')
-
+	filemaker_site_id=fields.Char(string='Filemaker site')
 	validcustomers_ids=fields.Many2many('res.partner', string="Customers", compute="_getvalidcustomer_ids")
+        main_contact=fields.Many2one('res.partner', string="Main contact", domain="[['type','=','contact'],['is_company','=',False]]")
 	def _getvalidcustomer_ids(self):
 		for rec in self.contract_ids:
 			self.validcustomers_ids=self.validcustomers_ids + rec.partner_id
@@ -100,6 +101,7 @@ class lubon_qlan_sites(models.Model):
 	_name='lubon_qlan.sites'
 	name=fields.Char(string="Site name")
 	alfacode=fields.Char(string="Site Code")
+        filemaker_site_id=fields.Char(string='Filemaker site')
         code=fields.Char()
 	ipv4=fields.Char(string="IPv4 net")
         ipv6=fields.Char(string="IPv6 net")
