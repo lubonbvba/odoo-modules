@@ -160,15 +160,35 @@
             <field name="name">tenants.tree</field>
             <field name="model">lubon_qlan.tenants</field>
             <field name="arch" type="xml">
-                <tree string="Tenants Tree">
+                <tree string="Tenants Tree" default_order="code">
                     <field name="code"/>
                     <field name="tenant_name"/>
                     <field name="upn"/>
                     <field name="is_telephony"/>
                     <field name="ip"/>
+		    <field name="main_contact"/>
                 </tree>
             </field>
         </record>
+        <record model="ir.ui.view" id="tenants_search_view">
+            <field name="name">tenants.search</field>
+            <field name="model">lubon_qlan.tenants</field>
+            <field name="arch" type="xml">
+                <search>
+                        <field name="code"/>
+                        <field name="tenant_name"/>
+                        <field name="main_contact"/>
+                    <filter name="tenants_telephony" string="Telephony tenants"
+                            domain="[('is_telephony', '=', True)]"/>
+                    <group string="Group By">
+                        <filter name="tenants_by_responsible" string="Responsible"
+                                context="{'group_by': 'main_contact'}"/>
+                    </group>
+
+                </search>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="tenants_form_view">
             <field name="name">tenants.form</field>
             <field name="model">lubon_qlan.tenants</field>
@@ -186,18 +206,14 @@
 	                <field name="filemaker_site_id"/>
 			<field name="validcustomers_ids" widget="many2many_tags"/>
                         <field name="main_contact"/>
+			<field name="tel_dedicated"/>
 
                       </group>
-                      <group string="Telephony">
+                      <group string="Config">
+                        <field name="is_citrix"/>
                         <field name="is_telephony"/>
-                        <field name="pbx_password"/>
-                      </group>
-                      <group string="Security" col="3">
-                        <field name="qtest_password"/>
-                        <button name="qtest_show" string="Show"/>
-                        <field name="qadm_password"/>
-                        <button name="qadm_show" string="Show"/>
-	                <field name="is_telephony"/>
+			<field name="is_mailonly"/>
+			<field name="is_qfilteronly"/>
                       </group>
                     </group>
                     <notebook>
@@ -218,6 +234,21 @@
                       </page>
                       <page string="Servers">
                       </page>
+		      <page string="Settings">
+	                      <group string="Security" col="3">
+        	                <field name="qtest_password"/>
+                	        <button name="qtest_show" string="Show"/>
+                        	<field name="qadm_password"/>
+	                        <button name="qadm_show" string="Show"/>
+        	                <!-- field name="is_telephony"/ -->
+                	      </group>
+		      </page>	
+                      <page string="Telephony">
+			<group>
+	                        <field name="pbx_password"/>
+			</group>
+                      </page>
+
                       <page string="Contracts">
                         <field name="contract_ids"/>
                       </page>
@@ -244,6 +275,7 @@
             <field name="model">lubon_qlan.adaccounts_import</field>
             <field name="arch" type="xml">
                 <tree string="Ad accounts Tree">
+                    <field name="importref"/>			
                     <field name="samaccountname"/>
                     <field name="tenant"/>
                     <field name="logonname"/>
@@ -259,9 +291,36 @@
                     <field name="msexchplus"/>
                     <field name="enabled"/>
                     <field name="id"/>
+						
                 </tree>
             </field>
         </record>
+        <record model="ir.ui.view" id="adaccounts_import_form_view">
+            <field name="name">adaccounts_import.form</field>
+            <field name="model">lubon_qlan.adaccounts_import</field>
+            <field name="arch" type="xml">
+                <form string="Import script">
+	                  <header>
+                    <button name="importadaccounts" string="Import" type="object"/>
+                  </header>
+
+                    <group>
+	                    <field name="importref"/>
+        	            <field name="samaccountname"/>
+                	    <field name="tenant"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- act_window id="launch_session_wizard"
+                    name="Add Attendees"
+                    src_model="openacademy.session"
+                    res_model="openacademy.wizard"
+                    view_mode="form"
+                    target="new"
+                    key2="client_action_multi"/ -->
+
 
 
 

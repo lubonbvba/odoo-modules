@@ -1,18 +1,25 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, fields, api
+import csv,os,string
+from path import path
+
 
 class lubon_qlan_tenants(models.Model):
 	_name = 'lubon_qlan.tenants'
 	_rec_name = 'code'
 	_sql_constraints = [('code_unique','UNIQUE(code)','Code has to be unique')]
-	code = fields.Char(oldname='name', required=True, help='Tenant code')
+	code = fields.Char(oldname='name', required=True, help='Tenant code', index=True )
 	tenant_name = fields.Char(string='Name', required=True, oldname='descript_name', help="Descriptive name of the tenant")
 	qadm_password = fields.Char(help="Password for qadm@upn user")
 	qtest_password = fields.Char()
 	upn = fields.Char()
 	ip = fields.Char(string='DC IP', help='Datacenter IP range')
 	is_telephony=fields.Boolean()
+	is_citrix=fields.Boolean()
+	is_mailonly=fields.Boolean()
+	is_qfilteronly=fields.Boolean()
+
 	pbx_password=fields.Char(string="Pbx password")
        	ip_ids=fields.One2many('lubon_qlan.ip','tenant_id')
         vlan_ids=fields.One2many('lubon_qlan.vlan','tenant_id')
@@ -22,6 +29,7 @@ class lubon_qlan_tenants(models.Model):
 	filemaker_site_id=fields.Char(string='Filemaker site')
 	validcustomers_ids=fields.Many2many('res.partner', string="Customers", compute="_getvalidcustomer_ids")
         main_contact=fields.Many2one('res.partner', string="Main contact", domain="[['type','=','contact'],['is_company','=',False]]")
+	tel_dedicated=fields.Char(string='Incoming tel',help="Number that is dedicated to the customer, with respect to SLA")
 #	qlan_adaccounts_import_ids=fields.One2many('lubon_qlan_adaccounts_import','tenant')
 	def _getvalidcustomer_ids(self):
 		for rec in self.contract_ids:
@@ -52,6 +60,7 @@ class lubon_qlan_adaccounts(models.Model):
 
 class lubon_qlan_adaccounts_import(models.TransientModel):
         _name='lubon_qlan.adaccounts_import'
+	importref=fields.Char(help="Reference to the import")
         samaccountname=fields.Char(required=True)
         logonname=fields.Char()
         tenant=fields.Char()
@@ -66,7 +75,50 @@ class lubon_qlan_adaccounts_import(models.TransientModel):
 	msexchstd=fields.Char()
 	msexchplus=fields.Char()
 	enabled=fields.Boolean()
+	def schedule_import(self, cr, user, context={}):
+   	    self.importadaccounts(self)
 
+	@api.one
+     	def importadaccounts(self, cr=None, uid=None, context=None, arg5=None):
+		table_import=self.env['lubon_qlan.adaccounts_import']
+		basepath='/mnt/general/odoo/adaccounts'
+		destpath=basepath + '/hist'
+		p = path(basepath)
+		for f in p.files(pattern='Daily-2*.csv'):
+		        s=f.stripext().basename().lstrip('Daily-')
+		        fi = open(f, 'rb')
+		        data = fi.read()
+		        fi.close()
+		        fo = open('/mnt/general/odoo/adaccounts/Daily-clean.csv', 'wb')
+		        fo.write(data.replace('\x00', ''))
+		        fo.close()
+
+
+		        with open ('/mnt/general/odoo/adaccounts/Daily-clean.csv', 'rb') as cleanfile:
+                		reader = csv.DictReader(cleanfile, delimiter=';')
+		                for row in reader:
+#					print (s, row['Samaccountname'],row['Displayname'],row['Tenant-01'],row['Qlan Product-9'],row['enabled'])
+					table_import.create({'importref':s, 
+						'samaccountname':row['Samaccountname'],
+                                                'logonname':row['userprincipalname'],
+                                                'tenant':row['Tenant-01'],
+                                                'product':row['Qlan Product-9'],
+                                                'smspasscode':row['SMS Passcode-8'],
+					        'exchange':row['Exchange-10'],
+					        'citrix':row['Citrix-11'],
+						'rdp':row['RDP-12'],
+					        'office':row['Office-13'],
+					        'msofficestd':row['MS Office STD'],
+						'msofficeproplus':row['MS Office ProPlus'],
+					        'msexchstd':row['MS Exch Std'],
+					        'msexchplus':row['MS Exch Plus'],
+					        'enabled':row['enabled'],
+						})
+
+		        cleanfile.close()
+		        q=path(f)
+		        q.move(destpath)
+	
 
 
 
