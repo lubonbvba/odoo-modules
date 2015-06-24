@@ -13,6 +13,13 @@ from openerp.http import request
 class Partner(models.Model):
         _inherit = 'res.partner'
         credential_ids=fields.One2many('lubon_credentials.credentials','partner_id',string='credentials')
+	masterkey=fields.Char()
+
+
+class Users(models.Model):
+        _inherit = 'res.users'
+	pin=fields.Char()
+
 
 
 
