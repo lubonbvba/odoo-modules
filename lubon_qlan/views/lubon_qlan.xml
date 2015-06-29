@@ -381,7 +381,7 @@
             <field name="view_mode">tree</field>
         </record>
         <!-- top level menu: no parent -->
-        <menuitem id="main_lubon_qlan_menu" name="Qlan" sequence="0"/>
+        <menuitem id="main_lubon_qlan_menu" name="Qlan" sequence="0" groups="qlan_manager,qlan_user"/>
         <!-- A first level in the left side menu is needed
              before using action= attribute -->
         <menuitem id="lubon_qlan_sites_menu" name="Sites"

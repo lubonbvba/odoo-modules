@@ -1,0 +1,21 @@
+<openerp>
+    <data>
+    	<record id="module_category_lubon_qlan" model="ir.module.category">
+    		<field name="name">Qlan</field>
+    		<field name="description">Qlan mgmt</field>
+    		<!--field name="sequence">5</field -->
+		</record>
+        <record id="qlan_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="category_id" ref="module_category_lubon_qlan"/>
+            <!-- field name="category_id" ref="base.module_category_lubon_customer"</field -->
+        </record>
+                <record id="qlan_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="category_id" ref="module_category_lubon_qlan"/>
+        </record>
+    </data>
+</openerp>
+

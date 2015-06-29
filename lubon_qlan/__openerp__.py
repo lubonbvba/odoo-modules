@@ -25,6 +25,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'security/security.xml',
         'templates.xml',
         'views/lubon_qlan.xml',
 #	    'lubon_qlan.py',
