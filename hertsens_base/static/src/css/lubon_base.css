@@ -1,0 +1,19 @@
+.modal-lg {
+    width: 90%;
+    height: 350px;
+}
+
+.openerp .oe_form_sheet_width {
+min-width: 50%;
+max-width: 80%;
+margin: 0 auto;
+}
+
+.passreveal {
+background-color: yellow;
+color: red;
+border: 10px solid blue;
+display: none;
+}
+
+

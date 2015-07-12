@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="assets_backend" name="openacademy assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/lubon_base/static/src/css/lubon_base.css"/>
+                <script type="text/javascript" src="/lubon_base/static/src/js/lubon_base.js"></script>
+            </xpath>
+        </template>
+    </data>
+</openerp>
