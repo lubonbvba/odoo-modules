@@ -22,6 +22,10 @@ class Partner(models.Model):
         rate_day=fields.Float(string="Daily rate")
 #	credential_ids=fields.One2many('lubon_credentials.credentials','partner_id',string='credentials')
 	formal_communication = fields.Boolean(String="Formal", help="Tick to use formal communication")
+	updateswindows = fields.Boolean(String="Windows Updates", help="Get notified of windows updates")
+        updateskluwer = fields.Boolean(String="Kluwer Updates", help="Get notified of kluwer updates")
+        updatestelephony = fields.Boolean(String="Telephony Updates", help="Get notified of telephony updates")
+
 
 class partner_title(models.Model):
 	_inherit = "res.partner.title"

@@ -19,6 +19,11 @@
                             <field name="mail_reminder"/>
                             <field name="formal_communication"/>
                         </group>
+                        <group string="Specific e-mail settings">
+				<field name="updateswindows"/>
+                                <field name="updateskluwer"/>
+                                <field name="updatestelephony"/>
+         		</group>
                     </page>
                 </notebook>
             </field>
