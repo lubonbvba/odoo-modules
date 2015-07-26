@@ -1,0 +1,940 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* lubon_qlan
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-07-23 23:10+0000\n"
+"PO-Revision-Date: 2015-07-24 01:57+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
+"Language: nl_BE\n"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "10.253.0.0/16"
+msgstr "10.253.0.0/16"
+
+#. module: lubon_qlan
+#: model:ir.actions.act_window,name:lubon_qlan.qlan_adaccounts_action
+#: model:ir.ui.menu,name:lubon_qlan.lubon_qlan_adaccounts_menu
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "AD Accounts"
+msgstr "AD Accounts"
+
+#. module: lubon_qlan
+#: model:ir.actions.act_window,name:lubon_qlan.qlan_adaccounts_import_action
+msgid "AD Accounts Import"
+msgstr "AD Accounts Import"
+
+#. module: lubon_qlan
+#: model:ir.ui.menu,name:lubon_qlan.lubon_qlan_adaccounts_import_menu
+msgid "AD Accounts import"
+msgstr "AD Accounts import"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "AD Groups"
+msgstr "AD Groups"
+
+#. module: lubon_qlan
+#: model:ir.actions.act_window,name:lubon_qlan.qlan_tenants_action
+#: model:ir.ui.menu,name:lubon_qlan.adtenants_menu
+msgid "AD Tenants"
+msgstr "AD Tenants"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.isp,account_login:0
+msgid "Account login"
+msgstr "Account login"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.isp,account:0
+msgid "Account number @ ISP"
+msgstr "Account number @ ISP"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.isp,account_password:0
+msgid "Account password"
+msgstr "Account password"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Accounts"
+msgstr "Accounts"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.adaccounts_import:lubon_qlan.adaccounts_import_tree_view
+msgid "Ad accounts Tree"
+msgstr "Ad accounts Tree"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,adaccounts_ids:0
+msgid "Adaccounts ids"
+msgstr "Adaccounts ids"
+
+#. module: lubon_qlan
+#: code:addons/lubon_qlan/invoicing.py:125
+#, python-format
+msgid "Add Hours"
+msgstr "Add Hours"
+
+#. module: lubon_qlan
+#: view:account.invoice:lubon_qlan.lubon_account_invoice_form
+#: model:ir.actions.act_window,name:lubon_qlan.launch_hours_wizard
+msgid "Add hours"
+msgstr "Add hours"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Admin"
+msgstr "Admin"
+
+#. module: lubon_qlan
+#: field:account.analytic.line,amount_hours:0
+msgid "Amount work"
+msgstr "Amount work"
+
+#. module: lubon_qlan
+#: model:ir.model,name:lubon_qlan.model_account_analytic_line
+msgid "Analytic Line"
+msgstr "Kostenplaatsboeking"
+
+#. module: lubon_qlan
+#: field:account.invoice,analytic_lines:0
+msgid "Analytic lines"
+msgstr "Analytic lines"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Assets"
+msgstr "Assets"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "But text"
+msgstr "But text"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "C0000-001"
+msgstr "C0000-001"
+
+#. module: lubon_qlan
+#: view:add_hours.wizard:lubon_qlan.lubon_qlan_add_hours_wizard
+msgid "Cancel"
+msgstr "Cancel"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,citrix:0
+msgid "Citrix"
+msgstr "Citrix"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,code:0 field:lubon_qlan.tenants,code:0
+msgid "Code"
+msgstr "Code"
+
+#. module: lubon_qlan
+#: sql_constraint:lubon_qlan.tenants:0
+msgid "Code has to be unique"
+msgstr "Code has to be unique"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Config"
+msgstr "Config"
+
+#. module: lubon_qlan
+#: model:ir.ui.menu,name:lubon_qlan.lubon_qlan_configuration_menu
+msgid "Configuration"
+msgstr "Instellingen"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Contract"
+msgstr "Contract"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,contract_ids:0
+#: field:lubon_qlan.tenants,contract_ids:0
+msgid "Contract ids"
+msgstr "Contract ids"
+
+#. module: lubon_qlan
+#: model:ir.actions.act_window,name:lubon_qlan.qlan_contracts_action
+#: model:ir.ui.menu,name:lubon_qlan.contracts_menu
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Contracts"
+msgstr "Contracten"
+
+#. module: lubon_qlan
+#: field:add_hours.wizard,create_uid:0
+#: field:lubon_qlan.adaccounts,create_uid:0
+#: field:lubon_qlan.adaccounts_import,create_uid:0
+#: field:lubon_qlan.ip,create_uid:0 field:lubon_qlan.isp,create_uid:0
+#: field:lubon_qlan.sites,create_uid:0 field:lubon_qlan.tenants,create_uid:0
+#: field:lubon_qlan.vlan,create_uid:0
+msgid "Created by"
+msgstr "Created by"
+
+#. module: lubon_qlan
+#: field:add_hours.wizard,create_date:0
+#: field:lubon_qlan.adaccounts,create_date:0
+#: field:lubon_qlan.adaccounts_import,create_date:0
+#: field:lubon_qlan.ip,create_date:0 field:lubon_qlan.isp,create_date:0
+#: field:lubon_qlan.sites,create_date:0 field:lubon_qlan.tenants,create_date:0
+#: field:lubon_qlan.vlan,create_date:0
+msgid "Created on"
+msgstr "Created on"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,credential_ids:0
+#: field:lubon_qlan.tenants,credential_ids:0
+msgid "Credential ids"
+msgstr "Credential ids"
+
+#. module: lubon_qlan
+#: model:ir.actions.act_window,name:lubon_qlan.qlan_credentials_action
+#: model:ir.ui.menu,name:lubon_qlan.lubon_qlan_credentials_menu
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Credentials"
+msgstr "Credentials"
+
+#. module: lubon_qlan
+#: field:add_hours.wizard,partner_id:0
+msgid "Customer"
+msgstr "Customer"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,ip:0
+msgid "DC IP"
+msgstr "DC IP"
+
+#. module: lubon_qlan
+#: selection:lubon_qlan.ip,ip_type:0
+msgid "DHCP Reservation"
+msgstr "DHCP Reservation"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.vlan,dns:0
+msgid "DNS"
+msgstr "DNS"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.vlan,dns:0
+msgid "DNS Servers, comma separated"
+msgstr "DNS Servers, comma separated"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.tenants,ip:0
+msgid "Datacenter IP range"
+msgstr "Datacenter IP range"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Description of the account"
+msgstr "Description of the account"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.tenants,tenant_name:0
+msgid "Descriptive name of the tenant"
+msgstr "Descriptive name of the tenant"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.isp,ip_dns:0
+msgid "Dynamic dns entry"
+msgstr "Dynamic dns entry"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts,ad_enabled:0
+#: field:lubon_qlan.adaccounts_import,enabled:0
+msgid "Enabled"
+msgstr "Enabled"
+
+#. module: lubon_qlan
+#: code:addons/lubon_qlan/invoicing.py:148
+#, python-format
+msgid "Error!"
+msgstr "Error!"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,exchange:0
+msgid "Exchange"
+msgstr "Exchange"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,filemaker_site_id:0
+#: field:lubon_qlan.tenants,filemaker_site_id:0
+msgid "Filemaker site"
+msgstr "Filemaker site"
+
+#. module: lubon_qlan
+#: selection:lubon_qlan.ip,ip_type:0 selection:lubon_qlan.isp,ip_type:0
+msgid "Fixed"
+msgstr "Fixed"
+
+#. module: lubon_qlan
+#: field:account.analytic.line,fullday:0
+msgid "Full day"
+msgstr "Full day"
+
+#. module: lubon_qlan
+#: view:account.analytic.line:lubon_qlan.lubon_account_analytic_line_form
+msgid "General Accounting"
+msgstr "Algemene boekhouding"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_search_view
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_search_view
+msgid "Group By"
+msgstr "Group By"
+
+#. module: lubon_qlan
+#: view:account.invoice:lubon_qlan.lubon_qlan_account_invoice_form
+msgid "Hours"
+msgstr "Hours"
+
+#. module: lubon_qlan
+#: field:add_hours.wizard,hours_ids:0
+msgid "Hours ids"
+msgstr "Hours ids"
+
+#. module: lubon_qlan
+#: field:add_hours.wizard,id:0 field:lubon_qlan.adaccounts,id:0
+#: field:lubon_qlan.adaccounts_import,id:0 field:lubon_qlan.ip,id:0
+#: field:lubon_qlan.isp,id:0 field:lubon_qlan.sites,id:0
+#: field:lubon_qlan.tenants,id:0 field:lubon_qlan.vlan,id:0
+msgid "ID"
+msgstr "ID"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.vlan,ipv4_gw:0
+msgid "IPv4 GW"
+msgstr "IPv4 GW"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.vlan,ipv4:0
+msgid "IPv4 Net"
+msgstr "IPv4 Net"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,ipv4:0
+msgid "IPv4 net"
+msgstr "IPv4 net"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.vlan,ipv6_gw:0
+msgid "IPv6 GW"
+msgstr "IPv6 GW"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.vlan,ipv6:0
+msgid "IPv6 Net"
+msgstr "IPv6 Net"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,ipv6:0
+msgid "IPv6 net"
+msgstr "IPv6 net"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "ISP"
+msgstr "ISP"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "ISP Info"
+msgstr "ISP Info"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.isp,account:0
+msgid "ISP account n°"
+msgstr "ISP account n°"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.isp,account_login:0
+msgid "ISP controlpanel login"
+msgstr "ISP controlpanel login"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.adaccounts_import:lubon_qlan.adaccounts_import_form_view
+msgid "Import"
+msgstr "Import"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.adaccounts_import:lubon_qlan.adaccounts_import_form_view
+msgid "Import script"
+msgstr "Import script"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,importref:0
+msgid "Importref"
+msgstr "Importref"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,tel_dedicated:0
+msgid "Incoming tel"
+msgstr "Incoming tel"
+
+#. module: lubon_qlan
+#: model:ir.model,name:lubon_qlan.model_stock_location
+msgid "Inventory Locations"
+msgstr "Voorraad locaties"
+
+#. module: lubon_qlan
+#: field:add_hours.wizard,invoice_id:0
+#: model:ir.model,name:lubon_qlan.model_account_invoice
+msgid "Invoice"
+msgstr "Factuur"
+
+#. module: lubon_qlan
+#: view:account.analytic.line:lubon_qlan.lubon_account_analytic_line_form
+msgid "Invoicing"
+msgstr "Invoicing"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.ip,ip:0
+msgid "Ip"
+msgstr "Ip"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.isp,ip_dns:0
+msgid "Ip dns"
+msgstr "Ip dns"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,ip_ids:0 field:lubon_qlan.tenants,ip_ids:0
+#: field:lubon_qlan.vlan,ip_ids:0
+msgid "Ip ids"
+msgstr "Ip ids"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.isp,ip_login:0
+msgid "Ip login"
+msgstr "Ip login"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.isp,ip_password:0
+msgid "Ip password"
+msgstr "Ip password"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.ip,ip_type:0 field:lubon_qlan.isp,ip_type:0
+msgid "Ip type"
+msgstr "Ip type"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,is_citrix:0
+msgid "Is citrix"
+msgstr "Is citrix"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,is_mailonly:0
+msgid "Is mailonly"
+msgstr "Is mailonly"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,is_qfilteronly:0
+msgid "Is qfilteronly"
+msgstr "Is qfilteronly"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,is_telephony:0
+msgid "Is telephony"
+msgstr "Is telephony"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,isp_ids:0
+msgid "Isp ids"
+msgstr "Isp ids"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.sites,wifikey_private:0
+msgid "Key private network"
+msgstr "Key private network"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.sites,wifikey_public:0
+msgid "Key public network"
+msgstr "Key public network"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "LAN IP info"
+msgstr "LAN IP info"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "LUB"
+msgstr "LUB"
+
+#. module: lubon_qlan
+#: field:add_hours.wizard,write_uid:0 field:lubon_qlan.adaccounts,write_uid:0
+#: field:lubon_qlan.adaccounts_import,write_uid:0
+#: field:lubon_qlan.ip,write_uid:0 field:lubon_qlan.isp,write_uid:0
+#: field:lubon_qlan.sites,write_uid:0 field:lubon_qlan.tenants,write_uid:0
+#: field:lubon_qlan.vlan,write_uid:0
+msgid "Last Updated by"
+msgstr "Last Updated by"
+
+#. module: lubon_qlan
+#: field:add_hours.wizard,write_date:0
+#: field:lubon_qlan.adaccounts,write_date:0
+#: field:lubon_qlan.adaccounts_import,write_date:0
+#: field:lubon_qlan.ip,write_date:0 field:lubon_qlan.isp,write_date:0
+#: field:lubon_qlan.sites,write_date:0 field:lubon_qlan.tenants,write_date:0
+#: field:lubon_qlan.vlan,write_date:0
+msgid "Last Updated on"
+msgstr "Last Updated on"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,location_ids:0
+msgid "Location ids"
+msgstr "Location ids"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.isp,ip_login:0
+msgid "Login to establish connection"
+msgstr "Login to establish connection"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts,logonname:0
+#: field:lubon_qlan.adaccounts_import,logonname:0
+msgid "Logonname"
+msgstr "Logonname"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Lubon"
+msgstr "Lubon"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.ip,mac:0
+msgid "Mac"
+msgstr "Mac"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,main_contact:0
+#: field:lubon_qlan.tenants,main_contact:0
+msgid "Main contact"
+msgstr "Main contact"
+
+#. module: lubon_qlan
+#: model:res.groups,name:lubon_qlan.qlan_manager
+msgid "Manager"
+msgstr "Manager"
+
+#. module: lubon_qlan
+#: model:ir.actions.act_window,name:lubon_qlan.qlan_messages_action
+#: model:ir.ui.menu,name:lubon_qlan.lubon_qlan_messages_menu
+msgid "Messages"
+msgstr "Berichten"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,msexchplus:0
+msgid "Msexchplus"
+msgstr "Msexchplus"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,msexchstd:0
+msgid "Msexchstd"
+msgstr "Msexchstd"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,msofficeproplus:0
+msgid "Msofficeproplus"
+msgstr "Msofficeproplus"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,msofficestd:0
+msgid "Msofficestd"
+msgstr "Msofficestd"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_search_view
+msgid "My Sites"
+msgstr "My Sites"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts,name:0 field:lubon_qlan.ip,name:0
+#: field:lubon_qlan.tenants,tenant_name:0 field:lubon_qlan.vlan,name:0
+msgid "Name"
+msgstr "Name"
+
+#. module: lubon_qlan
+#: sql_constraint:lubon_qlan.adaccounts:0
+msgid "Name has to be unique"
+msgstr "Name has to be unique"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Network info"
+msgstr "Network info"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.tenants,tel_dedicated:0
+msgid "Number that is dedicated to the customer, with respect to SLA"
+msgstr "Number that is dedicated to the customer, with respect to SLA"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,office:0
+msgid "Office"
+msgstr "Office"
+
+#. module: lubon_qlan
+#: field:account.analytic.line,onsite:0
+msgid "On site"
+msgstr "On site"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.tenants,qadm_password:0
+msgid "Password for qadm@upn user"
+msgstr "Password for qadm@upn user"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.isp,ip_password:0
+msgid "Password to establish connection"
+msgstr "Password to establish connection"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,pbx_password:0
+msgid "Pbx password"
+msgstr "Pbx password"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,ssid_private:0
+msgid "Private SSID"
+msgstr "Private SSID"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,wifikey_private:0
+msgid "Private key"
+msgstr "Private key"
+
+#. module: lubon_qlan
+#: field:add_hours.wizard,product_id:0
+#: field:lubon_qlan.adaccounts_import,product:0
+msgid "Product"
+msgstr "Product"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.isp,name:0
+msgid "Provider"
+msgstr "Provider"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,ssid_public:0
+msgid "Public SSID"
+msgstr "Public SSID"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,wifikey_public:0
+msgid "Public key"
+msgstr "Public key"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,qadm_password:0
+msgid "Qadm password"
+msgstr "Qadm password"
+
+#. module: lubon_qlan
+#: model:ir.module.category,name:lubon_qlan.module_category_lubon_qlan
+#: model:ir.ui.menu,name:lubon_qlan.main_lubon_qlan_menu
+msgid "Qlan"
+msgstr "Qlan"
+
+#. module: lubon_qlan
+#: model:ir.module.category,description:lubon_qlan.module_category_lubon_qlan
+msgid "Qlan mgmt"
+msgstr "Qlan mgmt"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,qtest_password:0
+msgid "Qtest password"
+msgstr "Qtest password"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,quant_ids:0
+msgid "Quant ids"
+msgstr "Quant ids"
+
+#. module: lubon_qlan
+#: model:ir.model,name:lubon_qlan.model_stock_quant
+msgid "Quants"
+msgstr "Aantallen"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Quants Tree"
+msgstr "Quants Tree"
+
+#. module: lubon_qlan
+#: help:account.analytic.line,rate_work:0
+msgid "Rate per hr/day used, depending on what is applicable"
+msgstr "Tarief per dag/uur used, afhankelijk van wat toepasselijk is."
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,rdp:0
+msgid "Rdp"
+msgstr "Rdp"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.adaccounts_import,importref:0
+msgid "Reference to the import"
+msgstr "Reference to the import"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts,person_id:0
+msgid "Related person"
+msgstr "Related person"
+
+#. module: lubon_qlan
+#: view:account.invoice:lubon_qlan.lubon_account_invoice_form
+msgid "Remove hours"
+msgstr "Remove hours"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_search_view
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_search_view
+msgid "Responsible"
+msgstr "Responsible"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.isp,ip_dns_reverse:0
+msgid "Reverse dns"
+msgstr "Reverse dns"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.sites,ssid_private:0
+msgid "SSID for use by employees"
+msgstr "SSID for use by employees"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.sites,ssid_public:0
+msgid "SSID for use by guests"
+msgstr "SSID for use by guests"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Sales orders"
+msgstr "Sales orders"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts,samaccountname:0
+#: field:lubon_qlan.adaccounts_import,samaccountname:0
+msgid "Samaccountname"
+msgstr "Samaccountname"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Security"
+msgstr "Security"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.vlan,sequence:0
+msgid "Sequence"
+msgstr "Sequence"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Servers"
+msgstr "Servers"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Settings"
+msgstr "Settings"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Show"
+msgstr "Show"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,alfacode:0
+msgid "Site Code"
+msgstr "Site Code"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Site config"
+msgstr "Site config"
+
+#. module: lubon_qlan
+#: field:lubon_credentials.credentials,site_id:0 field:lubon_qlan.ip,site_id:0
+#: field:lubon_qlan.isp,site_id:0 field:lubon_qlan.vlan,site_id:0
+#: field:stock.location,site_id:0 field:stock.quant,site_id:0
+msgid "Site id"
+msgstr "Site id"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,name:0
+msgid "Site name"
+msgstr "Site name"
+
+#. module: lubon_qlan
+#: model:ir.actions.act_window,name:lubon_qlan.zzqlan_sites_action
+#: model:ir.ui.menu,name:lubon_qlan.lubon_qlan_sites_menu
+#: model:ir.ui.menu,name:lubon_qlan.sites_menu
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Sites"
+msgstr "Sites"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_tree_view
+msgid "Sites Tree"
+msgstr "Sites Tree"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Sites form"
+msgstr "Sites form"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,smspasscode:0
+msgid "Smspasscode"
+msgstr "Smspasscode"
+
+#. module: lubon_qlan
+#: model:ir.ui.menu,name:lubon_qlan.lubon_qlan_tables_menu
+msgid "Tables"
+msgstr "Tables"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Telephony"
+msgstr "Telephony"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_search_view
+msgid "Telephony tenants"
+msgstr "Telephony tenants"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.adaccounts_import,tenant:0
+msgid "Tenant"
+msgstr "Tenant"
+
+#. module: lubon_qlan
+#: help:lubon_qlan.tenants,code:0
+msgid "Tenant code"
+msgstr "Tenant code"
+
+#. module: lubon_qlan
+#: field:lubon_credentials.credentials,tenant_id:0
+#: field:lubon_qlan.adaccounts,tenant_id:0 field:lubon_qlan.ip,tenant_id:0
+#: field:lubon_qlan.isp,tenant_id:0 field:lubon_qlan.vlan,tenant_id:0
+msgid "Tenant id"
+msgstr "Tenant id"
+
+#. module: lubon_qlan
+#: model:ir.ui.menu,name:lubon_qlan.lubon_qlan_tenants_menu
+msgid "Tenants"
+msgstr "Tenants"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_tree_view
+msgid "Tenants Tree"
+msgstr "Tenants Tree"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.tenants:lubon_qlan.tenants_form_view
+msgid "Tenants form"
+msgstr "Tenants form"
+
+#. module: lubon_qlan
+#: help:account.analytic.line,fullday:0
+msgid "Tick if full day intervention"
+msgstr "Tick if full day intervention"
+
+#. module: lubon_qlan
+#: help:account.analytic.line,onsite:0
+msgid "Tick if on site intervention"
+msgstr "Tick if on site intervention"
+
+#. module: lubon_qlan
+#: view:account.analytic.line:lubon_qlan.lubon_account_analytic_line_tree
+msgid "Total"
+msgstr "Totaal"
+
+#. module: lubon_qlan
+#: field:account.analytic.line,amount_total:0
+msgid "Total line"
+msgstr "Total line"
+
+#. module: lubon_qlan
+#: field:account.analytic.line,amount_travel:0
+msgid "Travel costs"
+msgstr "Travel costs"
+
+#. module: lubon_qlan
+#: field:account.analytic.line,rate_work:0
+msgid "Unit rate"
+msgstr "Unit rate"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.tenants,upn:0
+msgid "Upn"
+msgstr "Upn"
+
+#. module: lubon_qlan
+#: model:res.groups,name:lubon_qlan.qlan_user
+msgid "User"
+msgstr "Gebruiker"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.ip,vlan_id:0
+msgid "Vlan id"
+msgstr "Vlan id"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.sites,vlan_ids:0 field:lubon_qlan.tenants,vlan_ids:0
+msgid "Vlan ids"
+msgstr "Vlan ids"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "Vlan info"
+msgstr "Vlan info"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.vlan,vlan_tag:0
+msgid "Vlan tag"
+msgstr "Vlan tag"
+
+#. module: lubon_qlan
+#: field:lubon_qlan.isp,ip_address:0
+msgid "WAN ip"
+msgstr "WAN ip"
+
+#. module: lubon_qlan
+#: code:addons/lubon_qlan/invoicing.py:149
+#, python-format
+msgid "You cannot modify an invoiced analytic line! - lubon"
+msgstr "You cannot modify an invoiced analytic line! - lubon"
+
+#. module: lubon_qlan
+#: view:account.analytic.line:lubon_qlan.lubon_account_analytic_line_tree
+msgid "top"
+msgstr "top"
+
+#. module: lubon_qlan
+#: selection:lubon_qlan.isp,ip_type:0
+msgid "variable"
+msgstr "variable"
+
+#. module: lubon_qlan
+#: view:lubon_qlan.sites:lubon_qlan.sites_form_view
+msgid "vlans"
+msgstr "vlans"

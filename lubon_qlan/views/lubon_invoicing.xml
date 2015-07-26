@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <openerp>
+    <data>
+        <record model="ir.ui.view" id="lubon_company_form">
+            <field name="name">lubon_qlan.company_form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <field name="currency_id" position="after">
+                    <field name="default_hours_product"/>
+                </field>                   
+            </field>
+        </record>
+        <record model="ir.ui.view" id="lubon_account_analytic_line_form">
+            <field name="name">lubon_qlan.analytic_form</field>
+            <field name="model">account.analytic.line</field>
+            <field name="inherit_id" ref="account.view_account_analytic_line_form"/>
+            <field name="arch" type="xml">
+                <group string="General Accounting" position="before">
+        	       <group string="Invoicing">                  
+                        <field name="onsite"/>
+                        <field name="fullday"/>
+                        <field name="rate_work"/>
+                        <field name="qty_invoice"/>
+                        <field name="amount_hours"/>
+                        <field name="amount_travel"/>
+                        <field name="amount_total"/>
+                    </group>
+                </group>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="lubon_account_analytic_line_tree">
+            <field name="name">lubon_qlan.analytic_tree</field>
+            <field name="model">account.analytic.line</field>
+            <field name="inherit_id" ref="account.view_account_analytic_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="editable">top</attribute>
+                </xpath>
+                <field name="account_id" position="after">
+                    <field name="onsite"/>
+                    <field name="fullday"/>
+                    <field name="qty_invoice"/>
+                    <field name="rate_work"/>
+                    <field name="amount_hours"/>
+                    <field name="amount_travel"/>
+                    <field name="amount_total" sum="Total"/>
+                </field>
+            </field>
+        </record>
+                <act_window id="launch_hours_wizard"
+                name="Add hours"
+                res_model="add_hours.wizard"
+                view_mode="form"
+                target="new"/>
+        <record model="ir.ui.view" id="lubon_account_invoice_form">
+            <field name="name">lubon_qlan.invoice_form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='invoice_open']" position="before">
+                    <button name="launch_hours_wizard" states="draft" string="Add hours" type="object" groups="base.group_user"/>
+                </xpath>
+                <xpath expr="//button[@name='invoice_open']" position="after">
+                    <button name="remove_hours_from_invoice" states="draft" string="Remove hours" type="object" groups="base.group_user"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="lubon_qlan_add_hours_wizard">
+            <field name="name">lubon_qlan.add_hours_wizard</field>
+            <field name="model">add_hours.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="product_id"/>
+                        <field name="invoice_id"/>
+                    </group>
+                    <notebook>
+                        <page name="hours">
+                            <field name="hours_ids"/>
+                        </page>
+                    </notebook>
+                <footer>
+                    <button name="add_hours_to_invoice" string="OK" type="object" class="oe_highlight"/>
+                    <button name="Cancel" string="Cancel" special="cancel"/>
+                </footer>    
+                </form>   
+            </field>
+        </record>
+        <record model="ir.ui.view" id="lubon_qlan_account_invoice_form">
+            <field name="name">lubon_qlan.account_invoice_form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Hours">
+                        <field name="analytic_lines"/>
+                    </page>
+            </notebook>
+            </field>
+        </record>
+    </data>
+</openerp>

@@ -26,9 +26,9 @@
     'data': [
         # 'security/ir.model.access.csv',
 #	'static/src/js/lubon_base.js',
-	'static/src/css/lubon_base.css',
+	   'static/src/css/lubon_base.css',
         'templates.xml',
-	'views/lubon_base.xml',
+    	'views/lubon_base.xml',
         'reports/lubon_base_invoice.xml',
     ],
     # only loaded in demonstration mode

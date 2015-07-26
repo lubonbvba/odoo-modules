@@ -156,29 +156,50 @@
                 <strong>Fiscal Position Remark:</strong>
                 <span t-field="o.fiscal_position.note"/>
             </p>
-        </div>
-<!--         <div t-if="o.analytic_lines" style="page-break-before:always;" class="page">
-            <table class="table table-condensed">
+        
+        <p t-if="o.analytic_lines" style="page-break-before:always;">
+            <h3>Activity report for invoice: <span t-field="o.number"/></h3>
+            <table class="table table-condensed table-bordered">
+                <t t-set="total" t-value="0" />
                         <thead>
                             <tr>
-                                <th>Hours performed</th>
-                                <th class="text-right">Base</th>
-                                <th class="text-right">Amount</th>
+                                <th>Datum</th>
+                                <th>Naam</th>
+                                <th>Uitgevoerd</th>
+                                <th>Aantal</th>
+                                <th>Tarief</th>
+                                <th>Werk</th>    
+                                <th>Verplaatsing</th>
+                                <th>Totaal</th>    
                             </tr>
                         </thead>
                         <tbody>
                             <tr t-foreach="o.analytic_lines" t-as="t">
+                                <td class="text-right"><span t-field="t.date"/></td>
+                                <td><span t-field="t.user_id"/></td>
                                 <td><span t-field="t.name"/></td>
-                                <td class="text-right">
-                                    <span t-field="t.base" t-field-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
-                                </td>
+                                <td class="text-right"><span t-field="t.qty_invoice"/></td>
+                                <td class="text-right"><span t-field="t.rate_work"/></td>                    
+                                <td class="text-right"><span t-field="t.amount_hours"/></td>
+                                <td class="text-right"><span t-field="t.amount_travel"/></td>
                                 <td class="text-right">
                                     <span t-field="t.amount_total" t-field-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
                                 </td>
+                                <t t-set="total" t-value="total + t.amount_total" />
                             </tr>
+                            <!-- tfoot -->
+                                <tr>
+                                    <td  class="text-right" colspan="7">Totaal:</td>
+                                    <!--td class="text-right"><t t-esc="total"/></td-->
+                                    <td class="text-right">
+                                    <span t-esc="total" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                </td>
+                                </tr>
+                            <!-- /tfoot -->
                         </tbody>
             </table>
-        </div> -->
+        </p>
+        </div>
     </t>
 </t>
 

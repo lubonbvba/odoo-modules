@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','analytic','stock', 'lubon_base','lubon_credentials', 'lubon_partners'],
+    'depends': ['base','analytic','stock','hr_timesheet_invoice', 'lubon_base','lubon_credentials', 'lubon_partners'],
 
     # always loaded
     'data': [
@@ -28,6 +28,9 @@
         'security/security.xml',
         'templates.xml',
         'views/lubon_qlan.xml',
+        'views/lubon_invoicing.xml',
+        'reports/lubon_qlan_invoice.xml',
+
 #	    'lubon_qlan.py',
     ],
     # only loaded in demonstration mode

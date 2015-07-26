@@ -26,7 +26,8 @@
     'data': [
         'security/ir.model.access.csv',
         'templates.xml',
-	'views/lubon_partners.xml'
+        'views/lubon_partners.xml'
+        'views/lubon_invoicing.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
