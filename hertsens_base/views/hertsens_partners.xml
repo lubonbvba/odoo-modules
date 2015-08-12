@@ -14,8 +14,23 @@
                             <field name="mail_reminder"/>
                             <field name="mail_planning"/>
                         </group>
+                        <group string="Invoice settings">
+                            <field name="diesel" />
+                            <field name="cmr" />
+                        </group>
                     </page>
                 </notebook>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="hertsens_base_tree_view">
+            <field name="name">hertsens_partner.partner_tree</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <field name="email" position="after">
+                   <field name="diesel" />
+                    <field name="cmr" />
+                </field>
             </field>
         </record>
     </data>

@@ -1,0 +1,50 @@
+<openerp>
+   	<data noupdate="0">
+		<record model="ir.module.category" id="module_hertsens">
+            <field name="name">Hertsens</field>
+            <field name="description">Hertsens access rights</field>
+            <field name="sequence">5</field>
+    	</record>
+    	<record id="group_hertsens_user_her" model="res.groups">
+            <field name="name">HER / User</field>
+            <field name="category_id" ref="hertsens_base.module_hertsens"/>
+        </record>
+         <record id="group_hertsens_user_jlh" model="res.groups">
+            <field name="name">JLH / User</field>
+            <field name="category_id" ref="hertsens_base.module_hertsens"/>
+        </record>
+        <record id="group_hertsens_manager_her" model="res.groups">
+            <field name="name">HER / Manager</field>
+            <field name="category_id" ref="hertsens_base.module_hertsens"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+            <field name="implied_ids" eval="[(4, ref('hertsens_base.group_hertsens_user_her'))]"/>
+        </record>
+         <record id="group_hertsens_manager_jlh" model="res.groups">
+            <field name="name">JLH / Manager</field>
+            <field name="category_id" ref="hertsens_base.module_hertsens"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+            <field name="implied_ids" eval="[(4, ref('hertsens_base.group_hertsens_user_jlh'))]"/>
+        </record>
+        <record id="group_hertsens_manager" model="res.groups">
+            <field name="name">Hertsens / Manager</field>
+            <field name="category_id" ref="hertsens_base.module_hertsens"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+            <field name="implied_ids" eval="[(4, ref('hertsens_base.group_hertsens_manager_her'))]"/>
+            <field name="implied_ids" eval="[(4, ref('hertsens_base.group_hertsens_manager_jlh'))]"/>
+        </record>
+    </data>
+    <data>
+        <record id="restrict_delete_rides" model="ir.rule">
+            <field name="name">Invoiced rides cannot be deleted</field>
+            <field name="model_id" ref="model_hertsens_rit"/>
+            <!--field name="groups" eval="[(4, ref('openacademy.group_manager'))]"/-->
+            <field name="perm_read" eval="0"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force">
+                [('state','not ilike','invoiced')]
+            </field>
+        </record>
+    </data>
+</openerp>

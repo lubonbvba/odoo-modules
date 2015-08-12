@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="hertsens_company_form">
+            <field name="name">lubon_qlan.company_form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <field name="currency_id" position="after">
+                    <field name="default_rides_product"  domain="[('company_id','=', active_id)]"/>
+                    <field name="default_diesel_product"  domain="[('company_id','=', active_id)]"/>
+                    <field name="default_charges_vat_product"  domain="[('company_id','=', active_id)]"/>
+                    <field name="default_charges_exvat_product"  domain="[('company_id','=', active_id)]"/>
+                </field>                   
+            </field>
+        </record>
+        <record model="ir.ui.view" id="hertsens_account_invoice_form">
+            <field name="name">hertsens.account_invoice_form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Rides">
+                        <field name="rides_ids"/>
+                    </page>
+            </notebook>
+        </field>
+        </record>
+        <record id="action_ritten_create_invoice" model="ir.actions.act_window">
+            <field name="name">Create Invoice</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hertsens.invoice.create</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="multi" eval="1"/>
+        </record>
+
+        <record model="ir.values" id="values_ritten_create_invoice">
+            <!-- field name="model_id" ref="model_account_analytic_account" /-->
+            <field name="name">Invoice</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_ritten_create_invoice'))" />
+            <field name="key">action</field>
+            <field name="model">hertsens.rit</field>
+        </record>
+        <record id="view_hertsens_invoice_create_form" model="ir.ui.view">
+            <field name="name">ritten.invoice.create.form</field>
+            <field name="model">hertsens.invoice.create</field>
+            <field name="arch" type="xml">
+            <form string="Invoice contract">
+                    <p>Do you want to show details of each activity to your customer?</p>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="oneline"/>
+                            <field name="allrides_valid"/>
+                        </group>
+                    </group>
+                <notebook>
+        	        <page string="Rides">    
+						<field name="rides_ids">
+							<tree string="Rides to be invoiced" default_order="partner_id">
+                    			<field name="partner_id"/>
+                    			<field name="datum"/>
+                    <field name="vertrek"/>
+                    <field name="bestemming"/>
+                    <field name="refklant" />
+                    <field name="ritprijs" />
+                    <field name="wachttijd" />
+                    <field name="charges_vat" />
+                    <field name="charges_exvat" />
+                    <field name="finished"/>
+                    <field name="cmr" />
+                    <field name="state" />
+							</tree>
+                		</field> 
+                	</page>
+                </notebook>       
+                <footer>
+                    <button name="do_create" string="Create Invoice" type="object" class="oe_highlight" attrs="{'invisible': [('allrides_valid', '=', False)]}"/>
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel"  />
+                </footer>
+            </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="ritten_tree_view">
+            <field name="name">ritten.tree</field>
+            <field name="model">hertsens.rit</field>
+            <field name="arch" type="xml">
+                <tree string="Ritten Tree" editable="top" default_order="datum desc"  colors="blue:state == 'planned';black:state in ('completed');red:state=='waiting';green:state=='toinvoice';gray:state == 'invoiced'" >
+                    <field name="company_id" options="{'no_quick_create':True,'no_create_edit':True}"/>
+                    <field name="partner_id" options="{'no_quick_create':True,'no_create_edit':True}" domain="[('company_id','=',company_id)]" /> 
+                    <field name="datum"/>
+                    <field name="vertrek"/>
+                    <field name="bestemming"/>
+                    <field name="refklant" />
+                    <field name="ritprijs" />
+                    <field name="wachttijd" />
+                    <field name="total_ride_price" sum="Total"/>
+                    <field name="charges_vat" sum="Total"/>
+                    <field name="charges_exvat" sum="Total"/>
+                    <field name="finished"/>
+                    <field name="cmr" />
+                    <field name="state" />
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="ritten_form_view">
+            <field name="name">ritten.form</field>
+            <field name="model">hertsens.rit</field>
+            <field name="arch" type="xml">
+                <form string="Ritten form">
+                	<header>
+                		<field name="state" widget="statusbar"/>
+                	</header>
+                	<group>
+                    	<field name="company_id"  />
+                    	<field name="partner_id" domain="[('company_id','=',company_id)]" context="{'default_company_id':company_id, 'default_type':'contract'}"/>
+                    	
+                    	<field name="datum"/>
+                    	<field name="vertrek"/>
+                    	<field name="bestemming"/>
+                    	<field name="refklant" />
+                    	<field name="ritprijs" />
+                    	<field name="wachttijd" />
+                    	<field name="charges_vat" />
+                    	<field name="charges_exvat" />
+                    	<field name="cmr" />
+                    	<field name="state" />
+                	</group>
+                    <notebook>
+                    	<page string="Destinations">
+                    		<field name="destination_ids">
+                    			<tree string="Destinations" editable="bottom">
+                                	<field name="sequence" widget="handle"/>
+                                	<field name="destination" />
+                            	</tree>
+                            </field>
+                    		
+                    	</page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="ritten_search_view" >
+            <field name="name">ritten.search</field>
+            <field name="model">hertsens.rit</field>
+            <field name="arch" type="xml">
+                <search string="Search Ritten">
+                	<filter name="active" string="Active" domain="[('state','not ilike','invoiced')]" help="Active "/>
+                    <filter name="planned" string="Planned" domain="[('state','=','planned')]" help="Planned "/>
+                     <filter name="toinvoice" string="To be invoiced" domain="[('state','=','toinvoice')]" help="Ready for invoicing"/>
+                     <filter name="invoiced" string="Invoiced" domain="[('state','=','invoiced')]" help="Invoiced"/>
+                    <field name="partner_id" operator="child_of"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                    	<filter name="group_by_company" string="Company" context="{'group_by':'company_id'}"/>
+                    	<filter name="group_by_partner" string="Customer" context="{'group_by':'partner_id'}"/>
+                        <filter string="Salesperson" context="{'group_by':'user_id'}"/>
+                        <separator/>
+                        <filter string="Status" context="{'group_by':'state'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+<!--          <record model="ir.ui.view" id="contracten_tree_view">
+            <field name="name">contracten.tree</field>
+            <field name="model">account.analytic.account</field>
+            <field name="arch" type="xml">
+                <tree string="Contracten Tree" editable="top">
+                    <field name="company_id"  />
+                    <field name="partner_id" domain="[('company_id','=',company_id),('customer','=',1)]" context="{'default_company_id':company_id}"/>
+                    <field name="name" />
+                    <field name="diesel" />
+                    <field name="cmr" />                    
+                    <field name="type" invisible="1"/>        
+                </tree>
+            </field>
+        </record> -->
+
+
+
+
+
+
+       <record model="ir.actions.act_window" id="her_customers_action">
+            <field name="name">Customers Hertsens</field>
+            <field name="res_model">res.partner</field>
+            <field name="domain">[('company_id','=',3),('customer','=',1)]</field>
+            <field name="context">{'default_customer':1, 'default_company_id':3,'default_is_company':True}</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,kanban</field>
+        </record>
+<!--        <record model="ir.actions.act_window" id="her_contracts_action">
+            <field name="name">Contracten Hertsens</field>
+            <field name="res_model">account.analytic.account</field>
+            <field name="domain">[('company_id','=',3),('type','=','contract')]</field>
+            <field name="context">{'default_company_id':3, 'default_type':'contract'}</field>
+            <field name="view_id" ref="contracten_tree_view"></field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record> -->
+       <record model="ir.actions.act_window" id="her_ritten_action">
+            <field name="name">Ritten Hertsens</field>
+            <field name="res_model">hertsens.rit</field>
+            <field name="domain">[('company_id','=',3) ]</field>
+            <field name="context">{'default_company_id':3,'search_default_active': 1 }</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="ritten_tree_view"></field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="her_ritten_invoice_action">
+            <field name="name">Ritten Hertsens</field>
+            <field name="res_model">hertsens.rit</field>
+            <field name="domain">[('company_id','=',3),('state','=','toinvoice') ]</field>
+            <field name="context">{'default_company_id':3}</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="ritten_tree_view"></field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+ <!--       <record model="ir.actions.act_window" id="jlh_contracts_action">
+            <field name="name">Contracten JLH Logistics</field>
+            <field name="res_model">account.analytic.account</field>
+            <field name="domain">[('company_id','=',1),('type','=','contract')]</field>
+            <field name="context">{'default_company_id':1, 'default_type':'contract'}</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="contracten_tree_view"></field>
+            <field name="view_mode">tree,form,kanban</field>
+        </record> -->
+       <record model="ir.actions.act_window" id="jlh_ritten_action">
+            <field name="name">Ritten JLH Logistics</field>
+            <field name="res_model">hertsens.rit</field>
+            <field name="domain">[('company_id','=',1) ]</field>
+            <field name="context">{'default_company_id':1,'search_default_active': 1}</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="ritten_tree_view"></field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="jlh_ritten_invoice_action">
+            <field name="name">Ritten JLH Logistics</field>
+            <field name="res_model">hertsens.rit</field>
+            <field name="domain">[('company_id','=',1),('state','=','toinvoice') ]</field>
+            <field name="context">{'default_company_id':1}</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="ritten_tree_view"></field>
+            <field name="view_mode">tree,form</field>
+        </record>
+      <record model="ir.actions.act_window" id="ritten_action">
+            <field name="name">Ritten</field>
+            <field name="res_model">hertsens.rit</field>
+            <field name="domain">[('partner_id','child_of', active_id)]</field>
+            <field name="context">{'default_partner_id':ref('res.partner.partner_id'), 'default_company_id':ref('res.partner.company_id')}></field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="ritten_tree_view"></field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+       <record model="ir.actions.act_window" id="jlh_customers_action">
+            <field name="name">Customers JLH Logistics</field>
+            <field name="res_model">res.partner</field>
+            <field name="domain">[('company_id','=',1),('customer','=',1)]</field>
+            <field name="context">{'default_customer':1, 'default_company_id':1}</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,kanban</field>
+        </record>
+
+        <record id="partner_ritten_button" model="ir.ui.view">
+            <field name="name">hertsens_base.partner_ritten_button</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr='//div[@name="buttons"]' position='inside'>
+                    <button class="oe_inline oe_stat_button" type="action" name="%(ritten_action)d" 
+                        icon="fa-truck"  >
+                        <field name="ritten_count" string="Ritten" widget="statinfo"/>
+                    </button>    
+                </xpath>
+               
+            </field>
+        </record>
+
+
+
+        <menuitem id="ritten_menu" name="Ritten" parent="base.menu_base_partner" sequence="1" />
+<!--     	<menuitem id="top_her_menu" name="Hertsens" sequence="10"/>
+    	<menuitem id="main_her_menu" name="Hertsens" parent="top_her_menu"/> -->
+        <menuitem id="her_ritten_menu" name="Hertsens" parent="ritten_menu" sequence="1" action="her_ritten_action" groups="hertsens_base.group_hertsens_user_her" />
+        <menuitem id="her_ritten_invoice_menu" name="To be invoiced" parent="her_ritten_menu" sequence="1" action="her_ritten_invoice_action" />
+
+        <menuitem id="her_customers_menu" name="Hertsens" parent="base.menu_partner_form" action="her_customers_action" groups="hertsens_base.group_hertsens_user_her"/>
+<!--         <menuitem id="her_contracten_menu" name="Contracten" parent="main_her_menu" action="her_contracts_action"/> --> 
+  <!-- 	<menuitem id="top_jlh_menu" name="JLH Logistics" sequence="10"/>
+    	<menuitem id="main_jlh_menu" name="Hertsens" parent="top_jlh_menu"/> -->
+
+        <menuitem id="jlh_ritten_menu" name="JLH Logistics" parent="ritten_menu" sequence="1" action="jlh_ritten_action" groups="hertsens_base.group_hertsens_user_jlh"/>
+        <menuitem id="jlh_ritten_invoice_menu" name="To be invoiced" parent="jlh_ritten_menu" sequence="1" action="jlh_ritten_invoice_action"/>
+        <menuitem id="jlh_customers_menu" name="JLH Logistics" parent="base.menu_partner_form" action="jlh_customers_action" groups="hertsens_base.group_hertsens_user_jlh"/>
+
+<!--         <menuitem id="jlh_contracten_menu" name="Contracten" parent="main_jlh_menu" action="jlh_contracts_action"/> -->
+
+    </data>
+</openerp>

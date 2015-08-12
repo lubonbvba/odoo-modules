@@ -155,7 +155,57 @@
                 <strong>Fiscal Position Remark:</strong>
                 <span t-field="o.fiscal_position.note"/>
             </p>
+        <p t-if="o.rides_ids" style="page-break-before:always;">
+            <h3>Rittenoverzicht voor factuur: <span t-field="o.number"/></h3>
+            <table class="table table-condensed table-bordered">
+                <t t-set="total" t-value="0" />
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Vertrek</th>
+                                <th>Bestemming</th>
+                                <th>Ref</th>
+                                <th>CMR</th>
+                                <th>Ritprijs</th>
+                                <th>Wachttijd</th>
+                                <th>Totaal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.rides_ids" t-as="t">
+                                <td class="text-right"><span t-field="t.datum"/></td>
+                                <td><span t-field="t.vertrek"/></td>
+                                <td><span t-field="t.bestemming"/></td>
+                                <td><span t-field="t.refklant"/></td>
+                                <td><span t-field="t.cmr"/></td>
+                                <!-- td class="text-right"><span t-field="t.ritprijs"/></td>
+                                <td class="text-right"><span t-field="t.wachttijd"/></td>
+                                <td class="text-right"><span t-field="t.total_ride_price"/></td-->
+                                     <td class="text-right">
+                                        <span t-esc="t.ritprijs" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="t.wachttijd" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="t.total_ride_price" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                    </td>                               
+                                <t t-set="total" t-value="total + t.total_ride_price" />
+                            </tr>
+                            <!-- tfoot -->
+                                <tr>
+                                    <td  class="text-right" colspan="7">Totaal:</td>
+                                    <!--td class="text-right"><t t-esc="total"/></td-->
+                                    <td class="text-right">
+                                        <span t-esc="total" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                    </td>
+                                </tr>
+                            <!-- /tfoot -->
+                        </tbody>
+            </table>
+        </p>
         </div>
+
     </t>
 </t>
 
