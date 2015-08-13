@@ -1,3 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_hertsens_rit,access_hertsens_rit,model_hertsens_rit,,1,1,1,1
 access_hertsens_destination,access_hertsens_destination,model_hertsens_destination,,1,1,1,1
+h_access_account_invoice_uinvoice,account.invoice,model_account_invoice,hertsens_base.group_hertsens_user,1,0,0,0
+
+

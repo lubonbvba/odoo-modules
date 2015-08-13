@@ -16,7 +16,7 @@
                         </group>
                         <group string="Invoice settings">
                             <field name="diesel" />
-                            <field name="cmr" />
+                            <field name="ref_required" />
                         </group>
                     </page>
                 </notebook>
@@ -29,7 +29,7 @@
             <field name="arch" type="xml">
                 <field name="email" position="after">
                    <field name="diesel" />
-                    <field name="cmr" />
+                    <field name="ref_required" />
                 </field>
             </field>
         </record>

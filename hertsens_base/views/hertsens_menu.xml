@@ -90,8 +90,8 @@
             <field name="model">hertsens.rit</field>
             <field name="arch" type="xml">
                 <tree string="Ritten Tree" editable="top" default_order="datum desc"  colors="blue:state == 'planned';black:state in ('completed');red:state=='waiting';green:state=='toinvoice';gray:state == 'invoiced'" >
-                    <field name="company_id" options="{'no_quick_create':True,'no_create_edit':True}"/>
-                    <field name="partner_id" options="{'no_quick_create':True,'no_create_edit':True}" domain="[('company_id','=',company_id)]" /> 
+                	<field name="partner_id" options="{'no_quick_create':True,'no_create_edit':True}"/> 
+                    <field name="company_id" invisible="True" options="{'no_quick_create':True,'no_create_edit':True}"/>
                     <field name="datum"/>
                     <field name="vertrek"/>
                     <field name="bestemming"/>
@@ -150,11 +150,15 @@
             <field name="model">hertsens.rit</field>
             <field name="arch" type="xml">
                 <search string="Search Ritten">
-                	<filter name="active" string="Active" domain="[('state','not ilike','invoiced')]" help="Active "/>
+                	<filter name="active" string="Active" domain="[('state','in',['quoted','planned','completed','waiting'])]" help="Active "/>
                     <filter name="planned" string="Planned" domain="[('state','=','planned')]" help="Planned "/>
                      <filter name="toinvoice" string="To be invoiced" domain="[('state','=','toinvoice')]" help="Ready for invoicing"/>
+
+                     <filter name="Quote" string="Quoted" domain="[('state','=','Quoted')]" help="Invoiced"/>
                      <filter name="invoiced" string="Invoiced" domain="[('state','=','invoiced')]" help="Invoiced"/>
+                     <filter name="cancelled" string="Cancelled" domain="[('state','=','cancelled')]" help="Invoiced"/>
                     <field name="partner_id" operator="child_of"/>
+                    <field name="company_id" operator="child_of"/>
                     <separator/>
                     <group expand="0" string="Group By">
                     	<filter name="group_by_company" string="Company" context="{'group_by':'company_id'}"/>
@@ -258,7 +262,16 @@
             <field name="view_id" ref="ritten_tree_view"></field>
             <field name="view_mode">tree,form</field>
         </record>
-
+      <record model="ir.actions.act_window" id="rittenmenu_action">
+            <field name="name">Ritten</field>
+            <field name="res_model">hertsens.rit</field>
+            <field name="domain"></field>
+            <!-- field name="context">{'default_partner_id':ref('res.partner.partner_id'), 'default_company_id':ref('res.partner.company_id')}></field> -->
+            <field name="context">{'search_default_active': 1 }</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="ritten_tree_view"></field>
+            <field name="view_mode">tree,form</field>
+        </record>
 
        <record model="ir.actions.act_window" id="jlh_customers_action">
             <field name="name">Customers JLH Logistics</field>
@@ -268,7 +281,20 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,kanban</field>
         </record>
-
+       <record model="ir.actions.act_window" id="hertsens_jlh_invoices_action">
+            <field name="name">Invoices JLH Logistics</field>
+            <field name="res_model">account.invoice</field>
+            <field name="domain">[('company_id','=',1)]</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="hertsens_her_invoices_action">
+            <field name="name">Invoices Hertsens</field>
+            <field name="res_model">account.invoice</field>
+            <field name="domain">[('company_id','=',3)]</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
         <record id="partner_ritten_button" model="ir.ui.view">
             <field name="name">hertsens_base.partner_ritten_button</field>
             <field name="model">res.partner</field>
@@ -285,23 +311,22 @@
         </record>
 
 
-
-        <menuitem id="ritten_menu" name="Ritten" parent="base.menu_base_partner" sequence="1" />
-<!--     	<menuitem id="top_her_menu" name="Hertsens" sequence="10"/>
-    	<menuitem id="main_her_menu" name="Hertsens" parent="top_her_menu"/> -->
-        <menuitem id="her_ritten_menu" name="Hertsens" parent="ritten_menu" sequence="1" action="her_ritten_action" groups="hertsens_base.group_hertsens_user_her" />
-        <menuitem id="her_ritten_invoice_menu" name="To be invoiced" parent="her_ritten_menu" sequence="1" action="her_ritten_invoice_action" />
-
         <menuitem id="her_customers_menu" name="Hertsens" parent="base.menu_partner_form" action="her_customers_action" groups="hertsens_base.group_hertsens_user_her"/>
-<!--         <menuitem id="her_contracten_menu" name="Contracten" parent="main_her_menu" action="her_contracts_action"/> --> 
-  <!-- 	<menuitem id="top_jlh_menu" name="JLH Logistics" sequence="10"/>
-    	<menuitem id="main_jlh_menu" name="Hertsens" parent="top_jlh_menu"/> -->
-
-        <menuitem id="jlh_ritten_menu" name="JLH Logistics" parent="ritten_menu" sequence="1" action="jlh_ritten_action" groups="hertsens_base.group_hertsens_user_jlh"/>
-        <menuitem id="jlh_ritten_invoice_menu" name="To be invoiced" parent="jlh_ritten_menu" sequence="1" action="jlh_ritten_invoice_action"/>
         <menuitem id="jlh_customers_menu" name="JLH Logistics" parent="base.menu_partner_form" action="jlh_customers_action" groups="hertsens_base.group_hertsens_user_jlh"/>
 
-<!--         <menuitem id="jlh_contracten_menu" name="Contracten" parent="main_jlh_menu" action="jlh_contracts_action"/> -->
+
+        <menuitem id="ritten_menu" name="Rides" parent="base.menu_base_partner" sequence="1" />
+        <menuitem id="all_ritten_menu" name="Rides" parent="ritten_menu" sequence="0" action="rittenmenu_action" />
+        
+		<menuitem id="hertsens_invoicing_menu" name="Invoicing" parent="base.menu_base_partner" sequence="3" />
+       	<menuitem id="hertsens_toinvoice_menu" name="To be invoiced" parent="hertsens_invoicing_menu" sequence="1" action="" />
+       	 <menuitem id="hertsens_her_ritten_invoice_menu" name="Hertsens" parent="hertsens_toinvoice_menu" sequence="1" action="her_ritten_invoice_action" />
+        <menuitem id="hertsens_jlh_ritten_invoice_menu" name="JLH Logistics" parent="hertsens_toinvoice_menu" sequence="1" action="jlh_ritten_invoice_action"/>
+      	
+      	<menuitem id="hertsens_invoices_menu" name="Invoices" parent="hertsens_invoicing_menu" sequence="1" action="" />
+
+        <menuitem id="hertsens_invoices_menu_her" name="Hertsens" parent="hertsens_invoices_menu" sequence="1" action="hertsens_her_invoices_action" groups="hertsens_base.group_hertsens_user_her" />
+        <menuitem id="hertsens_invoices_menu_jlh" name="JLH Logistics" parent="hertsens_invoices_menu" sequence="1" action="hertsens_jlh_invoices_action" groups="hertsens_base.group_hertsens_user_jlh" />
 
     </data>
 </openerp>

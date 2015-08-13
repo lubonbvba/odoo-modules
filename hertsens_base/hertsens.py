@@ -38,7 +38,7 @@ class hertsens_rit(models.Model):
 	invoice_id=fields.Many2one('account.invoice')
 	destination_ids=fields.One2many('hertsens.destination','rit_id')
 	finished=fields.Boolean(help="Tick if ride is finished")
-	state=fields.Selection([('planned','Planned'),('completed','Completed'),('waiting','Waiting for info'),('toinvoice','To be invoiced'),('invoiced','Invoiced')], required=True, default='planned')
+	state=fields.Selection([('quoted','Quote'),('planned','Planned'),('cancelled', 'Cancelled'),('completed','Completed'),('waiting','Waiting for info'),('toinvoice','To be invoiced'),('invoiced','Invoiced')], required=True, default='planned')
 	# @api.onchange('partner_id')
 	# def _checkcompany(self):
 	# 	self.company_id=self.partner_id.company_id
@@ -50,12 +50,21 @@ class hertsens_rit(models.Model):
 	total_ride_price=fields.Float(string="Total price", compute=_calculate_total)
 
 	@api.one
-	@api.onchange('finished','cmr','ritprijs', 'datum')
+	@api.onchange('partner_id')
+	def _set_company(self):
+		self.company_id=self.partner_id.company_id
+	
+
+
+	@api.one
+	@api.onchange('finished','refklant','ritprijs', 'datum','cmr')
 	def _checkstate(self):
 		flagvalid=True
 		if self.ritprijs==0:
 			flagvalid=False
-		if self.partner_id.cmr and not self.cmr:
+		if not self.cmr:
+			flagvalid=False
+		if self.partner_id.ref_required and not self.refklant:
 			flagvalid=False
 		if self.finished:
 			if flagvalid:
@@ -195,7 +204,7 @@ class res_company(models.Model):
 class res_partner(models.Model):
 	_inherit= "res.partner"
 
-	cmr=fields.Boolean(help="CMR nummer verplicht?")	
+	ref_required=fields.Boolean(string="Ref required",help="Customer reference mandatory?")
 	diesel=fields.Float(help="Dieseltoeslag")
 	ritten_count=fields.Float(compute="_ritten_count")
 	partner_id=fields.Many2one('res.partner', required=True)
