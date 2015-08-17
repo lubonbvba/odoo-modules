@@ -1,23 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
- <openerp>
+<openerp>
     <data>
-        <record model="ir.ui.view" id="lubon_sale_form_view">
+        <record model="ir.ui.view" id="lubon_sale_tree_view">
             <field name="name">lubon_sale.sale</field>
             <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="inherit_id" ref="sale.view_quotation_tree"/>
             <field name="arch" type="xml">
-		<field name="pricelist_id" position="after">
-			<field name="quote_title"/>
-			<field name="has_discount"/>
-		</field>
-                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']"
-                  position="after">
-                    <field name="margin"/>
-                </xpath>
-                <xpath expr="//field[@name='order_line']/tree/field[@name='discount']"
-                  position="after">
-                    <field name="price_reduce"/>
-                </xpath>
+              <field name="date_order" position="after">
+                 <field name="quote_title"/>
+             </field>
+             <xpath expr="//field[@name='amount_total']"
+              position="replace">
+              <field name="amount_untaxed" sum="Total Ex VAT"/>
+          </xpath>
+
+      </field>
+  </record>
+
+  <record model="ir.ui.view" id="lubon_sale_form_view">
+    <field name="name">lubon_sale.sale</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+      <field name="pricelist_id" position="after">
+         <field name="quote_title"/>
+         <field name="has_discount"/>
+         <field name="global_discount"/>
+     </field>
+     <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']"
+      position="after">
+      <field name="margin"/>
+  </xpath>
+  <xpath expr="//field[@name='order_line']/tree/field[@name='discount']"
+      position="after">
+      <field name="price_reduce"/>
+  </xpath>
 
                 <!-- xpath expr="//field[@name='order_line']/form/group/group/field[@name='price_unit']"
                   position="after">
@@ -29,21 +46,25 @@
                 </xpath -->
                 <xpath expr="//field[@name='order_line']/form/group/group/field[@name='price_unit']"
                   position="after">
-                    <field name="price_reduce" class="oe_inline"/>
-                </xpath>
-	        <notebook position="inside">
-		  <page string="Front cover">
+                  <field name="price_reduce" class="oe_inline"/>
+              </xpath>
+              <notebook position="inside">
+                <page string="Front cover">
                     <field name="frontcover">
-		    </field>
-                  </page>
-                  <page string="Back cover">
+                    </field>
+                </page>
+                <page string="Back cover">
                     <field name="backcover">
                     </field>
-                  </page>
+                </page>
+                <page string="Contract">
+                    <field name="contract_text">
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
 
-                </notebook>
-            </field>
-        </record>
         <!-- record model="ir.ui.view" id="lubon_sale_line_form_view">
             <field name="name">lubon_sale.sale_line</field>
             <field name="model">sale.order.line</field>

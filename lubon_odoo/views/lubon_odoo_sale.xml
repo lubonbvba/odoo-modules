@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <openerp>
+    <data> 
+        <record model="ir.ui.view" id="lubon_odoo_sale">
+            <field name="name">lubon_odoo.sale</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
+                    <attribute name="domain">[('is_company','=',True),('parent_id','=',partner_id)]</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

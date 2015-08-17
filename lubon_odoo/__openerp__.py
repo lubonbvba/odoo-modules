@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "lubon_sale",
+    'name': "lubon_odoo",
 
     'summary': """
-        Implement lubon's modifications to sales and quotes 
-	""",
+        Lubon's generic modifications""",
 
     'description': """
-        Long description of module's purpose
+        This module changes generic odoo (mis)behaviour.
     """,
 
     'author': "Lubon bvba",
@@ -20,16 +19,14 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','sale','sale_margin'],
+    'depends': ['base','sale'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'templates.xml',
-	'views/lubon_sale.xml',
-	'reports/lubon_sale_reports.xml',
-    'reports/lubon_sale_contract.xml',
-
+        'views/lubon_odoo_partners.xml',
+#        'views/lubon_odoo_sale.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
