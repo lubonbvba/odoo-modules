@@ -12,66 +12,79 @@
 		</data>
 		<data>
 			<template id="report_contract_document">
-				<!--t t-call="report.external_layout"-->
-				<div class="page">
-					<div class="row">
-						<div align="center">
-							<img t-if="o.company_id.logo" t-att-src="'data:image/png;base64,%s' % o.company_id.logo" style="max-height: 145px;"/>
-						</div>
-					</div>
-
-					<div class="row" align="center">
-						<span>
-							Contract:
-							<h1><span t-field="o.quote_title"/></h1></span>
-						</div>
+				<t t-name="lubon_sale.report_contract_document">
+					<!--t t-call="report.external_layout"-->
+					<div class="page">
 						<div class="row">
-							<div class="col-xs-8 col-xs-offset-0">
-								<br/>Tussen:
+							<div align="center">
+								<img t-if="o.company_id.logo" t-att-src="'data:image/png;base64,%s' % o.company_id.logo" style="max-height: 145px;"/>
+							</div>
+						</div>
+
+						<div class="row" align="center">
+							<span>
+								Contract:
+								<h1><span t-field="o.quote_title"/></h1></span>
+							</div>
+							<div class="row">
+								<div class="col-xs-8 col-xs-offset-0">
+									<br/>Tussen:
+									<br/>
+									<br/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-8 col-xs-offset-0">
+									<div t-field="o.company_id.partner_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: true}"/>
+									<p t-if="o.company_id.partner_id.vat">Ondernemingsnummer: <span t-field="o.company_id.partner_id.vat"/></p>
+
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-8 col-xs-offset-0">Vertegenwoordigd door: Luc Bonjean, Zaakvoerder</div>
+							</div>
+							<div class="row">
 								<br/>
 								<br/>
+								<div class="col-xs-8 col-xs-offset-0">En:</div>
+								<br/>
+								<br/>
+								<br/>
+							</div>
+							<div class="row">
+								<div class="col-xs-8 col-xs-offset-0">
+									<div t-field="o.partner_id.parent_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: true}"/>
+									<p t-if="o.partner_id.vat">Ondernemingsnummer: <span t-field="o.partner_id.vat"/></p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-8 col-xs-offset-0">
+									<p>Vertegenwoordigd door: <span t-field="o.partner_id.name"/>
+									<span t-if="o.partner_id.function">, </span>
+									<span t-field="o.partner_id.function"/>
+								</p>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-xs-8 col-xs-offset-0">
-								<div t-field="o.company_id.partner_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: true}"/>
-								<p t-if="o.company_id.partner_id.vat">Ondernemingsnummer: <span t-field="o.company_id.partner_id.vat"/></p>
-
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-xs-8 col-xs-offset-0">Vertegenwoordigd door: Luc Bonjean, Zaakvoerder</div>
-						</div>
-						<div class="row">
-							<br/>
-							<br/>
-							<div class="col-xs-8 col-xs-offset-0">En:</div>
-							<br/>
-							<br/>
-							<br/>
-						</div>
-						<div class="row">
-							<div class="col-xs-8 col-xs-offset-0">
-								<div t-field="o.partner_id.parent_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: true}"/>
-								<p t-if="o.partner_id.vat">Ondernemingsnummer: <span t-field="o.partner_id.vat"/></p>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-xs-8 col-xs-offset-0">
-								<p>Vertegenwoordigd door: <span t-field="o.partner_id.name"/>
-								<span t-if="o.partner_id.function">, </span>
-								<span t-field="o.partner_id.function"/>
-							</p>
-						</div>
-					</div>
-					<!-- Part 2 Contract text -->
-					<p t-if="o.contract_text and o.state in ['draft','sent']"  style="page-break-before:always;">
-						<span  t-field="o.contract_text"/>
-					</p>
+						<!-- Part 2 Contract text -->
+<!-- 					<p t-if="o.contract_text and o.state in ['draft','sent']" style="page-break-before:always;">
+						<span t-field="o.contract_text"/>
+					</p> -->
 					<!-- Part 3 Contract items -->
-					<p  class="xx-small" style="page-break-before:always;">
+					<p class="xx-small" style="page-break-before:always;">
+						<span t-field="o.contract_appendix"/>
 						<div>
-							<p>Appendix 4: Product &amp; prijsoverzicht</p>
+							<!-- <h2><span t-field="contract_appendix"/></h2> -->
+							<p>
+								<div class="row">
+									<div class="col-xs-2 text-right">Contract term:</div><span t-field="o.contract_term"/>
+								</div>
+								<div class="row">
+									<div class="col-xs-2 text-right">Start date:</div><span t-field="o.contract_start_date"/>
+								</div>
+								<div class="row">
+									<br/>
+								</div>
+							</p>
 							<table class="table table-condensed table-bordered ">
 								<thead>
 									<tr>
@@ -79,8 +92,8 @@
 										<!-- th>Taxes</th -->
 										<th class="text-right">Quantity</th>
 										<th class="text-right">Price</th>
-										<th t-if="o.has_discount" groups="sale.group_discount_per_so_line">Disc.(%)</th>
-										<th t-if="o.has_discount" groups="sale.group_discount_per_so_line">Your price</th>
+										<th t-if="o.has_discount" class="text-right">Disc.(%)</th>
+										<th t-if="o.has_discount" class="text-right">Your price</th>
 										<th class="text-right">Total</th>
 									</tr>
 								</thead>
@@ -99,10 +112,10 @@
                         <td class="text-right">
                         	<span t-field="l.price_unit"/>
                         </td>
-                        <td t-if="o.has_discount" groups="sale.group_discount_per_so_line" class="text-right">
+                        <td t-if="o.has_discount"  class="text-right">
                         	<span t-field="l.discount"/>
                         </td>
-                        <td t-if="o.has_discount" groups="sale.group_discount_per_so_line" class="text-right">
+                        <td t-if="o.has_discount" class="text-right">
                         	<span t-field="l.price_reduce"/>
                         </td>
 
@@ -111,7 +124,9 @@
                         </td>
                     </tr>
                     <tr>
-                    	<td  class="text-right" colspan="5">Total ex VAT:</td>
+                    	<td  t-if="o.has_discount ==True" class="text-right" colspan="5">Total ex VAT:</td>
+                    	<td  t-if="o.has_discount != True" class="text-right" colspan="3">Total ex VAT:</td>
+
                     	<!--td class="text-right"><t t-esc="total"/></td-->
                     	<td class="text-right">
                     		<span t-field="o.amount_untaxed" t-field-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
@@ -124,7 +139,7 @@
     </p>
 
 </div>
-<!--/t-->
+</t>        
 </template>    
 
 <template id="report_contract">

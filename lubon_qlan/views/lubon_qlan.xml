@@ -3,21 +3,21 @@
 
 <openerp>
     <data>
-        <!-- window action -->
-        <!--
-            The following tag is an action definition for a "window action",
-            that is an action opening a view or a set of views
-        -->
-        <!-- record model="ir.actions.act_window" id="move_line_action">
-            <field name="name">Courses</field>
-            <field name="res_model">account.move.line</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">Create the first course
-                </p>
+        <record id="lubon_qlan_add_to_site" model="ir.actions.server">
+            <field name="name">Add to current site</field>
+            <field name="model_id" ref="model_stock_quant"/>
+            <field name="state">code</field>
+            <field name="code">
+                self.addtosite(context['active_ids'],context)
             </field>
-        </record -->
+        </record>
+
+        <record id="ir_lubon_qlan_add_to_site" model="ir.values">
+            <field eval="'client_action_multi'" name="key2"/>
+            <field eval="'stock.quant'" name="model"/>
+            <field name="name">Add to current site</field>
+            <field eval="'ir.actions.server,%d'%lubon_qlan_add_to_site" name="value"/>
+        </record>
 
         <record model="ir.ui.view" id="sites_tree_view">
             <field name="name">sites.tree</field>
@@ -54,15 +54,15 @@
                         </search>
                     </field>
                 </record>
-      <record model="ir.actions.act_window" id="lubon_qlan_show_quantsfqua">
-            <field name="name">SiteAssets001</field>
-            <field name="res_model">stock.quant</field>
-            <field name="domain">[('location_id','child_of', active_id)]</field>
-            <!--field name="context">{'default_partner_id':ref('res.partner.partner_id'), 'default_company_id':ref('res.partner.company_id')}></field-->
-            <field name="view_type">form</field>
-            <field name="view_id" ref="stock.view_stock_quant_tree"></field>
-            <field name="view_mode">tree,form</field>
-        </record>
+                <record model="ir.actions.act_window" id="lubon_qlan_show_quants">
+                    <field name="name">SiteAssets001</field>
+                    <field name="res_model">stock.quant</field>
+                    <field name="domain">[('location_id','child_of', active_id)]</field>
+                    <!--field name="context">{'default_partner_id':ref('res.partner.partner_id'), 'default_company_id':ref('res.partner.company_id')}></field-->
+                    <field name="view_type">form</field>
+                    <field name="view_id" ref="stock.view_stock_quant_tree"></field>
+                    <field name="view_mode">tree,form</field>
+                </record>
                 <record model="ir.ui.view" id="sites_form_view">
                     <field name="name">sites.form</field>
                     <field name="model">lubon_qlan.sites</field>
@@ -103,9 +103,9 @@
                                 </group>
                             </group>
                             <notebook>
-                             <page string="Vlan info">
-                               <field name="vlan_ids">
-                                   <tree string="vlans" editable="bottom">
+                               <page string="Vlan info">
+                                 <field name="vlan_ids">
+                                     <tree string="vlans" editable="bottom">
                                       <field name="name"/>
                                       <field name="vlan_tag"/>
                                       <field name="ipv4"/>
@@ -146,37 +146,39 @@
                           </field>
                       </page>
                       <page string="Security">
-                         <group col="4">
-                            <field name="ssid_private"/>
-                            <field name="ssid_public"/>
-                            <field name="wifikey_private"/>
-                            <field name="wifikey_public"/>
-                        </group>
-                    </page>
-                    <page string="Contract">
-                        <field name="contract_ids" create="False"/>
-                    </page>
-                    <page string="Credentials">
-                        <field name="credential_ids"/>
-                    </page>
-                    <page string="Assets">
-                        <field name="asset_ids">
-                            <tree string="Quants Tree" editable="bottom">
-                                <field name="site_id"/>
-                                <field name="asset_name" placeholder="Asset name"/>
-                            </tree>
-                        </field>
-                    </page>
-                    <page string="Site config">
-                        <group>
-                            <field name="location_ids" widget="many2many_tags"/>
-                        </group>
-                    </page>
+                       <group col="4">
+                        <field name="ssid_private"/>
+                        <field name="ssid_public"/>
+                        <field name="wifikey_private"/>
+                        <field name="wifikey_public"/>
+                    </group>
+                </page>
+                <page string="Contract">
+                    <field name="contract_ids" create="False"/>
+                </page>
+                <page string="Credentials">
+                    <field name="credential_ids"/>
+                </page>
+                <page string="Assets">
+                    <field name="asset_ids" context="{'default_site_id' : active_id }">
+                        <tree string="Quants Tree" editable="bottom">
+                            <field name="site_id"/>
+                            <field name="quant_id"/>
+                            <field name="lot_id"/>
+                            <field name="asset_name" placeholder="Asset name"/>
+                        </tree>
+                    </field>
+                </page>
+                <page string="Site config">
+                    <group>
+                        <field name="location_ids" widget="many2many_tags"/>
+                    </group>
+                </page>
 
-                </notebook>		
-            </sheet>
-        </form>
-    </field>
+            </notebook>		
+        </sheet>
+    </form>
+</field>
 </record>
 
 
@@ -261,21 +263,21 @@
               <page string="Servers">
               </page>
               <page string="Settings">
-                 <group string="Security" col="3">
-                   <field name="qtest_password"/>
-                   <button name="qtest_show" string="Show"/>
-                   <field name="qadm_password"/>
-                   <button name="qadm_show" string="Show"/>
-                   <!-- field name="is_telephony"/ -->
-               </group>
-           </page>	
-           <page string="Telephony">
-             <group>
-               <field name="pbx_password"/>
-           </group>
-       </page>
+               <group string="Security" col="3">
+                 <field name="qtest_password"/>
+                 <button name="qtest_show" string="Show"/>
+                 <field name="qadm_password"/>
+                 <button name="qadm_show" string="Show"/>
+                 <!-- field name="is_telephony"/ -->
+             </group>
+         </page>	
+         <page string="Telephony">
+           <group>
+             <field name="pbx_password"/>
+         </group>
+     </page>
 
-       <page string="Contracts">
+     <page string="Contracts">
         <field name="contract_ids"/>
     </page>
     <page string="Credentials">
@@ -326,16 +328,16 @@
     <field name="model">lubon_qlan.adaccounts_import</field>
     <field name="arch" type="xml">
         <form string="Import script">
-         <header>
+           <header>
             <button name="importadaccounts" string="Import" type="object"/>
         </header>
 
         <group>
-           <field name="importref"/>
-           <field name="samaccountname"/>
-           <field name="tenant"/>
-       </group>
-   </form>
+         <field name="importref"/>
+         <field name="samaccountname"/>
+         <field name="tenant"/>
+     </group>
+ </form>
 </field>
 </record>
 
@@ -406,6 +408,12 @@
                         <field name="view_type">form</field>
                         <field name="view_mode">tree</field>
                     </record>
+                    <record model="ir.actions.act_window" id="qlan_assets_action">
+                        <field name="name">Assets</field>
+                        <field name="res_model">lubon_qlan.assets</field>
+                        <field name="view_type">form</field>
+                        <field name="view_mode">tree,form</field>
+                    </record>
                     <!-- top level menu: no parent -->
                     <menuitem id="main_lubon_qlan_menu" name="Qlan" sequence="0" groups="qlan_manager,qlan_user"/>
         <!-- A first level in the left side menu is needed
@@ -442,6 +450,8 @@
 
                               <menuitem id="lubon_qlan_credentials_menu" name="Credentials" parent="lubon_qlan_tables_menu"
                                   action="qlan_credentials_action"/>
+                                  <menuitem id="lubon_qlan_assets_menu" name="Assets" parent="lubon_qlan_tables_menu"
+                                      action="qlan_assets_action"/>
 
 
 

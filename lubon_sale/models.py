@@ -24,7 +24,9 @@ class sale_order(models.Model):
 	contract_text = fields.Html("Contract text", placeholder="Contract text")
 	quote_title = fields.Char("Quote title", help="Title that appears on the quote and in the subjext of the e-mail", required=True)
 	global_discount=fields.Float("Discount")	
-	
+	contract_appendix=fields.Char(string="Title appendix page", default="Appendix 4: Product & prijsoverzicht")
+	contract_term=fields.Char(default="3 jaar", string="Initial term")
+	contract_start_date=fields.Date(string="Start date")
 	@api.onchange('has_discount')
 	def onchange_has_discount(self):
 		if not self.has_discount:

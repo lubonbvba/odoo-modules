@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data> 
+        <record model="ir.ui.view" id="lubon_odoo_view_translation_search">
+            <field name="name">lubon_odoo.lubon_view_translation_search</field>
+            <field name="model">ir.translation</field>
+            <field name="inherit_id" ref="base.view_translation_search"/>
+            <field name="arch" type="xml">
+                <field name="value" position="after">
+                    <field name="res_id"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</openerp>

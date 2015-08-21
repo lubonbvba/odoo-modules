@@ -224,6 +224,7 @@ class lubon_qlan_sites(models.Model):
 		act_win = act_obj.read(cr, uid, [res_id], context=context)[0]
 		act_win['domain'] = [('location_id', 'in', data['location_ids'])]
 		act_win['name'] = _('Site quants')
+		act_win['context'] = {'default_site_id':data['id']}
 		return act_win
 
 
@@ -231,7 +232,12 @@ class stock_location(models.Model):
 	_inherit="stock.location"
 	site_id=fields.Many2one('lubon_qlan.sites')
 
+class stock_quant(models.Model):
+	_inherit="stock.quant"
+	def addtosite(self,ids,context):
+		pdb.set_trace()
 
+	
 class lubon_qlan_assets(models.Model):
 	_inherits={'stock.quant': 'quant_id'}
 	_name="lubon_qlan.assets"

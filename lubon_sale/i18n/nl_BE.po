@@ -6,16 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 8.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-05 19:45+0000\n"
-"PO-Revision-Date: 2015-05-05 21:50+0100\n"
-"Last-Translator: <>\n"
+"POT-Creation-Date: 2015-08-21 15:00+0000\n"
+"PO-Revision-Date: 2015-08-21 17:02+0100\n"
+"Last-Translator: Luc Bonjean <luc@lubon.be>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: \n"
 "Language: nl_BE\n"
-"X-Generator: Poedit 1.7.6\n"
+"X-Generator: Poedit 1.5.4\n"
 
 #. module: lubon_sale
 #: view:website:sale.report_saleorder_document
@@ -28,9 +27,30 @@ msgid "Back cover"
 msgstr "Achterblad"
 
 #. module: lubon_sale
-#: field:sale.order,backcover:0
-msgid "Backcover text"
-msgstr "Tekst op het achterblad"
+#: model:ir.actions.report.xml,name:lubon_sale.lubon_sale_report_contract
+#: view:sale.order:lubon_sale.lubon_sale_form_view
+msgid "Contract"
+msgstr "Contract"
+
+#. module: lubon_sale
+#: view:sale.order:lubon_sale.lubon_sale_form_view
+msgid "Contract details"
+msgstr "Contract details"
+
+#. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
+msgid "Contract term:"
+msgstr "Initiele termijn:"
+
+#. module: lubon_sale
+#: field:sale.order,contract_text:0
+msgid "Contract text"
+msgstr "Contract text"
+
+#. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
+msgid "Contract:"
+msgstr "Contract:"
 
 #. module: lubon_sale
 #: view:website:sale.report_saleorder_document
@@ -40,22 +60,29 @@ msgstr "Besteldatum:"
 #. module: lubon_sale
 #: view:website:sale.report_saleorder_document
 msgid "Delivery and installation are billed separately."
-msgstr "Levering en installatie worden apart geïnstalleerd"
+msgstr "Levering en installatie worden apart gefactureerd."
 
 #. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
 #: view:website:sale.report_saleorder_document
 msgid "Description"
 msgstr "Omschrijving"
 
 #. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
 #: view:website:sale.report_saleorder_document
 msgid "Disc.(%)"
 msgstr "Korting(%)"
 
 #. module: lubon_sale
-#: field:sale.order,has_discount:0
+#: field:sale.order,global_discount:0 field:sale.order,has_discount:0
 msgid "Discount"
 msgstr "Korting"
+
+#. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
+msgid "En:"
+msgstr "En:"
 
 #. module: lubon_sale
 #: field:sale.order,has_text:0
@@ -68,9 +95,9 @@ msgid "Front cover"
 msgstr "Voorblad"
 
 #. module: lubon_sale
-#: field:sale.order,frontcover:0
-msgid "Frontcover text"
-msgstr "Tekst op het voorblad"
+#: field:sale.order,contract_term:0
+msgid "Initial term"
+msgstr "Initial term"
 
 #. module: lubon_sale
 #: view:website:sale.report_saleorder_document
@@ -83,6 +110,11 @@ msgid "Invoice and shipping address:"
 msgstr "Leverings- en factuuradres:"
 
 #. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
+msgid "Ondernemingsnummer:"
+msgstr "Ondernemingsnummer:"
+
+#. module: lubon_sale
 #: view:website:sale.report_saleorder_document
 msgid "Order N°"
 msgstr "Ordernr."
@@ -93,11 +125,18 @@ msgid "Payment Term:"
 msgstr "Betalingstermijn:"
 
 #. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
 #: view:website:sale.report_saleorder_document
 msgid "Price"
 msgstr "Prijs"
 
 #. module: lubon_sale
+#: field:sale.order,frontcover:0
+msgid "Qoute frontcover text"
+msgstr "Qoute frontcover text"
+
+#. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
 #: view:website:sale.report_saleorder_document
 msgid "Quantity"
 msgstr "Hoeveelheid"
@@ -111,6 +150,11 @@ msgstr "Offertedatum:"
 #: view:website:sale.report_saleorder_document
 msgid "Quotation N°"
 msgstr "Offertenr."
+
+#. module: lubon_sale
+#: field:sale.order,backcover:0
+msgid "Quote backcover text"
+msgstr "Quote backcover text"
 
 #. module: lubon_sale
 #: field:sale.order,quote_title:0
@@ -138,6 +182,16 @@ msgid "Shipping address:"
 msgstr "Afleveradres:"
 
 #. module: lubon_sale
+#: field:sale.order,contract_start_date:0
+msgid "Start date"
+msgstr "Start datum"
+
+#. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
+msgid "Start date:"
+msgstr "Start datum:"
+
+#. module: lubon_sale
 #: help:sale.order,has_discount:0
 msgid "Tick to enable discount on this quote"
 msgstr "Aanklikken om korting op deze order toe te laten"
@@ -148,19 +202,40 @@ msgid "Tick to enable html comments on this quote"
 msgstr "Tick to enable html comments on this quote"
 
 #. module: lubon_sale
+#: field:sale.order,contract_appendix:0
+msgid "Title appendix page"
+msgstr "Titel van de appendix pagina"
+
+#. module: lubon_sale
 #: help:sale.order,quote_title:0
 msgid "Title that appears on the quote and in the subjext of the e-mail"
 msgstr "Titel op de offerte en in het onderwerp van de e-mail."
 
 #. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
 #: view:website:sale.report_saleorder_document
 msgid "Total"
 msgstr "Totaal"
 
 #. module: lubon_sale
+#: view:sale.order:lubon_sale.lubon_sale_tree_view
+msgid "Total Ex VAT"
+msgstr "Totaal Ex BTW"
+
+#. module: lubon_sale
 #: view:website:sale.report_saleorder_document
 msgid "Total Excl VAT"
 msgstr "Totaal Ex BTW"
+
+#. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
+msgid "Total ex VAT:"
+msgstr "Totaal ex BTW:"
+
+#. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
+msgid "Tussen:"
+msgstr "Tussen:"
 
 #. module: lubon_sale
 #: view:website:sale.report_saleorder_document
@@ -169,8 +244,22 @@ msgstr "Btw:"
 
 #. module: lubon_sale
 #: view:website:sale.report_saleorder_document
-msgid "Validity of offer: 14 days, subject to change specs, depletion of stock or currency fluctuations."
-msgstr "Geldigheid offerte: 14 dagen, onder voorbehoud van wijzigingen in specs, uitputting voorraad of koersschommelingen."
+msgid ""
+"Validity of offer: 14 days, subject to change specs, depletion of stock or "
+"currency fluctuations."
+msgstr ""
+"Geldigheid offerte: 14 dagen, onder voorbehoud van wijzigingen in specs, "
+"uitputting voorraad of koersschommelingen."
+
+#. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
+msgid "Vertegenwoordigd door:"
+msgstr "Vertegenwoordigd door:"
+
+#. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
+msgid "Vertegenwoordigd door: Luc Bonjean, Zaakvoerder"
+msgstr "Vertegenwoordigd door: Luc Bonjean, Zaakvoerder"
 
 #. module: lubon_sale
 #: view:website:sale.report_saleorder_document
@@ -178,6 +267,7 @@ msgid "Your Reference:"
 msgstr "Uw referentie:"
 
 #. module: lubon_sale
+#: view:website:lubon_sale.report_contract_document
 #: view:website:sale.report_saleorder_document
 msgid "Your price"
 msgstr "Uw prijs"

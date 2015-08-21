@@ -33,6 +33,7 @@
 	'views/hertsens_partners.xml',
     'views/hertsens_menu.xml',
     'reports/hertsens_base_invoice.xml',
+    'reports/hertsens_base_header.xml',
 
     ],
     # only loaded in demonstration mode

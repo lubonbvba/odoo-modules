@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 8.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-13 15:17+0000\n"
-"PO-Revision-Date: 2015-08-13 17:21+0100\n"
+"POT-Creation-Date: 2015-08-21 09:46+0000\n"
+"PO-Revision-Date: 2015-08-21 12:30+0100\n"
 "Last-Translator: Luc Bonjean <luc@lubon.be>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.5.4\n"
 "Language: nl_BE\n"
+"X-Generator: Poedit 1.5.4\n"
 
 #. module: hertsens_base
 #: help:hertsens.invoice.create,oneline:0
@@ -22,9 +22,14 @@ msgid "1 invoice line for all rides?"
 msgstr "1 factuurlijn voor alle ritten?"
 
 #. module: hertsens_base
+#: model:ir.model,name:hertsens_base.model_account_move
+msgid "Account Entry"
+msgstr "Boeking"
+
+#. module: hertsens_base
 #: view:hertsens.rit:hertsens_base.ritten_search_view
 msgid "Active"
-msgstr "Actief"
+msgstr "Active"
 
 #. module: hertsens_base
 #: field:hertsens.invoice.create,allrides_valid:0
@@ -35,6 +40,11 @@ msgstr "Alle ritten geldig"
 #: view:website:account.report_invoice_document
 msgid "Amount"
 msgstr "Bedrag"
+
+#. module: hertsens_base
+#: model:ir.model,name:hertsens_base.model_account_bank_statement
+msgid "Bank Statement"
+msgstr "Bankafschrift"
 
 #. module: hertsens_base
 #: view:website:account.report_invoice_document
@@ -132,7 +142,7 @@ msgstr "Created on"
 #: view:hertsens.rit:hertsens_base.ritten_search_view
 #: field:hertsens.rit,company_id:0
 msgid "Customer"
-msgstr "Klant"
+msgstr "Customer"
 
 #. module: hertsens_base
 #: view:website:account.report_invoice_document
@@ -270,6 +280,16 @@ msgid "ID"
 msgstr "ID"
 
 #. module: hertsens_base
+#: help:res.users,operational_mode:0
+msgid ""
+"If operational mode is on, customers and invoices of all the companies are "
+"shown. No accounting actions are possible."
+msgstr ""
+"Als dit aan staat kan er in beide bedrijven gewerkt worden. Boekhoudkundige "
+"acties zijn verboden."
+
+#. module: hertsens_base
+#: view:account.invoice:hertsens_base.hertsens_account_invoice_operational_tree
 #: model:ir.model,name:hertsens_base.model_account_invoice
 #: view:website:account.report_invoice_document
 msgid "Invoice"
@@ -279,6 +299,11 @@ msgstr "Factuur"
 #: view:website:account.report_invoice_document
 msgid "Invoice Date:"
 msgstr "Factuurdatum:"
+
+#. module: hertsens_base
+#: model:ir.model,name:hertsens_base.model_account_invoice_line
+msgid "Invoice Line"
+msgstr "Factuurlijn"
 
 #. module: hertsens_base
 #: view:hertsens.invoice.create:hertsens_base.view_hertsens_invoice_create_form
@@ -307,7 +332,7 @@ msgid "Invoiced"
 msgstr "Gefactureerd"
 
 #. module: hertsens_base
-#: code:addons/hertsens_base/hertsens.py:260
+#: code:addons/hertsens_base/hertsens.py:279
 #: model:ir.ui.menu,name:hertsens_base.hertsens_invoices_menu
 #, python-format
 msgid "Invoices"
@@ -316,12 +341,12 @@ msgstr "Facturen"
 #. module: hertsens_base
 #: model:ir.actions.act_window,name:hertsens_base.hertsens_her_invoices_action
 msgid "Invoices Hertsens"
-msgstr "Invoices Hertsens"
+msgstr "Facturen Hertsens"
 
 #. module: hertsens_base
 #: model:ir.actions.act_window,name:hertsens_base.hertsens_jlh_invoices_action
 msgid "Invoices JLH Logistics"
-msgstr "Invoices JLH Logistics"
+msgstr "Facturen JLH Logistics"
 
 #. module: hertsens_base
 #: model:ir.ui.menu,name:hertsens_base.hertsens_invoicing_menu
@@ -363,9 +388,21 @@ msgid "Last Updated on"
 msgstr "Last Updated on"
 
 #. module: hertsens_base
+#: field:account.bank.statement,on:0 field:account.invoice,on:0
+#: field:account.invoice.line,on:0 field:account.move,on:0
+#: field:hertsens.rit,on:0 field:res.partner,on:0
+msgid "On"
+msgstr "On"
+
+#. module: hertsens_base
 #: field:hertsens.invoice.create,oneline:0
 msgid "Oneline"
 msgstr "Oneline"
+
+#. module: hertsens_base
+#: field:res.users,operational_mode:0
+msgid "Operational mode"
+msgstr "Operationele mode"
 
 #. module: hertsens_base
 #: view:website:account.report_invoice_document
@@ -386,7 +423,7 @@ msgstr "Klant"
 #: view:hertsens.rit:hertsens_base.ritten_search_view
 #: selection:hertsens.rit,state:0
 msgid "Planned"
-msgstr "Planned"
+msgstr "Gepland"
 
 #. module: hertsens_base
 #: help:hertsens.rit,wachttijd:0
@@ -416,22 +453,22 @@ msgstr "Product ritten"
 #. module: hertsens_base
 #: help:res.company,default_charges_vat_product:0
 msgid "Product to use for charges including vat"
-msgstr "Product to use for charges including vat"
+msgstr "Te gebruiken produkt voor doorrekening kosten onder btw regime"
 
 #. module: hertsens_base
 #: help:res.company,default_charges_exvat_product:0
 msgid "Product to use for charges with vat exempt"
-msgstr "Product to use for charges with vat exempt"
+msgstr "Te gebruiken produkt voor doorrekening kosten vrij van btw"
 
 #. module: hertsens_base
 #: help:res.company,default_diesel_product:0
 msgid "Product to use for diesel surcharge"
-msgstr "Product to use for diesel surcharge"
+msgstr "Te gebruiken produkt voor dieseltoeslag"
 
 #. module: hertsens_base
 #: help:res.company,default_rides_product:0
 msgid "Product to use for rides"
-msgstr "Product to use for rides"
+msgstr "Te gebruiken produkt voor ritten"
 
 #. module: hertsens_base
 #: view:website:account.report_invoice_document
@@ -481,17 +518,27 @@ msgstr "Creditnota"
 #. module: hertsens_base
 #: help:hertsens.rit,charges_vat:0
 msgid "Reimbursements vat"
-msgstr "Reimbursements vat"
+msgstr "Doorgerekende kosten onder btw regime"
 
 #. module: hertsens_base
 #: help:hertsens.rit,charges_exvat:0
 msgid "Reimbursements vat exempt"
-msgstr "Reimbursements vat exempt"
+msgstr "Doorgerekende kosten vrij van btw"
 
 #. module: hertsens_base
 #: view:website:account.report_invoice_document
 msgid "Remark:"
 msgstr "Medeling:"
+
+#. module: hertsens_base
+#: view:account.invoice:hertsens_base.hertsens_account_invoice_operational_tree
+msgid "Residual Amount"
+msgstr "Restbedrag"
+
+#. module: hertsens_base
+#: view:account.invoice:hertsens_base.hertsens_account_invoice_operational_tree
+msgid "Responsible"
+msgstr "Verantwoordelijke"
 
 #. module: hertsens_base
 #: field:res.partner,ride_ids:0
@@ -563,7 +610,7 @@ msgstr "Rittenoverzicht voor factuur:"
 #. module: hertsens_base
 #: view:hertsens.rit:hertsens_base.ritten_search_view
 msgid "Salesperson"
-msgstr "Salesperson"
+msgstr "Verkoper"
 
 #. module: hertsens_base
 #: view:hertsens.rit:hertsens_base.ritten_search_view
@@ -573,7 +620,7 @@ msgstr "Ritten zoeken"
 #. module: hertsens_base
 #: field:hertsens.destination,sequence:0
 msgid "Sequence"
-msgstr "Sequence"
+msgstr "Volgorde"
 
 #. module: hertsens_base
 #: view:website:account.report_invoice_document
@@ -644,6 +691,11 @@ msgid "Total"
 msgstr "Totaal"
 
 #. module: hertsens_base
+#: view:account.invoice:hertsens_base.hertsens_account_invoice_operational_tree
+msgid "Total Amount"
+msgstr "Totaalbedrag"
+
+#. module: hertsens_base
 #: view:website:account.report_invoice_document
 msgid "Total Without Taxes"
 msgstr "Totaal exclusief btw"
@@ -652,6 +704,16 @@ msgstr "Totaal exclusief btw"
 #: view:website:account.report_invoice_document
 msgid "Unit Price"
 msgstr "Eenheidsprijs"
+
+#. module: hertsens_base
+#: view:account.invoice:hertsens_base.hertsens_account_invoice_operational_tree
+msgid "Untaxed Amount"
+msgstr "Bedrag excl. btw"
+
+#. module: hertsens_base
+#: model:ir.model,name:hertsens_base.model_res_users
+msgid "Users"
+msgstr "Gebruikers"
 
 #. module: hertsens_base
 #: view:website:account.report_invoice_document
@@ -677,6 +739,16 @@ msgstr "Wachttijd"
 #: selection:hertsens.rit,state:0
 msgid "Waiting for info"
 msgstr "Te vervolledigen"
+
+#. module: hertsens_base
+#: selection:res.users,operational_mode:0
+msgid "off"
+msgstr "Uit"
+
+#. module: hertsens_base
+#: selection:res.users,operational_mode:0
+msgid "on"
+msgstr "Aan"
 
 #. module: hertsens_base
 #: view:hertsens.invoice.create:hertsens_base.view_hertsens_invoice_create_form

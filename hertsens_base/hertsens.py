@@ -39,6 +39,7 @@ class hertsens_rit(models.Model):
 	destination_ids=fields.One2many('hertsens.destination','rit_id')
 	finished=fields.Boolean(help="Tick if ride is finished")
 	state=fields.Selection([('quoted','Quote'),('planned','Planned'),('cancelled', 'Cancelled'),('completed','Completed'),('waiting','Waiting for info'),('toinvoice','To be invoiced'),('invoiced','Invoiced')], required=True, default='planned')
+	on=fields.Char(required=True,default="on")
 	# @api.onchange('partner_id')
 	# def _checkcompany(self):
 	# 	self.company_id=self.partner_id.company_id
@@ -193,6 +194,24 @@ class herstens_destination (models.Model):
 class invoice(models.Model):
 	_inherit="account.invoice"
 	rides_ids=fields.One2many( "hertsens.rit" ,"invoice_id")
+	on=fields.Char(required=True,default="on")
+
+class invoice_line(models.Model):
+	_inherit="account.invoice.line"
+	on=fields.Char(required=True,default="on")
+
+class account_move(models.Model):
+	_inherit="account.move"
+	on=fields.Char(required=True,default="on")
+
+class bank_statement(models.Model):
+	_inherit="account.bank.statement"
+	on=fields.Char(required=True,default="on")
+
+
+
+
+
 
 class res_company(models.Model):
 	_inherit= "res.company"

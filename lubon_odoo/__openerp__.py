@@ -26,6 +26,7 @@
         # 'security/ir.model.access.csv',
         'templates.xml',
         'views/lubon_odoo_partners.xml',
+        'views/lubon_odoo_odoo.xml',
 #        'views/lubon_odoo_sale.xml',
     ],
     # only loaded in demonstration mode
