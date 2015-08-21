@@ -32,9 +32,9 @@
 	'views/hertsens_base.xml',
 	'views/hertsens_partners.xml',
     'views/hertsens_menu.xml',
+    'views/hertsens_users.xml',
     'reports/hertsens_base_invoice.xml',
     'reports/hertsens_base_header.xml',
-
     ],
     # only loaded in demonstration mode
     'demo': [

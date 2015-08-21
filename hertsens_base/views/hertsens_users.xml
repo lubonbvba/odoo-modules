@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="">
+            <field name="name">hertsens_base.hertsens_view_users_form_simple_modif</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+            <field name="arch" type="xml">
+               <field name="company_id" position="after">
+                <field name="operational_mode" widget="radio"/>
+            </field>                   
+            
+        </field>
+    </record>
+</data>
+</openerp>
