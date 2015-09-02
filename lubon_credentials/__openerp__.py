@@ -20,16 +20,21 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base', 'web', 'base_setup'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'templates.xml',
-	'views/lubon_credentials.xml',
+        'wizard/lubon_credentials_update.xml',
+        'wizard/lubon_credentials_reveal.xml',
+        'views/assets.xml',
+        'views/res_config.xml',
+        'views/lubon_credentials.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo.xml',
     ],
+    'qweb': ['static/src/xml/widget.xml'],
 }
