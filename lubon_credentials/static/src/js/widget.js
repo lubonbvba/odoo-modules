@@ -10,10 +10,14 @@ openerp.lubon_credentials = function(openerp) {
             var self = this;
 
             this.credentials_id = this.get('value');
-            this.set('value', '');
             this.reveal_password();
 
             return this._super();
+        },
+        render_value: function() {
+            if (!this.get("effective_readonly")) {
+                this.$el.find('input').val('');
+            }
         },
         reveal_password: function() {
             var self = this;
@@ -95,8 +99,6 @@ openerp.lubon_credentials = function(openerp) {
         },
         start: function() {
             var self = this;
-
-            this.set('value', '');
 
             return this._super();
         },
