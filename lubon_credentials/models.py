@@ -3,7 +3,6 @@
 from openerp import models, fields, api, exceptions, _
 from openerp.http import request
 from openerp.exceptions import ValidationError
-import werkzeug.utils
 
 # class lubon_partners(models.Model):
 #     _name = 'lubon_partners.lubon_partners'
