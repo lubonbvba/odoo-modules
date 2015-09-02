@@ -88,7 +88,7 @@ openerp.lubon_credentials = function(openerp) {
 
 
     openerp.web.form.widgets.add('password', 'openerp.lubon_credentials.Password');
-    openerp.lubon_credentials.Password = openerp.web.form.AbstractField.extend({
+    openerp.lubon_credentials.Password = openerp.web.form.FieldChar.extend({
         template: "lubon_password",
         events: {
             'click .reveal_password_button': 'reveal_password',
@@ -99,6 +99,11 @@ openerp.lubon_credentials = function(openerp) {
             this.set('value', '');
 
             return this._super();
+        },
+        render_value: function() {
+            if (!this.get("effective_readonly")) {
+                this.$el.find('input').val('');
+            }
         },
         reveal_password: function() {
             var self = this;
