@@ -46,7 +46,7 @@ class lubon_qlan_credentials(models.Model):
         require_pin = True
 
         def validate_retry():
-            retry_count = request.session.get('lubon_pin_retry', 0)
+            retry_count = request.session.get('lubon_pin_retry', 1)
             request.session['lubon_pin_retry'] = retry_count + 1
             if retry_count >= 3:
                 request.session.logout()
@@ -54,8 +54,6 @@ class lubon_qlan_credentials(models.Model):
             return True
 
         if require_pin and not pin:
-            if not validate_retry():
-                return -1
             raise ValidationError("PIN required!")
 
         if require_pin and pin != self.env.user.pin:
@@ -63,7 +61,7 @@ class lubon_qlan_credentials(models.Model):
                 return -1
             raise ValidationError("Incorrect PIN!")
 
-        request.session['lubon_pin_retry'] = 0
+        request.session['lubon_pin_retry'] = 1
 
         return [self.password or '', self.env['ir.config_parameter'].get_param('lubon_credentials.reveal_credentials_timeout', '') or 15000]
 
