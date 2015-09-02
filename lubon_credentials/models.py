@@ -17,6 +17,31 @@ class Partner(models.Model):
     credential_ids = fields.One2many('lubon_credentials.credentials', 'partner_id', string='credentials')
     masterkey = fields.Char()
 
+    @api.one
+    def reveal_credentials(self, pin=None):
+
+        require_pin = True
+
+        def validate_retry():
+            retry_count = request.session.get('lubon_pin_retry', 1)
+            request.session['lubon_pin_retry'] = retry_count + 1
+            if retry_count >= 3:
+                request.session.logout()
+                return False
+            return True
+
+        if require_pin and not pin:
+            raise ValidationError("PIN required!")
+
+        if require_pin and pin != self.env.user.pin:
+            if not validate_retry():
+                return -1
+            raise ValidationError("Incorrect PIN!")
+
+        request.session['lubon_pin_retry'] = 1
+
+        return [self.masterkey or '', self.env['ir.config_parameter'].get_param('lubon_credentials.reveal_credentials_timeout', '') or 15000]
+
 
 class Users(models.Model):
     _inherit = 'res.users'

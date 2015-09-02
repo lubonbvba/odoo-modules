@@ -85,4 +85,63 @@ openerp.lubon_credentials = function(openerp) {
             return this._super();
         }
     });
+
+
+    openerp.web.form.widgets.add('password', 'openerp.lubon_credentials.Password');
+    openerp.lubon_credentials.Password = openerp.web.form.AbstractField.extend({
+        template: "lubon_password",
+        events: {
+            'click .reveal_password_button': 'reveal_password',
+        },
+        start: function() {
+            var self = this;
+
+            this.set('value', '');
+
+            return this._super();
+        },
+        reveal_password: function() {
+            var self = this;
+
+            var model = new openerp.web.Model(self.view.dataset.model);
+
+            var content_element = self.$el.find('.reveal_password_content');
+            var pin_element = self.$el.find('.reveal_password_pin');
+            var pin_input = pin_element.find('input[type="password"]');
+            var button_element = self.$el.find('.reveal_password_button');
+
+            model.call('reveal_credentials', [self.view.datarecord.id, pin_input.val()]).then(function(data) {
+                if (data[0] === -1) {
+                    openerp.web.redirect('/web/login');
+                }
+                content_element.find('.reveal_password_content_value').text(data[0][0]).show();
+                content_element.find('.reveal_password_content_copy').show();
+                content_element.show();
+                button_element.hide();
+                pin_element.hide();
+                var copy_sel = content_element.find('.reveal_password_content_copy');
+                copy_sel.on('click', function(e) {
+                    e.preventDefault();
+                });
+                copy_sel.clipboard({
+                    path: '/lubon_credentials/static/src/swf/jquery.clipboard.swf',
+                    copy: function() {
+                        var value = copy_sel.parents('.reveal_password_content:first').find('.reveal_password_content_value').text();
+                        return value;
+                    }
+                });
+                setTimeout(function() {
+                    content_element.find('.reveal_password_content_value').text('********');
+                    content_element.find('.reveal_password_content_copy').hide();
+                    pin_input.val('');
+                    button_element.show();
+                }, parseInt(data[0][1]));
+            }).fail(function(result, e) {
+                // e.preventDefault();
+                content_element.hide();
+                button_element.show();
+                pin_element.show();
+            });
+        }
+    });
 }
