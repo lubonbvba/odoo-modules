@@ -9,6 +9,7 @@ openerp.lubon_credentials = function(openerp) {
         },
         start: function() {
             this.credentials_id = this.get('value');
+            this.set('value', '');
             this.reveal_password();
             return this._super();
         },
@@ -22,6 +23,9 @@ openerp.lubon_credentials = function(openerp) {
             var button_element = self.$el.find('.reveal_password_button');
 
             model.call('reveal_credentials', [self.credentials_id, pin_input.val()]).then(function(data) {
+                if (data[0] === -1) {
+                    openerp.web.redirect('/web/login');
+                }
                 content_element.find('.reveal_password_content_value').text(data[0][0]).show();
                 content_element.find('.reveal_password_content_copy').show();
                 content_element.show();
@@ -52,7 +56,7 @@ openerp.lubon_credentials = function(openerp) {
         events: {
             'click .content_copy': 'copy_to_clipboard',
         },
-        init: function (field_manager, node) {
+        init: function(field_manager, node) {
             this.clipboard = true;
             return this._super(field_manager, node);
         },

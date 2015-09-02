@@ -3,6 +3,7 @@
 from openerp import models, fields, api, exceptions, _
 from openerp.http import request
 from openerp.exceptions import ValidationError
+import werkzeug.utils
 
 # class lubon_partners(models.Model):
 #     _name = 'lubon_partners.lubon_partners'
@@ -45,11 +46,25 @@ class lubon_qlan_credentials(models.Model):
 
         require_pin = True
 
+        def validate_retry():
+            retry_count = request.session.get('lubon_pin_retry', 0)
+            request.session['lubon_pin_retry'] = retry_count + 1
+            if retry_count >= 3:
+                request.session.logout()
+                return False
+            return True
+
         if require_pin and not pin:
+            if not validate_retry():
+                return -1
             raise ValidationError("PIN required!")
 
         if require_pin and pin != self.env.user.pin:
+            if not validate_retry():
+                return -1
             raise ValidationError("Incorrect PIN!")
+
+        request.session['lubon_pin_retry'] = 0
 
         return [self.password or '', self.env['ir.config_parameter'].get_param('lubon_credentials.reveal_credentials_timeout', '') or 15000]
 
