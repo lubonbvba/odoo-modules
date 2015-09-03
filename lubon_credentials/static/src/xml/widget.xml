@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="credentials">
+    	<span>
+	        <span class="oe_form_char_content reveal_password_content" style="display:none;">
+	        	<span class="reveal_password_content_value"></span>
+	        	<button class="reveal_password_content_copy" data-clipboard-text="Copy Me!" title="Copy">Copy</button>
+	        </span>
+
+	        <span class="oe_form_field oe_form_field_char reveal_password_pin" style="display:none;">
+	        	<span>Enter PIN to reveal password:</span>
+	            <input type="password"/>
+		    </span>
+		    
+            <button href="#" class="btn_txt oe_link reveal_password_button">Reveal</button>
+	    </span>
+    </t>
+
+    <t t-name="FieldCharClipboard" t-extend="FieldChar">
+	    <t t-jquery="span.oe_form_char_content" t-operation="after">
+	    	<t t-if="widget.clipboard">
+	        	<button class="content_copy" data-clipboard-text="Copy Me!" title="Copy">Copy</button>
+		    </t>
+	    </t>
+	</t>
+
+    <t t-name="lubon_password">
+    	<span>
+    		<t t-if="!widget.get('effective_readonly')">
+	            <input t-att-type="widget.password ? 'password' : 'text'"
+	                t-att-id="widget.id_for_label"
+	                t-att-tabindex="widget.node.attrs.tabindex"
+	                t-att-autofocus="widget.node.attrs.autofocus"
+	                t-att-placeholder="widget.node.attrs.placeholder"
+	                t-att-maxlength="widget.field.size"
+	            /><img class="oe_field_translate oe_input_icon" t-if="widget.field.translate" t-att-src='_s + "/web/static/src/img/icons/terp-translate.png"' width="16" height="16" border="0"/>
+	        </t>
+
+    		<t t-if="widget.get('effective_readonly')">
+		        <span class="oe_form_char_content reveal_password_content">
+		        	<span class="reveal_password_content_value">********</span>
+		        	<button class="reveal_password_content_copy" style="display:none;" data-clipboard-text="Copy Me!" title="Copy">Copy</button>
+		        </span>
+
+		        <span class="oe_form_field oe_form_field_char reveal_password_pin" style="display:none;">
+		        	<span>Enter PIN to reveal password:</span>
+		            <input type="password"/>
+			    </span>
+			    
+	            <button href="#" class="btn_txt oe_link reveal_password_button">Reveal</button>
+	        </t>
+	    </span>
+    </t>
+</templates> 

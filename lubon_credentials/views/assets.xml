@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- JS/CSS includes for backend -->
+        <template id="assets_backend" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link href="/lubon_credentials/static/src/css/main.css" rel="stylesheet" type="text/css"/>
+                <script type="text/javascript" src="/lubon_credentials/static/src/js/jquery.clipboard.js"></script>
+                <script type="text/javascript" src="/lubon_credentials/static/src/js/widget.js"></script>
+            </xpath>
+        </template>
+
+    </data>
+</openerp>
