@@ -30,6 +30,8 @@
         'templates.xml',
     	'views/lubon_base.xml',
         'reports/lubon_base_invoice.xml',
+        'reports/lubon_base_header.xml',
+
     ],
     # only loaded in demonstration mode
     'demo': [

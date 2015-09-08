@@ -6,6 +6,9 @@ access_lubon_qlan_ip,access_lubon_qlan_ip,model_lubon_qlan_ip,,1,1,1,1
 access_lubon_qlan_vlan,access_lubon_qlan_vlan,model_lubon_qlan_vlan,,1,1,1,1
 access_lubon_qlan_isp,access_lubon_qlan_isp,model_lubon_qlan_isp,,1,1,1,1
 access_lubon_qlan_assets,access_lubon_qlan_assets,model_lubon_qlan_assets,,1,1,1,1
+access_lubon_qlan_memberships,access_lubon_qlan_memberships,model_lubon_qlan_memberships,,1,1,1,1
+access_lubon_qlan_interfaces,access_lubon_qlan_interfaces,model_lubon_qlan_interfaces,,1,1,1,1
+
 
 
 

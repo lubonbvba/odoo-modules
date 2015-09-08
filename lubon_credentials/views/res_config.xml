@@ -30,8 +30,8 @@
         <menuitem action="action_credentials_config_settings"
                   name="Credential Settings"
                   id="lubon_credentials_config_settings_menu"
-                  parent="base.menu_config"
-                  groups="base.group_no_one"/>
+                  parent="base.menu_config" />
+               <!--   groups="base.group_no_one"/> -->
 
     </data>
 </openerp>
