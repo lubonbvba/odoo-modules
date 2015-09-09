@@ -125,9 +125,9 @@ class lubon_qlan_adaccounts_import(models.TransientModel):
 
 class lubon_qlan_vlan(models.Model):
 	_name='lubon_qlan.vlan'
-	name=fields.Char()
+	name=fields.Char(required=True)
 	sequence=fields.Integer()
-	vlan_tag=fields.Integer()
+	vlan_tag=fields.Integer(required=True)
 	ipv4=fields.Char(string="IPv4 Net name")
 	ipv4_net=fields.Char(string="IPv4 Net")
 	ipv4_mask=fields.Selection([("32","/32"),("30","/30"),("29","/29"),("28","/28"),("27","/27"),("26","/26"),("25","/25"),("24","/24"),("16","/16"),("12","/12"),("8","/8")])
@@ -145,20 +145,31 @@ class lubon_qlan_vlan(models.Model):
 	def calculate_ipv4(self):
 		if self.ipv4_net and self.ipv4_mask:
 			self.ipv4=self.ipv4_net + '/' + self.ipv4_mask
+	@api.multi
+	def name_get(self):
+		res=[]
+		for line in self:
+			text=''
+			if line.name:
+				text=line.name
+			if line.vlan_tag:
+				text+='(' + str(line.vlan_tag) + ')'
+			res.append((line.id,text ))
+		return res 	
 
 class lubon_qlan_ip(models.Model):
 	_name='lubon_qlan.ip'
 	
-	name=fields.Char(string="IP Address")
-	vlan_id=fields.Many2one('lubon_qlan.vlan') 
-	mac=fields.Char()
+	name=fields.Char(string="IP Address", help="Auto calculated, do not modify")
+	vlan_id=fields.Many2one('lubon_qlan.vlan', string="Vlan", help="Vlan this IP address belongs to") 
+	mac=fields.Char(help="Mac Address")
 	ip_type=fields.Selection([("fixed","Fixed"),("dhcp","DHCP Reservation")])
-	ip=fields.Integer(string="Host Address")
-	tenant_id=fields.Many2one('lubon_qlan.tenants')
+	ip=fields.Integer(string="Host Address", help="Host part of the IP Address")
+	tenant_id=fields.Many2one('lubon_qlan.tenants', help="Optional tenant this ip belongs to")
 	asset_id=fields.Many2one('lubon_qlan.assets')
 	site_id=fields.Many2one('lubon_qlan.sites')
-	memberships_id=fields.Many2one('lubon_qlan.memberships')
-	interface_id=fields.Many2one('lubon_qlan.interfaces')
+	memberships_id=fields.Many2one('lubon_qlan.memberships', string="Membership", help="Description of vlan membership")
+	interface_id=fields.Many2one('lubon_qlan.interfaces', help="Interface this ip belongs to.")
 	@api.onchange('memberships_id')
 	@api.multi
 	def compute_related_fields(self):
@@ -323,6 +334,7 @@ class lubon_qlan_assets(models.Model):
 			})
 		#pdb.set_trace()
 	@api.one
+	@api.depends('ips')
 	def _calculate_ip_display(self):
 		self.ip_display=""
 		for ip in self.ips:
@@ -330,7 +342,7 @@ class lubon_qlan_assets(models.Model):
 				if self.ip_display:
 					self.ip_display+=","
 				self.ip_display+=ip.name
-	ip_display=fields.Char(string="IP", compute="_calculate_ip_display")
+	ip_display=fields.Char(string="IP", compute="_calculate_ip_display", store=True)
 		
 
 
@@ -349,7 +361,7 @@ class lubon_qlan_interfaces(models.Model):
 	site_id=fields.Many2one('lubon_qlan.sites',required=True) 
 	memberships_ids=fields.One2many('lubon_qlan.memberships','interface_id')
 	mac=fields.Char()
-	vlan_string=fields.Char(string="Vlan", readonly=True)
+	
 	@api.one
 	@api.onchange('name')
 	def compute_display_name(self):
@@ -362,12 +374,22 @@ class lubon_qlan_interfaces(models.Model):
 		#pdb.set_trace()
 		self.site_id=self.asset_id.site_id
 		return self.asset_id.site_id
+
 	@api.one
-	@api.onchange('memberships_ids')
+#	@api.onchange('memberships_ids')
 	def compute_vlan_string(self):
-		self.vlan_string=""
+		vlan_string=""
 		for m in self.memberships_ids:
-			self.vlan_string+= "," + str(m.vlan_id.vlan_tag) 
+			if vlan_string:
+				vlan_string+= ","
+			vlan_string+= str(m.vlan_id.vlan_tag) 
+			if m.member_type == 'u':
+				vlan_string+='(u)' 
+		#pdb.set_trace()	
+		self.vlan_string=vlan_string
+
+	vlan_string=fields.Char(string="Vlan", compute="compute_vlan_string")
+
 	@api.multi
 	def name_get(self):
 		#pdb.set_trace()
@@ -380,6 +402,19 @@ class lubon_qlan_interfaces(models.Model):
 				text+=line.name
 			res.append((line.id,text ))
 		return res 		
+	
+	@api.one
+	@api.onchange('connected_to')
+	def set_connected_to(self):
+		#self.connected_to.connected_to=self.env.context['interface_id']
+		if self.connected_to:
+			other_itf=self.env['lubon_qlan.interfaces'].browse(self.connected_to.id)
+			other_itf.write({'connected_to': self.env.context['interface_id']})
+		else:
+			other_itf=self.env['lubon_qlan.interfaces'].browse(self.env.context['interface_id']).connected_to
+			other_itf.write({'connected_to': False})
+#		pdb.set_trace()
+
 
 class lubon_qlan_memberships(models.Model):
 #	_inherits={'stock.quant': 'quant_id'}
@@ -387,8 +422,8 @@ class lubon_qlan_memberships(models.Model):
 	
 	name=fields.Char()
 	display_name=fields.Char()
-	interface_id=fields.Many2one('lubon_qlan.interfaces')
-	vlan_id=fields.Many2one('lubon_qlan.vlan')
+	interface_id=fields.Many2one('lubon_qlan.interfaces', string="Interface")
+	vlan_id=fields.Many2one('lubon_qlan.vlan', string="Vlan")
 	ip_ids=fields.One2many('lubon_qlan.ip','memberships_id')
 	member_type=fields.Selection([('u','Untagged'),('t','Tagged')], default='u', required=True)
 	site_id=fields.Many2one('lubon_qlan.sites', required=True)
@@ -442,4 +477,31 @@ class add_quant_to_site_wizard(models.TransientModel):
 		for q in self.quant_ids:
 			self.env['lubon_qlan.assets'].new_asset(self.site_id,q)
 
+class add_interfaces_to_asset_wizard(models.TransientModel):
+	_name="add_interfaces_to_asset.wizard"
+	assets_id=fields.Many2one("lubon_qlan.assets")
+	start=fields.Char(String="Start string", placeholder="eth")
+	number=fields.Integer(String="Number", help="Number of interfaces", default=1)
+	start_number=fields.Integer(String="Start Number", help="Number of interfaces", default=1)
+	width=fields.Integer(String="Number width", placeholder="2")
+	fill=fields.Char(String="Fill character", default="0")
 
+	@api.one
+	@api.onchange('number')
+	def calculate_width(self):
+		self.width=1
+		if self.number>10:
+			self.width=2
+	@api.one
+	def add_interfaces_to_assets(self):
+		for x in xrange(self.start_number, self.start_number +  self.number):
+			appendix=str(x)
+			while len(appendix)<self.width:
+				appendix=str(self.fill)+appendix
+			name=str(self.start) + appendix
+			self.env['lubon_qlan.interfaces'].create({
+				'asset_id': self.assets_id.id,
+				'name': name,
+				'site_id': self.assets_id.site_id.id
+				})
+			
