@@ -178,12 +178,16 @@ class lubon_qlan_ip(models.Model):
 
 	@api.onchange('ip')
 	def _compute_name(self):
-		if self.vlan_id:
-			if  (not self.vlan_id.ipv4_net or not self.ip):
-				raise exceptions.Warning(
-                	_("VLAN '%s' is not properly configured ") % self.vlan_id.name)
-			else:
-				self.name=self.vlan_id.ipv4_net + '.' +str(self.ip)
+		#pdb.set_trace()
+		if not (self.ip):
+			self.name=""
+		else:
+			if self.vlan_id:
+				if  (not self.vlan_id.ipv4_net):
+					raise exceptions.Warning(
+						_("VLAN '%s' is not properly configured ") % self.vlan_id.name)
+				else:
+					self.name=self.vlan_id.ipv4_net + '.' +str(self.ip)
 
 class lubon_qlan_isp(models.Model):
 	_name='lubon_qlan.isp'
@@ -213,6 +217,7 @@ class lubon_qlan_sites(models.Model):
 	name=fields.Char(string="Site name")
 	alfacode=fields.Char(string="Site Code")
 	filemaker_site_id=fields.Char(string='Filemaker site')
+	partner_id=fields.Many2one('res.partner', string="Address", domain="[('is_company','=',True)]")
 	code=fields.Char()
 	ipv4=fields.Char(string="IPv4 net")
 	ipv6=fields.Char(string="IPv6 net")
@@ -229,6 +234,20 @@ class lubon_qlan_sites(models.Model):
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
 	location_ids=fields.One2many('stock.location', 'site_id')
 	asset_ids=fields.One2many('lubon_qlan.assets','site_id')
+	notes=fields.Html()
+	@api.one
+	def _vlan_count(self):
+		self.vlan_count=len(self.vlan_ids)
+	vlan_count=fields.Integer(compute=_vlan_count)
+	@api.one
+	def _assets_count(self):
+		self.assets_count=len(self.asset_ids)
+	assets_count=fields.Integer(compute=_assets_count)
+	@api.one
+	def _ip_count(self):
+		self.ip_count=len(self.ip_ids)
+	ip_count=fields.Integer(compute=_ip_count)
+
 
 	@api.multi
 	def search_quants(self):
@@ -309,6 +328,9 @@ class lubon_qlan_assets(models.Model):
 #	_inherits={'stock.quant': 'quant_id'}
 	_name="lubon_qlan.assets"
 	_rec_name="asset_name"
+	parent_id=fields.Many2one('lubon_qlan.assets')
+	child_ids=fields.One2many('lubon_qlan.assets','parent_id')
+	is_container=fields.Boolean(string="Container", help="Can contain other devices")
 	quant_id=fields.Many2one('stock.quant')
 	product_id=fields.Many2one('product.product')
 	site_id=fields.Many2one('lubon_qlan.sites', required=True)
@@ -320,6 +342,7 @@ class lubon_qlan_assets(models.Model):
 	part=fields.Char(string="Part n°", help="Manufacturer part number")
 	warranty_end_date=fields.Date(string="End date warranty")
 	sequence=fields.Integer()
+	notes=fields.Html()
 	ips=fields.One2many('lubon_qlan.ip','asset_id')
 	interfaces_ids=fields.One2many('lubon_qlan.interfaces','asset_id')
 	credentials_ids=fields.One2many('lubon_credentials.credentials','asset_id')
@@ -352,15 +375,15 @@ class lubon_qlan_interfaces(models.Model):
 #	_inherits={'stock.quant': 'quant_id'}
 	_name="lubon_qlan.interfaces"
 	_order="name"
-	name=fields.Char(required=True)
+	name=fields.Char(required=True, help="eth=Ethernet, gi=Gigabit, Fi=Fiber, pwr=power")
 #	display_name=fields.Char()
 	sequence=fields.Integer()
 	asset_id=fields.Many2one('lubon_qlan.assets')
-	interface_type=fields.Selection([('phys','Physical'),('virt','Virtual')])
 	connected_to=fields.Many2one('lubon_qlan.interfaces',domain="[('site_id','=',parent.site_id)]")
 	site_id=fields.Many2one('lubon_qlan.sites',required=True) 
 	memberships_ids=fields.One2many('lubon_qlan.memberships','interface_id')
 	mac=fields.Char()
+	interface_type_id=fields.Many2one("lubon_qlan.interface_type", string="Type")
 	
 	@api.one
 	@api.onchange('name')
@@ -407,14 +430,18 @@ class lubon_qlan_interfaces(models.Model):
 	@api.onchange('connected_to')
 	def set_connected_to(self):
 		#self.connected_to.connected_to=self.env.context['interface_id']
-		if self.connected_to:
-			other_itf=self.env['lubon_qlan.interfaces'].browse(self.connected_to.id)
-			other_itf.write({'connected_to': self.env.context['interface_id']})
-		else:
-			other_itf=self.env['lubon_qlan.interfaces'].browse(self.env.context['interface_id']).connected_to
-			other_itf.write({'connected_to': False})
+		if 'interface_id' in self.env.context.keys():
+			if self.connected_to:
+				other_itf=self.env['lubon_qlan.interfaces'].browse(self.connected_to.id)
+				other_itf.write({'connected_to': self.env.context['interface_id']})
+			else:
+				other_itf=self.env['lubon_qlan.interfaces'].browse(self.env.context['interface_id']).connected_to
+				other_itf.write({'connected_to': False})
 #		pdb.set_trace()
 
+class lubon_qlan_interface_type(models.Model):
+	_name="lubon_qlan.interface_type"
+	name=fields.Char()
 
 class lubon_qlan_memberships(models.Model):
 #	_inherits={'stock.quant': 'quant_id'}
@@ -480,17 +507,17 @@ class add_quant_to_site_wizard(models.TransientModel):
 class add_interfaces_to_asset_wizard(models.TransientModel):
 	_name="add_interfaces_to_asset.wizard"
 	assets_id=fields.Many2one("lubon_qlan.assets")
-	start=fields.Char(String="Start string", placeholder="eth")
+	start=fields.Char(String="Start string", placeholder="eth", help="eth=Ethernet, gi=Gigabit, Fi=Fiber, pwr=power")
 	number=fields.Integer(String="Number", help="Number of interfaces", default=1)
 	start_number=fields.Integer(String="Start Number", help="Number of interfaces", default=1)
 	width=fields.Integer(String="Number width", placeholder="2")
 	fill=fields.Char(String="Fill character", default="0")
-
+	interface_type_id=fields.Many2one("lubon_qlan.interface_type", string="Type", required="True")
 	@api.one
 	@api.onchange('number')
 	def calculate_width(self):
 		self.width=1
-		if self.number>10:
+		if self.number + self.start_number > 9:
 			self.width=2
 	@api.one
 	def add_interfaces_to_assets(self):
@@ -502,6 +529,7 @@ class add_interfaces_to_asset_wizard(models.TransientModel):
 			self.env['lubon_qlan.interfaces'].create({
 				'asset_id': self.assets_id.id,
 				'name': name,
-				'site_id': self.assets_id.site_id.id
+				'site_id': self.assets_id.site_id.id,
+				'interface_type_id': self.interface_type_id.id,
 				})
 			

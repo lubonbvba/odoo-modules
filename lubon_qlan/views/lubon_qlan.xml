@@ -7,23 +7,35 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>
-                    <record model="ir.actions.act_window" id="qlan_interfaces_action">
-                      <field name="name">Interfaces</field>
-                      <field name="res_model">lubon_qlan.interfaces</field>
-                      <field name="view_type">form</field>
-                      <field name="view_mode">tree,form</field>
-                    </record>   
+    <record model="ir.actions.act_window" id="qlan_interfaces_action">
+      <field name="name">Interfaces</field>
+      <field name="res_model">lubon_qlan.interfaces</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    <record model="ir.actions.act_window" id="qlan_vlan_action">
+      <field name="name">Vlans</field>
+      <field name="res_model">lubon_qlan.vlan</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    <record model="ir.actions.act_window" id="qlan_credentials_action">
+      <field name="name">Credentials</field>
+      <field name="res_model">lubon_credentials.credentials</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>  
     <act_window id="act_add_interfaces_to_assets" name="Add interfaces to asset" res_model="add_interfaces_to_asset.wizard"
-          view_mode="form"
-          target="new"/>  
-<act_window id="act_add_interfaces_to_assets_zz"
-            name="Add interfaces to asset"
-            src_model="lubon_qlan.assets"
-            res_model="add_interfaces_to_asset.wizard"
-            view_mode="form"
-            target="new"
-            context="{'default_assets_id': active_id}"
-            key2="client_action_multi"/>          
+      view_mode="form"
+      target="new"/>  
+      <act_window id="act_add_interfaces_to_assets_zz"
+        name="Add interfaces to asset"
+        src_model="lubon_qlan.assets"
+        res_model="add_interfaces_to_asset.wizard"
+        view_mode="form"
+        target="new"
+        context="{'default_assets_id': active_id}"
+        key2="client_action_multi"/>          
 
 <!--     <record model="ir.actions.act_window" id="act_add_interfaces_to_assets">
       <field name="name">Add interfaces</field>
@@ -43,6 +55,7 @@
             <field name="number"/>
             <field name="width"/>
             <field name="fill"/>
+            <field name="interface_type_id"/>
           </group>
           <footer>
             <button name="add_interfaces_to_assets" string="OK" type="object" class="oe_highlight"/>
@@ -124,14 +137,17 @@
             <!--field name="asset_remarks"/-->
             <field name="ip_display"/>    
             <field name="lot"/>
+            <field name="parent_id" domain="[('site_id','=',site_id),('is_container','=',True),('id','!=',active_id)]" options="{'no_quick_create':True,'no_create_edit':True}"/>
           </group>
           <group>
-            <field name="quant_id"/>
+            <field name="quant_id" options="{'no_quick_create':True,'no_create_edit':True}"/>
             <field name="site_id"/> 
+            <field name="is_container"/> 
             <field name="tenant_id"/> 
             <field name="warranty_end_date"/> 
           </group>
         </group>
+        <field name="notes"/>
         <notebook>
           <page string="IP">
             <field name="ips" context="{'default_asset_id' : active_id, 'default_site_id' : site_id }"/>
@@ -142,6 +158,9 @@
           </page>
           <page string="Credentials">
             <field name="credentials_ids" context="{'default_asset_id' : active_id, 'default_site_id' : site_id }"/>
+          </page>
+          <page string="Parts">
+            <field name="child_ids" context="{'default_parent_id' : active_id, 'default_site_id' : site_id }"/>
           </page>
           <!-- page string="Config">
             <button name="act_add_interfaces_to_assets"  string="Add interfaces" type="action" context="{'default_asset_id': active_id}" groups="base.group_user"/>
@@ -190,7 +209,7 @@
         </group>
         <notebook>
           <page string="IP Adresses">
-            <field name="ip_ids" context="{'default_memberships_id': active_id, 'default_asset_id': asset_id, 'default_site_id': site_id, 'default_vlan_id': vlan_id}"/>
+            <field name="ip_ids" context="{'default_memberships_id': active_id, 'default_asset_id': asset_id, 'default_site_id': site_id, 'default_interface_id': interface_id,'default_vlan_id': vlan_id}"/>
           </page>
         </notebook>
       </form>
@@ -208,10 +227,10 @@
         <field name="id" invisible="True"/>
         <field name="name"/>
         <!--field name="display_name"/ -->
-        <field name="interface_type"/>
+        <field name="interface_type_id" options="{'no_quick_create':True,'no_create_edit':True}"/>
         <field name="mac"/>
         <field name="vlan_string" />
-        <field name="connected_to" context="{'interface_id': id}" domain="[('site_id','=',site_id),('asset_id','!=', asset_id)]"/>
+        <field name="connected_to" context="{'interface_id': id}" domain="[('site_id','=',site_id),('asset_id','!=', asset_id),('interface_type_id','=', interface_type_id)]" options="{'no_quick_create':True,'no_create_edit':True}"/>
       </tree>
     </field>
   </record>
@@ -237,10 +256,10 @@
           <field name="site_id"/>
           <field name="name"/>
           <field name="display_name"/>
-          <field name="interface_type"/>
+          <field name="interface_type_id" options="{'no_quick_create':True,'no_create_edit':True}"/>
           <field name="mac"/>
-          <field name="connected_to" domain="[('site_id','=',site_id)]"/>
-          <field name="vlan_string"/>
+          <field name="connected_to" context="{'interface_id': id}" domain="[('site_id','=',site_id),('asset_id','!=', asset_id),('interface_type_id','=', interface_type_id)]"/>
+          <field name="vlan_string" options="{'no_quick_create':True,'no_create_edit':True}"/>
         </group>
         <notebook>
           <page string="Vlan membership">
@@ -278,7 +297,7 @@
         <field name="asset_id" domain="[('site_id','=',site_id)]" context="{'default_site_id': site_id}"/>
         <field name="interface_id" domain="[('asset_id','=',asset_id)]" context="{'default_site_id': site_id, 'default_asset_id': asset_id ,'default_mac': mac}, 'default_name': 'eth'"/>
         <field name="vlan_id" domain="[('site_id','=',site_id)]"/>
-        <field name="memberships_id" domain="[('interface_id','=',interface_id),('vlan_id','=',vlan_id)]" context="{'default_site_id': site_id, 'default_asset_id': asset_id, 'default_interface_id': interface_id, 'default_vlan_id': vlan_id}"/>
+        <field name="memberships_id" domain="[('interface_id','=',interface_id),('vlan_id','=',vlan_id)]" context="{'default_site_id': site_id, 'default_asset_id': asset_id, 'default_interface_id': interface_id, 'default_vlan_id': vlan_id}" options="{'no_quick_create':True,'no_create_edit':True}"/>
         <field name="name"/>
         <field name="ip"/>
         <field name="mac"/>
@@ -286,6 +305,23 @@
       </tree>
     </field>
   </record>
+  <record model="ir.ui.view" id="lubon_qlan_vlan_tree">
+    <field name="name">lubon_qlan.vlan_tree</field>
+    <field name="model">lubon_qlan.vlan</field>
+    <field name="arch" type="xml">
+      <tree string="VLAN Info">
+        <field name="site_id"/>
+        <field name="name"/>
+        <field name="vlan_tag"/>
+        <field name="ipv4"/>
+        <field name="ipv4_net"/>
+        <field name="ipv4_mask"/>
+        <field name="ipv4_gw"/>
+        <field name="ipv4_dhcp"/>
+        <field name="dns"/>
+      </tree>
+    </field>
+  </record>  
   <record model="ir.ui.view" id="lubon_qlan_vlan_form">
     <field name="name">lubon_qlan.vlan_form</field>
     <field name="model">lubon_qlan.vlan</field>
@@ -312,6 +348,15 @@
           </group>
         </group>
       </form>
+    </field>
+  </record>
+  <record model="ir.ui.view" id="vlan_search_view">
+    <field name="name">vlan.search</field>
+    <field name="model">lubon_qlan.vlan</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="site_id"/>
+      </search>
     </field>
   </record>
   <record model="ir.ui.view" id="ip_search_view">
@@ -349,7 +394,6 @@
           <field name="alfacode" />
           <field name="code" />
           <field name="ipv4"/>
-          <field name="filemaker_site_id"/>
           <field name="main_contact"/>
         </tree>
       </field>
@@ -409,191 +453,200 @@
                   </div>
                   <field name="location_ids" invisible="True"/>
                   <div class="oe_right oe_button_box" name="buttons">
-                    <button string="Assets" type="action" class="oe_stat_button" name="%(qlan_assets_action)d" icon="fa-shopping-cart" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
+                    <button type="action" class="oe_stat_button" name="%(qlan_assets_action)d" icon="fa-shopping-cart" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
+                      <field name="assets_count" string="Assets" widget="statinfo"/>
                     </button>
-                    <button string="IP adresses" type="action" class="oe_stat_button" name="%(qlan_ip_action)d" icon="fa-th-list" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
-                      Number: 
+                    <button type="action" class="oe_stat_button" name="%(qlan_ip_action)d" icon="fa-th-list" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
+                      <field name="ip_count" string="IP" widget="statinfo"/> 
+                    </button>
+                    <button type="action" class="oe_stat_button" name="%(qlan_vlan_action)d" icon="fa-signal" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
+                      <field name="vlan_count" string="VLAN" widget="statinfo"/>
+                    </button>
+                    <button type="action" class="oe_stat_button" name="%(qlan_credentials_action)d" icon="fa-key" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
+                      <!-- field name="vlan_count" string="VLAN" widget="statinfo"/ -->
                     </button>
                   </div>
-                  <group cols="6">
-                    <group string="Admin">
+                  <group>
+                    <group>
                       <!-- field name="name" placeholder="Lubon" widget="char2"/-->
                       <field name="alfacode" placeholder="LUB"/>
                       <field name="code" placeholder="C0000-001"/>
                       <field name="main_contact"/>
-                      <field name="filemaker_site_id"/>
                     </group>
-                                  <!--group string="Network info">
-                                    <field name="ipv4" placeholder="10.253.0.0/16"/>
-                                    <field name="ipv6"/>
-                                  </group-->
-                                </group>
-                                <notebook>
-                                 <page string="Assets">
-                                  <field name="asset_ids" context="{'default_site_id' : active_id }">
-                                  </field>
-                                </page>
-                                <page string="Vlan info">
-                                 <field name="vlan_ids">
-                                  <tree string="vlans" >
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="name"/>
-                                    <field name="vlan_tag"/>
-                                    <field name="ipv4"/>
-                                    <field name="ipv4_gw"/>
-                                    <field name="dns"/>
-                                    <field name="ipv6"/>
-                                    <field name="ipv6_gw"/>
-                                  </tree>
-                                </field>
-                              </page>
-                              <page string="ISP Info">
-                                <field name="isp_ids">
-                                  <tree string="ISP" editable="bottom">
-                                    <field name="name"/>
-                                    <field name="ip_type"/>
-                                    <field name="ip_address"/>
-                                    <field name="ip_login"/>
-                                    <field name="ip_password"/>
-                                    <field name="ip_dns"/>
-                                    <field name="ip_dns_reverse"/>
-                                    <field name="account"/>
-                                    <field name="account_login"/>
-                                    <field name="account_password"/>
-                                  </tree>
-                                </field>
-                              </page>
-                              <page string="LAN IP info">
-                                <field name="ip_ids" context="{'default_site_id': active_id}">
-                                </field>
-                              </page>
-                              <page string="Security">
-                               <group col="4">
-                                <field name="ssid_private"/>
-                                <field name="ssid_public"/>
-                                <field name="wifikey_private"/>
-                                <field name="wifikey_public"/>
-                              </group>
-                            </page>
-                            <page string="Contract">
-                              <field name="contract_ids" create="False"/>
-                            </page>
-                            <page string="Credentials">
-                              <field name="credential_ids"/>
-                            </page>
+                    <group>
+                      
+                      <field name="partner_id" options="{'no_quick_create':True,'no_create_edit':True, 'always_reload': True}" context="{'show_address': 1}"/>
+                    </group>
 
-                            <page string="Site config">
-                              <group>
-                                <field name="location_ids" widget="many2many_tags"/>
-                                <field name="id" invisible="True"/>
-                                <button name="search_quants"  string="Add Devices" type="object" context="{'active_site_id': id}" groups="base.group_user"/>
-                              </group>
-                            </page>
-
-                          </notebook>		
-                        </sheet>
-                      </form>
+                  </group>
+                  <field name="notes"/>
+                  <notebook>
+                   <page string="Assets" invisible="True">
+                    <field name="asset_ids" context="{'default_site_id' : active_id }">
                     </field>
-                  </record>
-                  <record model="ir.ui.view" id="tenants_tree_view">
-                    <field name="name">tenants.tree</field>
-                    <field name="model">lubon_qlan.tenants</field>
-                    <field name="arch" type="xml">
-                      <tree string="Tenants Tree" default_order="code">
-                        <field name="code"/>
-                        <field name="tenant_name"/>
-                        <field name="upn"/>
-                        <field name="is_telephony"/>
-                        <field name="ip"/>
-                        <field name="main_contact"/>
+                  </page>
+                  <page string="Vlan info" invisible="True">
+                   <field name="vlan_ids">
+                    <tree string="vlans" >
+                      <field name="sequence" widget="handle"/>
+                      <field name="name"/>
+                      <field name="vlan_tag"/>
+                      <field name="ipv4"/>
+                      <field name="ipv4_gw"/>
+                      <field name="dns"/>
+                      <field name="ipv6"/>
+                      <field name="ipv6_gw"/>
+                    </tree>
+                  </field>
+                </page>
+                <page string="ISP Info">
+                  <field name="isp_ids">
+                    <tree string="ISP" editable="bottom">
+                      <field name="name"/>
+                      <field name="ip_type"/>
+                      <field name="ip_address"/>
+                      <field name="ip_login"/>
+                      <field name="ip_password"/>
+                      <field name="ip_dns"/>
+                      <field name="ip_dns_reverse"/>
+                      <field name="account"/>
+                      <field name="account_login"/>
+                      <field name="account_password"/>
+                    </tree>
+                  </field>
+                </page>
+                <page string="LAN IP info" invisible="True">
+                  <field name="ip_ids" context="{'default_site_id': active_id}">
+                  </field>
+                </page>
+                <page string="Security">
+                 <group col="4">
+                  <field name="ssid_private"/>
+                  <field name="ssid_public"/>
+                  <field name="wifikey_private"/>
+                  <field name="wifikey_public"/>
+                </group>
+              </page>
+              <page string="Contract">
+                <field name="contract_ids" create="False"/>
+              </page>
+              <page string="Credentials">
+                <field name="credential_ids"/>
+              </page>
+
+              <page string="Site config">
+                <group>
+                  <field name="location_ids" widget="many2many_tags"/>
+                  <field name="id" invisible="True"/>
+                  <field name="filemaker_site_id"/>
+                  <button name="search_quants"  string="Add Devices" type="object" context="{'active_site_id': id}" groups="base.group_user"/>
+                  </group>
+              </page>
+
+            </notebook>		
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="tenants_tree_view">
+      <field name="name">tenants.tree</field>
+      <field name="model">lubon_qlan.tenants</field>
+      <field name="arch" type="xml">
+        <tree string="Tenants Tree" default_order="code">
+          <field name="code"/>
+          <field name="tenant_name"/>
+          <field name="upn"/>
+          <field name="is_telephony"/>
+          <field name="ip"/>
+          <field name="main_contact"/>
+        </tree>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="tenants_search_view">
+      <field name="name">tenants.search</field>
+      <field name="model">lubon_qlan.tenants</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="tenant_name"  string="Search Name, Code, IP" filter_domain="['|','|',('code','ilike',self),('tenant_name','ilike',self),('ip','ilike',self)]"/>
+          <field name="code"/>
+          <field name="tenant_name"/>
+          <field name="main_contact"/>
+          <filter name="tenants_telephony" string="Telephony tenants"
+            domain="[('is_telephony', '=', True)]"/>
+            <group string="Group By">
+              <filter name="tenants_by_responsible" string="Responsible"
+                context="{'group_by': 'main_contact'}"/>
+              </group>
+
+            </search>
+          </field>
+        </record>
+
+        <record model="ir.ui.view" id="tenants_form_view">
+          <field name="name">tenants.form</field>
+          <field name="model">lubon_qlan.tenants</field>
+          <field name="arch" type="xml">
+            <form string="Tenants form">
+              <sheet>  
+                <group col="3">
+                  <group string="Admin">
+                    <field name="code"/>
+                    <field name="tenant_name"/>
+                    <field name="upn"/>
+                    <field name="filemaker_site_id"/>
+                    <field name="validcustomers_ids" widget="many2many_tags"/>
+                    <field name="main_contact"/>
+                    <field name="tel_dedicated"/>
+
+                  </group>
+                  <group string="Config">
+                    <field name="ip"/>
+                    <field name="is_citrix"/>
+                    <field name="is_telephony"/>
+                    <field name="is_mailonly"/>
+                    <field name="is_qfilteronly"/>
+                  </group>
+                </group>
+                <notebook>
+                  <page string="AD Accounts">
+                    <field name="adaccounts_ids" context="{'default_tenant_id' : active_id }">
+                      <tree string="Accounts" editable="bottom">
+                        <field name="name"/>
+                        <field name="samaccountname"/>                              
+                        <field name="logonname"/>
+                        <field name="tenant_id" invisible="True"/>
+                        <!-- field name="main_partner" invisible="False"/ -->
+                        <field name="validcustomers_ids" invisible="True" />
+                        <field name="person_id" domain="[('type','=','contact'),('parent_id.id','in', validcustomers_ids[0][2])]"/>
                       </tree>
                     </field>
-                  </record>
-                  <record model="ir.ui.view" id="tenants_search_view">
-                    <field name="name">tenants.search</field>
-                    <field name="model">lubon_qlan.tenants</field>
-                    <field name="arch" type="xml">
-                      <search>
-                        <field name="tenant_name"  string="Search Name, Code, IP" filter_domain="['|','|',('code','ilike',self),('tenant_name','ilike',self),('ip','ilike',self)]"/>
-                        <field name="code"/>
-                        <field name="tenant_name"/>
-                        <field name="main_contact"/>
-                        <filter name="tenants_telephony" string="Telephony tenants"
-                          domain="[('is_telephony', '=', True)]"/>
-                          <group string="Group By">
-                            <filter name="tenants_by_responsible" string="Responsible"
-                              context="{'group_by': 'main_contact'}"/>
-                            </group>
+                  </page>
+                  <page string="AD Groups">
+                  </page>
+                  <page string="Servers">
+                    <field name="assets_ids" context="{'default_tenant_id': active_id}"/>
+                  </page>
+                  <page string="Settings">
+                   <group string="Security" col="3">
+                     <field name="qtest_password"/>
+                     <button name="qtest_show" string="Show"/>
+                     <field name="qadm_password"/>
+                     <button name="qadm_show" string="Show"/>
+                     <!-- field name="is_telephony"/ -->
+                   </group>
+                 </page>	
+                 <page string="Telephony">
+                   <group>
+                     <field name="pbx_password"/>
+                   </group>
+                 </page>
 
-                          </search>
-                        </field>
-                      </record>
-
-                      <record model="ir.ui.view" id="tenants_form_view">
-                        <field name="name">tenants.form</field>
-                        <field name="model">lubon_qlan.tenants</field>
-                        <field name="arch" type="xml">
-                          <form string="Tenants form">
-                            <sheet>  
-                              <group col="3">
-                                <group string="Admin">
-                                  <field name="code"/>
-                                  <field name="tenant_name"/>
-                                  <field name="upn"/>
-                                  <field name="filemaker_site_id"/>
-                                  <field name="validcustomers_ids" widget="many2many_tags"/>
-                                  <field name="main_contact"/>
-                                  <field name="tel_dedicated"/>
-
-                                </group>
-                                <group string="Config">
-                                  <field name="ip"/>
-                                  <field name="is_citrix"/>
-                                  <field name="is_telephony"/>
-                                  <field name="is_mailonly"/>
-                                  <field name="is_qfilteronly"/>
-                                </group>
-                              </group>
-                              <notebook>
-                                <page string="AD Accounts">
-                                  <field name="adaccounts_ids" context="{'default_tenant_id' : active_id }">
-                                    <tree string="Accounts" editable="bottom">
-                                      <field name="name"/>
-                                      <field name="samaccountname"/>                              
-                                      <field name="logonname"/>
-                                      <field name="tenant_id" invisible="True"/>
-                                      <!-- field name="main_partner" invisible="False"/ -->
-                                      <field name="validcustomers_ids" invisible="True" />
-                                      <field name="person_id" domain="[('type','=','contact'),('parent_id.id','in', validcustomers_ids[0][2])]"/>
-                                    </tree>
-                                  </field>
-                                </page>
-                                <page string="AD Groups">
-                                </page>
-                                <page string="Servers">
-                                  <field name="assets_ids" context="{'default_tenant_id': active_id}"/>
-                                </page>
-                                <page string="Settings">
-                                 <group string="Security" col="3">
-                                   <field name="qtest_password"/>
-                                   <button name="qtest_show" string="Show"/>
-                                   <field name="qadm_password"/>
-                                   <button name="qadm_show" string="Show"/>
-                                   <!-- field name="is_telephony"/ -->
-                                 </group>
-                               </page>	
-                               <page string="Telephony">
-                                 <group>
-                                   <field name="pbx_password"/>
-                                 </group>
-                               </page>
-
-                               <page string="Contracts">
-                                <field name="contract_ids"/>
-                              </page>
-                              <page string="Credentials">
-                                <field name="credential_ids"/>
-                              </page>
+                 <page string="Contracts">
+                  <field name="contract_ids"/>
+                </page>
+                <page string="Credentials">
+                  <field name="credential_ids"/>
+                </page>
 
 
                       <!--page string="Customers">
@@ -732,63 +785,50 @@
                       <field name="view_type">form</field>
                       <field name="view_mode">tree,form</field>
                     </record>
+                    <record model="ir.actions.act_window" id="qlan_interface_type_action">
+                      <field name="name">Interface Types</field>
+                      <field name="res_model">lubon_qlan.interface_type</field>
+                      <field name="view_type">form</field>
+                      <field name="view_mode">tree,form</field>
+                    </record>
 
                     <!-- top level menu: no parent -->
                     <menuitem id="main_lubon_qlan_menu" name="Qlan" sequence="0" groups="qlan_manager,qlan_user"/>
-        <!-- A first level in the left side menu is needed
-        before using action= attribute -->
+
         <menuitem id="lubon_qlan_sites_menu" name="Sites"
           parent="main_lubon_qlan_menu"/>
-          <menuitem id="lubon_qlan_tenants_menu" name="Tenants"
+        <menuitem id="lubon_qlan_tenants_menu" name="Tenants"
             parent="main_lubon_qlan_menu"/>
-        <!-- the following menuitem should appear *after*
-             its parent lubon_debug_menu and *after* its
-             action move_line_action -->
-             <menuitem id="sites_menu" name="Sites" parent="lubon_qlan_sites_menu"
+        <menuitem id="sites_menu" name="Sites" parent="lubon_qlan_sites_menu"
               action="zzqlan_sites_action"/>
-              <menuitem id="lubon_qlan_assets_sites_menu" name="Assets" parent="lubon_qlan_sites_menu"
+        <menuitem id="lubon_qlan_assets_sites_menu" name="Assets" parent="lubon_qlan_sites_menu"
                 action="qlan_assets_action"/>     
-        <!-- menuitem id="invoicess_menu" name="Invoices" parent="lubon_debug_menu"
-        action="invoice_action"/ -->
+
 
         <menuitem id="adtenants_menu" name="AD Tenants" parent="lubon_qlan_tenants_menu"
           action="qlan_tenants_action" groups="qlan_user"/>
-          <menuitem id="contracts_menu" name="Contracts" parent="lubon_qlan_tenants_menu"
+        <menuitem id="contracts_menu" name="Contracts" parent="lubon_qlan_tenants_menu"
             action="qlan_contracts_action" groups="qlan_manager"/>
-
-
-            <menuitem id="lubon_qlan_configuration_menu" name="Configuration"
-              parent="main_lubon_qlan_menu" groups="base.group_no_one"/>
-              <menuitem id="lubon_qlan_tables_menu" name="Tables" parent="lubon_qlan_configuration_menu"/>
-              <menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tables_menu"
-                action="qlan_adaccounts_action"/>
-                <menuitem id="lubon_qlan_adaccounts_import_menu" name="AD Accounts import" parent="lubon_qlan_tables_menu"
-                  action="qlan_adaccounts_import_action"/>
-
-                  <menuitem id="lubon_qlan_messages_menu" name="Messages" parent="lubon_qlan_tables_menu"
-                    action="qlan_messages_action"/>
-
-
-                    <menuitem id="lubon_qlan_credentials_menu" name="Credentials" parent="lubon_qlan_tables_menu"
-                      action="qlan_credentials_action"/>
-                      <menuitem id="lubon_qlan_assets_menu" name="Assets" parent="lubon_qlan_tables_menu"
-                        action="qlan_assets_action"/>
-                        <menuitem id="lubon_qlan_ipss_menu" name="IP" parent="lubon_qlan_tables_menu"
-                          action="qlan_ip_action"/>
-                          <menuitem id="lubon_qlan_interfaces_menu" name="Interfaces" parent="lubon_qlan_tables_menu"
-                            action="qlan_interfaces_action"/>
-                            <menuitem id="lubon_qlan_memberships_menu" name="Vlan Memberships" parent="lubon_qlan_tables_menu"
-                              action="qlan_memberships_action"/>
-
-
-
-
-
-
-
-        <!-- Full id location:
-             action="lubon_debug.move_line_action"
-             It is not required when it is the same module -->
+        <menuitem id="lubon_qlan_configuration_menu" name="Configuration"
+          parent="main_lubon_qlan_menu" groups="base.group_no_one"/>
+        <menuitem id="lubon_qlan_tables_menu" name="Tables" parent="lubon_qlan_configuration_menu"/>
+        <menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tables_menu"
+            action="qlan_adaccounts_action"/>
+        <menuitem id="lubon_qlan_adaccounts_import_menu" name="AD Accounts import" parent="lubon_qlan_tables_menu"
+              action="qlan_adaccounts_import_action"/>
+        <menuitem id="lubon_qlan_messages_menu" name="Messages" parent="lubon_qlan_tables_menu"
+                action="qlan_messages_action"/>
+        <menuitem id="lubon_qlan_credentials_menu" name="Credentials" parent="lubon_qlan_tables_menu"
+                  action="qlan_credentials_action"/>
+        <menuitem id="lubon_qlan_assets_menu" name="Assets" parent="lubon_qlan_tables_menu"
+                    action="qlan_assets_action"/>
+        <menuitem id="lubon_qlan_ipss_menu" name="IP" parent="lubon_qlan_tables_menu" action="qlan_ip_action"/>
+        <menuitem id="lubon_qlan_interfaces_menu" name="Interfaces" parent="lubon_qlan_tables_menu"
+                        action="qlan_interfaces_action"/>
+        <menuitem id="lubon_qlan_memberships_menu" name="Vlan Memberships" parent="lubon_qlan_tables_menu"
+          action="qlan_memberships_action"/>
+        <menuitem id="lubon_qlan_interface_type_menu" name="Interface Types" parent="lubon_qlan_tables_menu"
+          action="qlan_interface_type_action"/>
            </data>
          </openerp>
 
