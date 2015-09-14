@@ -328,7 +328,7 @@ class lubon_qlan_assets(models.Model):
 #	_inherits={'stock.quant': 'quant_id'}
 	_name="lubon_qlan.assets"
 	_rec_name="asset_name"
-	parent_id=fields.Many2one('lubon_qlan.assets')
+	parent_id=fields.Many2one('lubon_qlan.assets', string="Part of")
 	child_ids=fields.One2many('lubon_qlan.assets','parent_id')
 	is_container=fields.Boolean(string="Container", help="Can contain other devices")
 	quant_id=fields.Many2one('stock.quant')
@@ -343,6 +343,7 @@ class lubon_qlan_assets(models.Model):
 	warranty_end_date=fields.Date(string="End date warranty")
 	sequence=fields.Integer()
 	notes=fields.Html()
+	location=fields.Char(help="Where is the asset located")
 	ips=fields.One2many('lubon_qlan.ip','asset_id')
 	interfaces_ids=fields.One2many('lubon_qlan.interfaces','asset_id')
 	credentials_ids=fields.One2many('lubon_credentials.credentials','asset_id')

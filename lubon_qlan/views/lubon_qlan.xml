@@ -138,6 +138,7 @@
             <field name="ip_display"/>    
             <field name="lot"/>
             <field name="parent_id" domain="[('site_id','=',site_id),('is_container','=',True),('id','!=',active_id)]" options="{'no_quick_create':True,'no_create_edit':True}"/>
+            <field name="location"/>
           </group>
           <group>
             <field name="quant_id" options="{'no_quick_create':True,'no_create_edit':True}"/>
@@ -177,6 +178,7 @@
       <search>
         <field name="asset_name"  string="Search Name, Serial, IP" filter_domain="['|','|',('asset_name','ilike',self),('lot','ilike',self),('ip_display','ilike',self)]" />
         <field name="site_id"/>
+        <field name="parent_id"/>
       </search>
     </field>
   </record>
