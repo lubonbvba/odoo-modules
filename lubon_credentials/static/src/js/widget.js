@@ -56,7 +56,9 @@ openerp.lubon_credentials = function(openerp) {
                     button_element.show();
                 }, parseInt(data[0][1]));
             }).fail(function(result, e) {
-                // e.preventDefault();
+                e.preventDefault();
+                var error = result.data.message.split(/\n/);
+                openerp.webclient.notification.warn(error[0],error[1]);
                 content_element.hide();
                 button_element.show();
                 pin_element.show();
@@ -144,7 +146,9 @@ openerp.lubon_credentials = function(openerp) {
                     button_element.show();
                 }, parseInt(data[0][1]));
             }).fail(function(result, e) {
-                // e.preventDefault();
+                e.preventDefault();
+                var error = result.data.message.split(/\n/);
+                openerp.webclient.notification.warn(error[0],error[1]);
                 content_element.hide();
                 button_element.show();
                 pin_element.show();
