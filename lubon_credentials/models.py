@@ -3,6 +3,9 @@
 from openerp import models, fields, api, exceptions, _
 from openerp.http import request
 from openerp.exceptions import ValidationError
+from Crypto.PublicKey import RSA
+import ast
+import pdb
 
 # class lubon_partners(models.Model):
 #     _name = 'lubon_partners.lubon_partners'
@@ -31,6 +34,7 @@ class Partner(models.Model):
             return True
 
         if require_pin and not pin:
+            b=1
             raise ValidationError("PIN required!")
 
         if require_pin and pin != self.env.user.pin:
@@ -48,15 +52,21 @@ class Users(models.Model):
     pin = fields.Char()
 
 
+
 class lubon_qlan_credentials(models.Model):
     _name = 'lubon_credentials.credentials'
     _rec_name = 'description'
 
     description = fields.Char(string="Description", required=True)
     user = fields.Char(string="User")
-    password = fields.Char(string="Password", type='password')
+    password = fields.Char()
+    hint = fields.Char()
+    password01 = fields.Char(string="Pass")
+    password02 = fields.Char(string="Conf")
+    encrypted=fields.Char(string="Encrypted")
+    is_saved=fields.Boolean(string="Saved")
     partner_id = fields.Many2one('res.partner',  ondelete='set null', string="Partner", index=True)
-
+ #   credentials_type=fields.Selection([('tenant_admin','Tenant admin'),('wifi','Wifi'),('site_admin','Site admin'),('telephony','Telephony'),('general','General')], default='general')
     @api.one
     def show_password(self):
         raise exceptions.ValidationError(self.password)
@@ -64,7 +74,6 @@ class lubon_qlan_credentials(models.Model):
 
     def _get_ipaddress(self, cr, uid, context=None):
         return request.httprequest.environ['REMOTE_ADDR']
-
     @api.one
     def reveal_credentials(self, pin=None):
 
@@ -87,8 +96,46 @@ class lubon_qlan_credentials(models.Model):
             raise ValidationError("Incorrect PIN!")
 
         request.session['lubon_pin_retry'] = 1
+        password=""
+        if self.encrypted:
+            f= open('/home/odoo/.odoo/private_key.pem','r')
+            r = RSA.importKey(f.read())
+            f.close()
+            encrypted= ast.literal_eval(str(self.encrypted))
+            password=r.decrypt(encrypted)
+        return [password or '', self.env['ir.config_parameter'].get_param('lubon_credentials.reveal_credentials_timeout', '') or 15000]
+    
+    @api.one
+    def encrypt(self):
+        if not self.is_saved:
+            self.password01=self.password
+            self.password02=self.password
+            self.encrypt_password(True)
+            self.password=''
+        return True
 
-        return [self.password or '', self.env['ir.config_parameter'].get_param('lubon_credentials.reveal_credentials_timeout', '') or 15000]
+
+    
+    @api.one
+    @api.onchange('password01','password02')
+    def encrypt_password(self, force=False):
+        if (self.password01 and self.password02) or force:
+            if self.password01 == self.password02:
+                f= open('/home/odoo/.odoo/public_key.pem','r')
+                r = RSA.importKey(f.read())
+                f.close()
+                #pdb.set_trace()
+                encrypted=""
+                if self.password01:
+                    p=self.password01.encode('utf-8')
+                    encrypted=r.encrypt(p,32)
+                self.encrypted=encrypted
+                self.password01=''
+                self.password02=''
+                self.is_saved=1
+            else:
+                raise ValidationError("Pls enter the same password twice")
+
 
 
 class base_config_settings(models.TransientModel):

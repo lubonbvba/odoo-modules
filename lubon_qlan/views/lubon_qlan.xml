@@ -248,6 +248,18 @@
       </field>
     </field>
   </record>
+        <record model="ir.ui.view" id="lubon_qlan_credentials_search_view">
+            <field name="name">lubon_qlan.credentials_search</field>
+            <field name="model">lubon_credentials.credentials</field>
+            <field name="inherit_id" ref="lubon_credentials.lubon_credentials_search_view"/>
+            <field name="arch" type="xml">
+              <field name="description" position="after">
+                <field name="site_id"/>
+                <field name="asset_id"/>
+                <field name="tenant_id"/>
+            </field>
+        </field>
+    </record>  
   <record model="ir.ui.view" id="lubon_qlan_interfaces_form">
     <field name="name">lubon_qlan.interfaces_form</field>
     <field name="model">lubon_qlan.interfaces</field>
@@ -464,7 +476,10 @@
                     <button type="action" class="oe_stat_button" name="%(qlan_vlan_action)d" icon="fa-signal" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
                       <field name="vlan_count" string="VLAN" widget="statinfo"/>
                     </button>
-                    <button type="action" class="oe_stat_button" name="%(qlan_credentials_action)d" icon="fa-key" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
+                    <button type="action" class="oe_stat_button" name="%(qlan_credentials_action)d" icon="fa-key" context="{'search_default_site_id': active_id, 'default_site_id': active_id}" string="Credentials">
+                      <!-- field name="vlan_count" string="VLAN" widget="statinfo"/ -->
+                    </button>
+                   <button type="action" class="oe_stat_button" name="%(qlan_credentials_action)d" icon="fa-wifi" context="{'search_default_site_id': active_id,'default_site_id': active_id ,'search_default_credentials_type': 'wifi','default_credentials_type': 'wifi' }" string="WiFi">
                       <!-- field name="vlan_count" string="VLAN" widget="statinfo"/ -->
                     </button>
                   </div>
@@ -629,13 +644,14 @@
                     <field name="assets_ids" context="{'default_tenant_id': active_id}"/>
                   </page>
                   <page string="Settings">
-                   <group string="Security" col="3">
+                   <group string="Security">
                      <field name="qtest_password"/>
-                     <button name="qtest_show" string="Show"/>
                      <field name="qadm_password"/>
-                     <button name="qadm_show" string="Show"/>
+                     </group>
+
+                     <!-- field name="credential_ids" domain="[('tenant_id','=',active_id),(credentials_type','ilike','tenant_admin')]" context="{'default_credentials_type':'tenant_admin'}"/ -->
                      <!-- field name="is_telephony"/ -->
-                   </group>
+                   
                  </page>	
                  <page string="Telephony">
                    <group>
@@ -766,13 +782,11 @@
                       <field name="view_mode">tree,form</field>
                       <!--field name="domain">[["type","=",'delivery']]</field -->
                     </record>
-
-
                     <record model="ir.actions.act_window" id="qlan_credentials_action">
                       <field name="name">Credentials</field>
                       <field name="res_model">lubon_credentials.credentials</field>
                       <field name="view_type">form</field>
-                      <field name="view_mode">tree</field>
+                      <field name="view_mode">tree,form</field>
                     </record>
                     <record model="ir.actions.act_window" id="qlan_assets_action">
                       <field name="name">Assets</field>
