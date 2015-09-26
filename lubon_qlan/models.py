@@ -329,8 +329,10 @@ class lubon_qlan_assets(models.Model):
 	_name="lubon_qlan.assets"
 	_rec_name="asset_name"
 	parent_id=fields.Many2one('lubon_qlan.assets', string="Part of")
+
 	child_ids=fields.One2many('lubon_qlan.assets','parent_id')
 	is_container=fields.Boolean(string="Container", help="Can contain other devices")
+	show_in_site=fields.Boolean(string="Show", help="Show in sites", default=True)
 	quant_id=fields.Many2one('stock.quant')
 	product_id=fields.Many2one('product.product')
 	site_id=fields.Many2one('lubon_qlan.sites', required=True)

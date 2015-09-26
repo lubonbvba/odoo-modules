@@ -144,6 +144,7 @@
             <field name="quant_id" options="{'no_quick_create':True,'no_create_edit':True}"/>
             <field name="site_id"/> 
             <field name="is_container"/> 
+            <field name="show_in_site"/> 
             <field name="tenant_id"/> 
             <field name="warranty_end_date"/> 
           </group>
@@ -177,7 +178,7 @@
     <field name="arch" type="xml">
       <search>
         <field name="asset_name"  string="Search Name, Serial, IP" filter_domain="['|','|',('asset_name','ilike',self),('lot','ilike',self),('ip_display','ilike',self)]" />
-        <field name="site_id"/>
+        <field name="site_id" filter_domain="['&amp;',('site_id','ilike',self),('show_in_site','=',1)]"/>
         <field name="parent_id"/>
       </search>
     </field>
@@ -479,9 +480,9 @@
                     <button type="action" class="oe_stat_button" name="%(qlan_credentials_action)d" icon="fa-key" context="{'search_default_site_id': active_id, 'default_site_id': active_id}" string="Credentials">
                       <!-- field name="vlan_count" string="VLAN" widget="statinfo"/ -->
                     </button>
-                   <button type="action" class="oe_stat_button" name="%(qlan_credentials_action)d" icon="fa-wifi" context="{'search_default_site_id': active_id,'default_site_id': active_id ,'search_default_credentials_type': 'wifi','default_credentials_type': 'wifi' }" string="WiFi">
+<!--                    <button type="action" class="oe_stat_button" name="%(qlan_credentials_action)d" icon="fa-wifi" context="{'search_default_site_id': active_id,'default_site_id': active_id ,'search_default_credentials_type': 'wifi','default_credentials_type': 'wifi' }" string="WiFi"> -->
                       <!-- field name="vlan_count" string="VLAN" widget="statinfo"/ -->
-                    </button>
+                    <!-- </button> -->
                   </div>
                   <group>
                     <group>
@@ -498,11 +499,11 @@
                   </group>
                   <field name="notes"/>
                   <notebook>
-                   <page string="Assets" invisible="True">
+<!--                    <page string="Assets" invisible="True">
                     <field name="asset_ids" context="{'default_site_id' : active_id }">
                     </field>
-                  </page>
-                  <page string="Vlan info" invisible="True">
+                  </page> -->
+<!--                   <page string="Vlan info" invisible="True">
                    <field name="vlan_ids">
                     <tree string="vlans" >
                       <field name="sequence" widget="handle"/>
@@ -515,7 +516,7 @@
                       <field name="ipv6_gw"/>
                     </tree>
                   </field>
-                </page>
+                </page> -->
                 <page string="ISP Info">
                   <field name="isp_ids">
                     <tree string="ISP" editable="bottom">
@@ -532,10 +533,10 @@
                     </tree>
                   </field>
                 </page>
-                <page string="LAN IP info" invisible="True">
+<!--                 <page string="LAN IP info" invisible="True">
                   <field name="ip_ids" context="{'default_site_id': active_id}">
                   </field>
-                </page>
+                </page> -->
                 <page string="Security">
                  <group col="4">
                   <field name="ssid_private"/>
@@ -547,10 +548,10 @@
               <page string="Contract">
                 <field name="contract_ids" create="False"/>
               </page>
-              <page string="Credentials">
+<!--               <page string="Credentials">
                 <field name="credential_ids"/>
               </page>
-
+ -->
               <page string="Site config">
                 <group>
                   <field name="location_ids" widget="many2many_tags"/>
