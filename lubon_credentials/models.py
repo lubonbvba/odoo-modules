@@ -56,7 +56,7 @@ class Users(models.Model):
 class lubon_qlan_credentials(models.Model):
     _name = 'lubon_credentials.credentials'
     _rec_name = 'description'
-    active=fields.Boolean()
+    active=fields.Boolean(default=True)
     description = fields.Char(string="Description", required=True)
     user = fields.Char(string="User")
     password = fields.Char()

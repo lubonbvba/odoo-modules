@@ -554,6 +554,7 @@
  -->
               <page string="Site config">
                 <group>
+                  <field name="ipv4"/>
                   <field name="location_ids" widget="many2many_tags"/>
                   <field name="id" invisible="True"/>
                   <field name="filemaker_site_id"/>
