@@ -105,7 +105,7 @@
             <field name="perm_create" eval="1"/>
             <field name="perm_unlink" eval="1"/>
             <field name="domain_force">
-                ['&amp;','|',('company_id','=',False),('company_id','child_of',[user.company_id.id]),('on','not like',user.operational_mode)]
+                ['&amp;','|',('company_id','=',False),('company_id','child_of',[user.company_id.id]),('on','like',user.operational_mode)]
             </field>
         </record>
         <record id="hertsens_account_invoice_read" model="ir.rule">
@@ -116,7 +116,7 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-                ['|','|',('company_id','=',False),('company_id','child_of',[user.company_id.id]),('on','not like',user.operational_mode)]
+                ['|','|',('company_id','=',False),('company_id','child_of',[user.company_id.id]),('on','like',user.operational_mode)]
             </field>
         </record>
         <record id="hertsens_account_invoice_line_default" model="ir.rule">
