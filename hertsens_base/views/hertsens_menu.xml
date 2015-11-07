@@ -59,7 +59,7 @@
             <field name="arch" type="xml">
                 <notebook position="inside">
                     <page string="Rides">
-                        <field name="rides_ids"/>
+                        <field name="rides_ids" readonly="1"/>
                     </page>
                 </notebook>
             </field>
@@ -154,6 +154,7 @@
               <field name="state" widget="statusbar"/>
           </header>
           <group>
+            <group>
              <field name="company_id"  />
              <field name="partner_id" domain="[('company_id','=',company_id)]" context="{'default_company_id':company_id, 'default_type':'contract'}"/>
 
@@ -162,12 +163,16 @@
              <field name="bestemming"/>
              <field name="refklant" />
              <field name="ritprijs" />
+         </group>
+         <group>
              <field name="wachttijd" />
              <field name="charges_vat" />
              <field name="charges_exvat" />
              <field name="cmr" />
              <field name="state" />
+             <field name="invoice_id" readonly="1" />
          </group>
+        </group>
          <notebook>
              <page string="Destinations">
               <field name="destination_ids">

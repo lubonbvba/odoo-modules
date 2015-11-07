@@ -43,6 +43,15 @@ class hertsens_rit(models.Model):
 	# @api.onchange('partner_id')
 	# def _checkcompany(self):
 	# 	self.company_id=self.partner_id.company_id
+	# @api.multi
+	# def unlink(self):
+	# 	pdb.set_trace()
+	# 	for ride in self:
+	# 		if ride.state not in ('draft', 'cancel'):
+	# 			raise Warning(_('You cannot delete an invoice which is not draft or cancelled. You should refund it instead.'))
+	# 			return models.Model.unlink(self)
+
+
 	@api.one
 	@api.onchange('ritprijs','wachttijd')
 	def _calculate_total(self):
@@ -195,6 +204,12 @@ class invoice(models.Model):
 	_inherit="account.invoice"
 	rides_ids=fields.One2many( "hertsens.rit" ,"invoice_id")
 	on=fields.Char(required=True,default="on")
+	@api.one
+	def action_cancel(self):
+		for ride in self.rides_ids:
+			ride.state='toinvoice'
+			ride.invoice_id=""
+		return super(invoice, self)
 
 class invoice_line(models.Model):
 	_inherit="account.invoice.line"
