@@ -205,11 +205,12 @@ class invoice(models.Model):
 	rides_ids=fields.One2many( "hertsens.rit" ,"invoice_id")
 	on=fields.Char(required=True,default="on")
 	@api.one
-	def action_cancel(self):
+	def action_cancel(self,vals=None,context=None):
 		for ride in self.rides_ids:
 			ride.state='toinvoice'
 			ride.invoice_id=""
-		return super(invoice, self)
+		#pdb.set_trace()	
+		return super(invoice, self.with_context(from_parent_object=True)).action_cancel()
 
 class invoice_line(models.Model):
 	_inherit="account.invoice.line"
