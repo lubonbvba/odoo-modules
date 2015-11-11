@@ -633,6 +633,7 @@
                         <field name="name"/>
                         <field name="samaccountname"/>                              
                         <field name="logonname"/>
+                        <field name="product"/>
                         <field name="tenant_id" invisible="True"/>
                         <!-- field name="main_partner" invisible="False"/ -->
                         <field name="validcustomers_ids" invisible="True" />
@@ -681,7 +682,18 @@
                 </form>
               </field>
             </record>
+            <record model="ir.ui.view" id="adaccounts_tree_view">
+              <field name="name">adaccounts.tree</field>
+              <field name="model">lubon_qlan.adaccounts</field>
+              <field name="arch" type="xml">
+                <tree string="Ad accounts Tree">
+                  <field name="samaccountname"/>
+                  <field name="logonname"/>
+                  <field name="objectguid"/>
 
+                </tree>
+              </field>
+            </record>
             <record model="ir.ui.view" id="adaccounts_import_tree_view">
               <field name="name">adaccounts_import.tree</field>
               <field name="model">lubon_qlan.adaccounts_import</field>
@@ -689,6 +701,7 @@
                 <tree string="Ad accounts Tree">
                   <field name="importref"/>			
                   <field name="samaccountname"/>
+                  <field name="processed"/>
                   <field name="tenant"/>
                   <field name="logonname"/>
                   <field name="product"/>
@@ -702,6 +715,7 @@
                   <field name="msexchstd"/>
                   <field name="msexchplus"/>
                   <field name="enabled"/>
+                  <field name="objectguid"/>
                   <field name="id"/>
 
                 </tree>
@@ -715,11 +729,25 @@
                  <header>
                   <button name="importadaccounts" string="Import" type="object"/>
                 </header>
-
                 <group>
-                 <field name="importref"/>
-                 <field name="samaccountname"/>
-                 <field name="tenant"/>
+                  <field name="importref"/>     
+                  <field name="samaccountname"/>
+                  <field name="processed"/>
+                  <field name="tenant"/>
+                  <field name="logonname"/>
+                  <field name="product"/>
+                  <field name="smspasscode"/>
+                  <field name="exchange"/>
+                  <field name="citrix"/>
+                  <field name="rdp"/>
+                  <field name="office"/>
+                  <field name="msofficestd"/>
+                  <field name="msofficeproplus"/>
+                  <field name="msexchstd"/>
+                  <field name="msexchplus"/>
+                  <field name="enabled"/>
+                  <field name="objectguid"/>
+                  <field name="id"/>
                </group>
              </form>
            </field>

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, fields, api,exceptions,_
-import csv,os,string
+import csv,os,string,datetime,logging
 from path import path
 import pdb
+from os.path import expanduser
 
+logger = logging.getLogger(__name__)
 
 class lubon_qlan_tenants(models.Model):
 	_name = 'lubon_qlan.tenants'
@@ -40,13 +42,16 @@ class lubon_qlan_tenants(models.Model):
 
 class lubon_qlan_adaccounts(models.Model):
 	_name='lubon_qlan.adaccounts'
-	_sql_constraints = [('name_unique','UNIQUE(name)','Name has to be unique')]
-	name=fields.Char(required=True)
+	_sql_constraints = [('guid_unique','UNIQUE(objectguid)','objectguid has to be unique')]
+	name=fields.Char()
 	samaccountname=fields.Char()
 	logonname=fields.Char()
-
+	product=fields.Char()
+	objectguid=fields.Char(required=True)
+	date_first=fields.Datetime(help="Date of first import")
+	date_last=fields.Datetime(help="Date last seen")
 	ad_enabled=fields.Boolean(string="Enabled",default=True)
-	tenant_id=fields.Many2one('lubon_qlan.tenants', required=True)
+	tenant_id=fields.Many2one('lubon_qlan.tenants') #, required=True)
 	person_id=fields.Many2one('res.partner', string="Related person")
 
 	validcustomers_ids=fields.Many2many('res.partner', compute='_getvalidcustomer_ids',)
@@ -64,6 +69,7 @@ class lubon_qlan_adaccounts(models.Model):
 class lubon_qlan_adaccounts_import(models.TransientModel):
 	_name='lubon_qlan.adaccounts_import'
 	importref=fields.Char(help="Reference to the import")
+	processed=fields.Boolean(default=False)
 	samaccountname=fields.Char(required=True)
 	logonname=fields.Char()
 	tenant=fields.Char()
@@ -78,32 +84,38 @@ class lubon_qlan_adaccounts_import(models.TransientModel):
 	msexchstd=fields.Char()
 	msexchplus=fields.Char()
 	enabled=fields.Boolean()
+	objectguid=fields.Char()
 	def schedule_import(self, cr, user, context={}):
 		self.importadaccounts(self)
-	@api.one
-	def importadaccounts(self, cr=None, uid=None, context=None, arg5=None):
+	
+	@api.multi
+ 	def importadaccounts(self): # , cr=None, uid=None, context=None, arg5=None):
+		logger.info('Importing ad accounts')
 		table_import=self.env['lubon_qlan.adaccounts_import']
-		basepath='/mnt/general/odoo/adaccounts'
+		basepath=expanduser("~")
+		basepath +='/odoo-imports/adaccounts'
 		destpath=basepath + '/hist'
 		p = path(basepath)
 		for f in p.files(pattern='Daily-2*.csv'):
+			
 			s=f.stripext().basename().lstrip('Daily-')
+			logger.info('Processing file: ' + f.name)
 			fi = open(f, 'rb')
 			data = fi.read()
 			fi.close()
-			fo = open('/mnt/general/odoo/adaccounts/Daily-clean.csv', 'wb')
+			fo = open(basepath + '/Daily-clean.csv', 'wb')
 			fo.write(data.replace('\x00', ''))
 			fo.close()
 
 
-			with open ('/mnt/general/odoo/adaccounts/Daily-clean.csv', 'rb') as cleanfile:
+			with open (basepath + '/Daily-clean.csv', 'rb') as cleanfile:
 				reader = csv.DictReader(cleanfile, delimiter=';')
 				for row in reader:
 	#					print (s, row['Samaccountname'],row['Displayname'],row['Tenant-01'],row['Qlan Product-9'],row['enabled'])
 					table_import.create({'importref':s, 
 					'samaccountname':row['Samaccountname'],
 					'logonname':row['userprincipalname'],
-					'tenant':row['Tenant-01'],
+					'tenant':row['Tenant-01'].upper(),
 					'product':row['Qlan Product-9'],
 					'smspasscode':row['SMS Passcode-8'],
 					'exchange':row['Exchange-10'],
@@ -115,10 +127,30 @@ class lubon_qlan_adaccounts_import(models.TransientModel):
 					'msexchstd':row['MS Exch Std'],
 					'msexchplus':row['MS Exch Plus'],
 					'enabled':row['enabled'],
-					})
+					'objectguid':row['objectguid'],
+					}).process_import()
 				cleanfile.close()
 				q=path(f)
 				q.move(destpath)
+		
+	@api.one		
+	def process_import(self):
+		
+		table_accounts=self.env['lubon_qlan.adaccounts']
+		account=table_accounts.search([('objectguid', '=', self.objectguid)])
+		if not account:
+			account=table_accounts.create({'objectguid': self.objectguid,
+											'date_first': datetime.datetime.now(),
+											})
+
+		account.update({'samaccountname': self.samaccountname,
+						'logonname': self.logonname,	
+						'date_last':datetime.datetime.now(),
+						'product': self.product,
+						'tenant_id': self.env['lubon_qlan.tenants'].search([('code','=', self.tenant)])
+						})
+
+
 
 
 
