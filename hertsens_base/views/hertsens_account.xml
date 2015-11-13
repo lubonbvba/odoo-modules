@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="hertsens_account_view_account_statement_operation_template_form">
+            <field name="name">hertsens_base.hertsens_account_view_account_statement_operation_template_form</field>
+            <field name="model">account.statement.operation.template</field>
+            <field name="inherit_id" ref="account.view_account_statement_operation_template_form"/>
+            <field name="arch" type="xml">
+               <field name="tax_id" position="after">
+                <field name="company_id" />
+            </field>                   
+            
+        </field>
+    </record>
+</data>
+</openerp>

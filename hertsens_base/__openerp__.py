@@ -25,6 +25,7 @@
     # always loaded
     'data': [
     'security/security.xml',
+    'security/hertsens_account_security.xml',
     'security/ir.model.access.csv',
 #	'static/src/js/lubon_base.js',
 #	'static/src/css/lubon_base.css',
@@ -33,6 +34,7 @@
 	'views/hertsens_partners.xml',
     'views/hertsens_menu.xml',
     'views/hertsens_users.xml',
+    'views/hertsens_account.xml',
     'reports/hertsens_base_invoice.xml',
     'reports/hertsens_base_header.xml',
     ],
