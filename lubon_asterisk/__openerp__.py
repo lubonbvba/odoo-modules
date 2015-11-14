@@ -6,7 +6,7 @@
         Module to enable web dialer""",
 
     'description': """
-        Long description of module's purpose
+        This module builds upon the asterisk asterisk_click2dial, it enables the webdialer of our private pbx.
     """,
 
     'author': "Lubon bvba",
@@ -25,6 +25,7 @@
     'data': [
         # 'security/ir.model.access.csv',
         'templates.xml',
+        'views/lubon_asterisk.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="lubon_asterisk_view_asterisk_server_form">
+            <field name="name">lubon_asterisk.view_lubon_asterisk</field>
+            <field name="model">asterisk.server</field>
+            <field name="inherit_id" ref="asterisk_click2dial.view_asterisk_server_form"/>
+            <field name="arch" type="xml">
+                <group name="dialplan" position="after">
+                    <group name="mirta" string="Mirta Settings">
+                        <field name="server_starturl"/>
+                        <field name="server_key"/>
+                        <field name="server_tenant"/>
+                        <field name="server_timeout"/>
+                        <field name="server_cid"/>
+                    </group>
+                </group>
+            </field>
+        </record>
+    </data>
+</openerp>
+
