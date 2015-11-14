@@ -24,6 +24,7 @@
             <field name="arch" type="xml">
                <field name="tz" position="after">
                 <field name="internal_number"/>
+                <field name="resource"/>
             </field>                   
         </field>
     </record>
