@@ -367,7 +367,7 @@ class lubon_qlan_assets(models.Model):
 	show_in_site=fields.Boolean(string="Show", help="Show in sites", default=True)
 	quant_id=fields.Many2one('stock.quant')
 	product_id=fields.Many2one('product.product')
-	site_id=fields.Many2one('lubon_qlan.sites', required=True)
+	site_id=fields.Many2one('lubon_qlan.sites', required=True, help="Readonly if part of another eqpt or has parts.")
 	tenant_id=fields.Many2one('lubon_qlan.tenants', string="Tenant")
 	asset_name=fields.Char(required=True)
 	asset_type=fields.Selection([('switch','switch'),('server','server'),('firewall','firewall')])
@@ -402,6 +402,25 @@ class lubon_qlan_assets(models.Model):
 				self.ip_display+=ip.name
 	ip_display=fields.Char(string="IP", compute="_calculate_ip_display", store=True)
 		
+	@api.one
+	@api.onchange('site_id')
+	def manage_site_id(self):
+		#pdb.set_trace()
+#		if self.child_ids:
+#			return {'title': 'Fout', 'message': "Heeft childs"}
+		for interface in self.interfaces_ids:
+			interface.site_id=self.site_id
+		for credential in self.credentials_ids:
+			credential.site_id=self.site_id
+			#pdb.set_trace()
+		for ip in self.ips:
+			ip.site_id=self.site_id
+	# @api.one
+	# def write(self,vals):
+	# 	pdb.set_trace()
+	# 	super(lubon_qlan_assets,self).write(vals)
+
+
 
 
 
