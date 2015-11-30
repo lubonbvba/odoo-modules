@@ -93,7 +93,7 @@ class res_partner(models.Model):
 			if self.supplier_file_zipped:
 				zip=zipfile.ZipFile(basepath, "r")
 				zip.extract(self.supplier_file_resulting, tempdir)
-			shutil.copyfile(tempdir + self.supplier_file_resulting+self.supplier_id.supplier_file)
+			shutil.copyfile(tempdir + self.supplier_file_resulting,self.supplier_file)
 		except:
 			logger.error("Error in ftp operation: " + result)
 		#print "Error"
