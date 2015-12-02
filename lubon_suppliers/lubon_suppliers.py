@@ -2,7 +2,7 @@
 
 from openerp import models, fields, api, registry, _
 from os.path import expanduser
-from datetime import datetime
+from datetime import datetime,date,timedelta
 import ftplib, zipfile, logging,csv,tempfile,shutil, barcodenumber
 import pdb
 
@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 class res_partner(models.Model):
 	_inherit = 'res.partner'
 
+	supplier_cron_job= fields.Many2one('ir.cron',string="Schedule")
 	supplier_fileimport = fields.Boolean(string="File Import", help="Supplier has pricelists",default=False)
 	supplier_transfermethod = fields.Selection([('ftp', 'FTP'),('none','None')], default='none')
 	supplier_transferserver=fields.Char(help='Server')
@@ -32,6 +33,14 @@ class res_partner(models.Model):
 	supplier_delete_details=fields.Boolean(string="Delete import detail", default=False)
 	brand_ids=fields.Many2many('res.partner',domain="[('manufacturer','=',True)]",relation="supplierbrands", column1="suppliers", column2="brands")
 	
+	@api.one
+	def process_schedule(self):
+		logger.info("Executing Schedule for:" + str(self.id))
+		self.retrieve_prices()
+
+
+
+
 	@api.one
 	def retrieve_prices(self):
 		#test transfertype
@@ -127,19 +136,22 @@ class lubon_suppliers_info_import(models.Model):
 	D2_Eur=fields.Char()
 	purchase_price=fields.Float()
 	stock=fields.Char()
-	BackorderDate=fields.Char()
-	ModifDate=fields.Char()
+	BackorderDate=fields.Date()
+	ModifDate=fields.Datetime()
+
 	eancode=fields.Char()
 	manufacturer_id=fields.Many2one('res.partner', domain="[('manufacturer','=',True)]")
 
 	def processfile(self,stats):
 		logger.info("Start processfile")
 		n=0
+		dummy=0
 		with open (stats.supplier_id.supplier_file, 'rb') as cleanfile:
 			reader = csv.DictReader(cleanfile, delimiter=';')
 			for row in reader:
 				n+=1
-				self.create({'stats_id':stats.id, 
+				#pdb.set_trace()
+				imported=self.create({'stats_id':stats.id, 
 					'description':row['Description'],
 					'supplier_part': row['ArtID'],
 					'manuf_part':row['PartID'],
@@ -154,10 +166,22 @@ class lubon_suppliers_info_import(models.Model):
 					'PriceGroup':row['PriceGroup'],
 					'purchase_price':row['PricePersonal_Eur'].replace(",","."),
 					'stock':row['Stock'],
-					'BackorderDate':row['BackorderDate'],
-					'ModifDate':row['ModifDate'],
 					'eancode':row['EanCode'],
-					})#.process_import()
+					})
+				try:
+					imported.BackorderDate=datetime.strptime(row['BackorderDate'],"%d/%m/%Y").date()
+				except:
+					dummy+=1
+
+					# do nothing
+					#imported.BackorderDate=datetime.now().date()
+
+				try:
+					imported.ModifDate=datetime.strptime(row['ModifDate'],"%d/%m/%Y %H:%M:%S")
+				except:
+					imported.ModifDate=datetime.strptime(row['ModifDate'],"%d/%m/%Y %H:%M:%S")
+
+
 				if (stats.supplier_id.supplier_num >0  and  n>stats.supplier_id.supplier_num):
 					break
 			cleanfile.close()
@@ -217,11 +241,17 @@ class lubon_suppliers_import_stats(models.Model):
 											('manufacturer','=',True)])
 			if not(partner):
 				partner=table_partners.create({'name': search,
-										'manufacturer': True})
+										'manufacturer': True,
+										'supplier': False,
+										'customer': False})
 				self.numbrands+=1
+			else:
+				partner.supplier=False
+				partner.customer=False
 		#update only brands of intrest for this supplier, to improve speed.		
 		for brand in self.supplier_id.brand_ids:		
 			parts=self.parts_ids.search([('manufacturer', '=', brand.name)])
+
 			#if not parts:
 				#pdb.set_trace()
 			for part in parts:
@@ -239,10 +269,13 @@ class lubon_suppliers_import_stats(models.Model):
 		starttime=datetime.now()
 		table_products=self.env['product.template']
 		table_prod_supplier=self.env['product.supplierinfo']
-		parts=self.parts_ids.search([('manufacturer_id','in',self.supplier_id.brand_ids.ids),('stats_id',"=",self.id)])
+		searchdate=(datetime.now()- timedelta(days=30)).strftime('%Y-%m-%d')
+		#pdb.set_trace()
+		parts=self.parts_ids.search([('manufacturer_id','in',self.supplier_id.brand_ids.ids),('stats_id',"=",self.id),('ModifDate','>=',searchdate )])
 		#pdb.set_trace()
 		self.numcreated=0
 		self.numupdated=0
+
 		for part in parts:
 			self.numupdated+=1
 			search=self.supplier_id.supplier_prefix + ("0" * (8-len(part.supplier_part)) + part.supplier_part)
@@ -294,9 +327,18 @@ class lubon_suppliers_import_stats(models.Model):
 			# product.seller_id=self.supplier_id
 		
 		
-		#parts=table_products.search([('last_stats_id', "!=",self.id),('seller_id','=',self.supplier_id.id)])
+		parts=table_products.search(['&','&',('last_stats_id',"!=",False),('seller_id','=',self.supplier_id.id),('last_stats_id', "!=",self.id)])
+		
 		#parts=table_products.search([('default_code', "ilike",'TD%'),('seller_ids','not in',[self.supplier_id.id])])
-		self.numdelete=len(parts)
+		self.numdeleted=len(parts)
+		for part in parts:
+			part.active=False
+		
 		self.stop_products= datetime.now()
 		self.elap_products= (datetime.now()-starttime).seconds
 		logger.info("End processproducts")
+	
+#class supplierbrands(models.Model):
+#	_inherit="lubon_suppliers.supplierbrands"
+#	fullyimported=fields.Boolean(default=False)
+

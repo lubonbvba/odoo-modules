@@ -7,7 +7,7 @@
     <field name="inherit_id" ref="base.view_partner_form"/>
     <field name="arch" type="xml">
       <xpath expr="//page[@name='sales_purchases']/group/group/field[@name='supplier']" position="after">
-       <field name="manufacturer"/>
+       <!-- <field name="manufacturer"/> -->
        <field name="supplier_fileimport"/>
      </xpath>
    </field>
@@ -43,6 +43,8 @@
        <field name="name" readonly="True"/>
        <field name="manufacturer" readonly="True"/>
        <field name="supplier_fileimport" readonly="True"/>
+       <field name="supplier_cron_job" />
+       <field name="id" />
      </group>
      <group>
       <button string="Process" name="retrieve_prices" type="object"/>
@@ -166,7 +168,9 @@
   <field name="inherit_id" ref="product.product_template_search_view"/>
   <field name="arch" type="xml">
     <xpath expr="//field[@name='name']" position="replace">
-     <field name="ean13" string="Name, Ref, EAN, Part" filter_domain="['|','|','|',('name','ilike',self),('ean13','ilike',self),('default_code','ilike',self),('manuf_part','ilike',self)]"/>
+     <field name="name" string="Name, Ref, EAN, Part" filter_domain="['|','|','|',('name','ilike',self),('ean13','ilike',self),('default_code','ilike',self),('manuf_part','ilike',self)]"/>
+     <field name="manufacturer" filter_domain="[('manufacturer','ilike',self)]"/>
+     <field name="manuf_part" filter_domain="[('manuf_part','ilike',self)]"/>
    </xpath>
  </field>
 </record>
@@ -219,7 +223,7 @@
  <field name="view_id" ref="lubon_suppliers_import_tree_view" />
  <field name="act_window_id" ref="lubon_suppliers_import_config" />
 </record>
-<menuitem id="lubon_suppliers_config_menu" name="Supplier config" parent="purchase.menu_procurement_management_product"
+<menuitem id="lubon_suppliers_config_menu" name="Supplier config" parent="purchase.menu_procurement_management_product" groups="purchase.group_purchase_manager,purchase.group_purchase_user"
   action="lubon_suppliers_import_config"/>
 
   <menuitem id="lubon_suppliers_import_menu" name="Supplier import" parent="lubon_qlan.lubon_qlan_tables_menu"

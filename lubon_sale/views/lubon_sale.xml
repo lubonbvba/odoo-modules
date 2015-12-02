@@ -20,6 +20,7 @@
   <record model="ir.ui.view" id="lubon_sale_form_view">
     <field name="name">lubon_sale.sale</field>
     <field name="model">sale.order</field>
+    <field name="priority">18</field>
     <field name="inherit_id" ref="sale.view_order_form"/>
     <field name="arch" type="xml">
       <field name="pricelist_id" position="after">
@@ -27,13 +28,20 @@
        <field name="has_discount"/>
        <field name="global_discount"/>
      </field>
+
+     <xpath expr="//field[@name='order_line']/tree" position="attributes">
+       <attribute name="colors">red:purchase_price_current&gt;purchase_price;green:purchase_price_current&lt;purchase_price</attribute>
+       <attribute name="editable">bottom</attribute>
+     </xpath>
      <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']"
       position="after">
+      <field name="purchase_price_current"/>
       <field name="margin"/>
     </xpath>
     <xpath expr="//field[@name='order_line']/tree/field[@name='discount']"
       position="after">
       <field name="price_reduce"/>
+      <!--field name="discount"/ -->
     </xpath>
 
                 <!-- xpath expr="//field[@name='order_line']/form/group/group/field[@name='price_unit']"

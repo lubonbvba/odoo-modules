@@ -26,6 +26,7 @@
     'data': [
         # 'security/ir.model.access.csv',
         'templates.xml',
+        'security/ir.model.access.csv',
         'views/lubon_suppliers.xml',
     ],
     # only loaded in demonstration mode

@@ -55,14 +55,22 @@ class sale_order(models.Model):
 class sale_order_line(models.Model):
 	_inherit = 'sale.order.line'
 	tax_id = fields.Many2many(required=True)
-
-	def _get_price_reduce(self, cr, uid, ids, field_name, arg, context=None):
+	purchase_price_current=fields.Float(compute="_get_purchase_price_current",help="Current product purchase price.")
+	price_reduce = fields.Float(string="Current", hint="Current purchase price", compute="_get_price_reduce")
+	
+	@api.multi
+	def _get_price_reduce(self):
 		#Correct error in normal odoo behaviour
-		pdb.set_trace()
-		res = dict.fromkeys(ids, 0.0)
-		for line in self.browse(cr, uid, ids, context=context):
-			res[line.id] = line.price_unit * (1-line.discount)
-		return res
+		#pdb.set_trace()
+		for line in self:
+			line.price_reduce = line.price_unit * (1-line.discount/100)
+
+	@api.multi	
+	def _get_purchase_price_current(self):
+		for line in self:
+			line.purchase_price_current=line.product_id.standard_price
+
+
 
 	# @api.onchange('discount')
 	# def onchange_discount(self):
