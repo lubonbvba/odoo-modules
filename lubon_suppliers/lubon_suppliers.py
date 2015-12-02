@@ -270,16 +270,14 @@ class lubon_suppliers_import_stats(models.Model):
 		table_products=self.env['product.template']
 		table_prod_supplier=self.env['product.supplierinfo']
 		searchdate=(datetime.now()- timedelta(days=30)).strftime('%Y-%m-%d')
-		#pdb.set_trace()
-		parts=self.parts_ids.search([('manufacturer_id','in',self.supplier_id.brand_ids.ids),('stats_id',"=",self.id),('ModifDate','>=',searchdate )])
-		#pdb.set_trace()
+		parts=self.parts_ids.search(['&',('manufacturer_id','in',self.supplier_id.brand_ids.ids),('stats_id',"=",self.id)])
 		self.numcreated=0
 		self.numupdated=0
 
 		for part in parts:
 			self.numupdated+=1
 			search=self.supplier_id.supplier_prefix + ("0" * (8-len(part.supplier_part)) + part.supplier_part)
-			product=table_products.search([('default_code','=',search)])
+			product=table_products.search(['&',('default_code','=',search),('active',"in", [True,False])])
 			if not product:
 				ean13=''
 				if part.eancode:
@@ -304,6 +302,7 @@ class lubon_suppliers_import_stats(models.Model):
 											})
 			product.update({'manufacturer': part.manufacturer_id.id,
 							'manuf_part': part.manuf_part,
+							'active': True,
 							'categ_id': self.supplier_id.supplier_product_category_id.id,
 							#'ean13': ean13,
 							'route_ids': self.supplier_id.route_ids.ids,
@@ -331,8 +330,8 @@ class lubon_suppliers_import_stats(models.Model):
 		
 		#parts=table_products.search([('default_code', "ilike",'TD%'),('seller_ids','not in',[self.supplier_id.id])])
 		self.numdeleted=len(parts)
-		for part in parts:
-			part.active=False
+		#for part in parts:
+		#	part.active=False
 		
 		self.stop_products= datetime.now()
 		self.elap_products= (datetime.now()-starttime).seconds
