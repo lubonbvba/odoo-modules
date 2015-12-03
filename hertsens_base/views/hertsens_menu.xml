@@ -127,21 +127,21 @@
     <field name="name">ritten.tree</field>
     <field name="model">hertsens.rit</field>
     <field name="arch" type="xml">
-        <tree string="Ritten Tree" editable="top" default_order="datum desc"  colors="blue:state == 'planned';black:state in ('completed');red:state=='waiting';green:state=='toinvoice';gray:state == 'invoiced'" >
-           <field name="partner_id" options="{'no_quick_create':True,'no_create_edit':True}"/> 
+        <tree string="Ritten Tree" editable="top" default_order="datum desc"  colors="blue:state == 'planned';black:state in ('completed');red:state=='waiting';green:state=='toinvoice';gray:state == 'invoiced'"  >
+           <field name="partner_id" options="{'no_quick_create':True,'no_create_edit':True}" attrs="{'readonly': [('state', '=', 'invoiced')]}"/> 
            <field name="company_id" invisible="True" options="{'no_quick_create':True,'no_create_edit':True}"/>
-           <field name="datum"/>
-           <field name="vertrek"/>
-           <field name="bestemming"/>
-           <field name="refklant" />
-           <field name="ritprijs" />
-           <field name="wachttijd" />
-           <field name="total_ride_price" sum="Total"/>
-           <field name="charges_vat" sum="Total"/>
-           <field name="charges_exvat" sum="Total"/>
-           <field name="finished"/>
-           <field name="cmr" />
-           <field name="state" />
+           <field name="datum" attrs="{'readonly': [('state', '=', 'invoiced')]}"/>
+           <field name="vertrek" attrs="{'readonly': [('state', '=', 'invoiced')]}"/>
+           <field name="bestemming" attrs="{'readonly': [('state', '=', 'invoiced')]}"/>
+           <field name="refklant" attrs="{'readonly': [('state', '=', 'invoiced')]}" />
+           <field name="ritprijs" attrs="{'readonly': [('state', '=', 'invoiced')]}" />
+           <field name="wachttijd" attrs="{'readonly': [('state', '=', 'invoiced')]}" />
+           <field name="total_ride_price" sum="Total" attrs="{'readonly': [('state', '=', 'invoiced')]}"/>
+           <field name="charges_vat" sum="Total" attrs="{'readonly': [('state', '=', 'invoiced')]}"/>
+           <field name="charges_exvat" sum="Total" attrs="{'readonly': [('state', '=', 'invoiced')]}"/>
+           <field name="finished" attrs="{'readonly': [('state', '=', 'invoiced')]}"/>
+           <field name="cmr"  attrs="{'readonly': [('state', '=', 'invoiced')]}"/>
+           <field name="state" attrs="{'readonly': [('state', '=', 'invoiced')]}" />
        </tree>
    </field>
 </record>
