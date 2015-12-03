@@ -170,7 +170,7 @@
              <field name="charges_exvat" />
              <field name="cmr" />
              <field name="state" />
-             <field name="invoice_id" readonly="1" />
+             <field name="invoice_id" domain="[('partner_id','=',partner_id)]" />
          </group>
         </group>
          <notebook>
@@ -193,6 +193,7 @@
     <field name="model">hertsens.rit</field>
     <field name="arch" type="xml">
         <search string="Search Ritten">
+         <field name="cmr" string="CMR, Ref, vertrek, bestemming" filter_domain="['|','|','|',('cmr','ilike',self),('refklant','ilike',self),('vertrek','ilike',self),('bestemming','ilike',self)]"/>   
          <filter name="active" string="Active" domain="[('state','in',['quoted','planned','completed','waiting'])]" help="Active "/>
          <filter name="planned" string="Planned" domain="[('state','=','planned')]" help="Planned "/>
          <filter name="toinvoice" string="To be invoiced" domain="[('state','=','toinvoice')]" help="Ready for invoicing"/>
