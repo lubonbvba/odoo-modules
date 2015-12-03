@@ -196,6 +196,8 @@ class lubon_suppliers_info_import(models.Model):
 
 class product_template(models.Model):
 	_inherit = 'product.template'
+#	_sql_constraints = [('default_code_unique','UNIQUE(default_code)',"Internal ref must be unique")]
+
 	default_code=fields.Char(index=True)
 	ean13=fields.Char(index=True)
 	manuf_part=fields.Char(string="Partnr", index=True)
