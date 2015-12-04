@@ -32,7 +32,10 @@ class res_partner(models.Model):
 	supplier_num=fields.Integer(string="Max records to process", help="0=Unlimited", default=0)
 	supplier_delete_details=fields.Boolean(string="Delete import detail", default=False)
 	brand_ids=fields.Many2many('res.partner',domain="[('manufacturer','=',True)]",relation="supplierbrands", column1="suppliers", column2="brands")
-	
+	supplier_header_line=fields.Integer(string="Header line", default=1, help="Line number to retrieve field names")
+	supplier_delimiter=fields.Char(string="Delimiter",default=";",size=1)
+	supplier_field_part=fields.Many2one('lubon_suppliers.fieldnames', domain="[('supplier_id','=',active_id)]")
+	issue_ids=fields.One2many('lubon_suppliers.info_import','issue_id')
 	@api.one
 	def process_schedule(self):
 		logger.info("Executing Schedule for:" + str(self.id))
@@ -41,10 +44,10 @@ class res_partner(models.Model):
 
 
 
-	@api.one
+	@api.multi
 	def retrieve_prices(self):
 		#test transfertype
-		
+		#self.env['product.template'].search([('active','=',False)]).activate_all()
 		logger.info("Start retrieve_prices")
 		starttime=datetime.now()
 		table_stats=self.env['lubon_suppliers.import_stats']
@@ -109,6 +112,26 @@ class res_partner(models.Model):
 		#shutil.rmtree(tempdir)
 		stats.update({'stop_transfer': datetime.now()})
 		logger.info("End getfile ftp")
+	@api.one	
+	def readfields(self):
+		with open (self.supplier_file, 'rb') as cleanfile:
+			n=1
+			reader = csv.reader(cleanfile, delimiter=str(self.supplier_delimiter))
+			for row in reader:
+				if n>=self.supplier_header_line:
+					break
+		cleanfile.close()
+		for field in row:
+			self.env['lubon_suppliers.fieldnames'].create({
+				'supplier_id':self.id,
+				'name':str(field),
+				})
+
+
+class lubon_suppliers_fieldnames(models.Model):
+	_name='lubon_suppliers.fieldnames'
+	name=fields.Char()
+	supplier_id=fields.Many2one('res.partner')
 
 
 
@@ -118,6 +141,7 @@ class lubon_suppliers_info_import(models.Model):
 	stats_id=fields.Many2one('lubon_suppliers.import_stats',ondelete='cascade')
 #	supplier_info_id=fields.Many2one('product.supplierinfo')
 	description=fields.Char()
+	issue_id=fields.Many2one('res.partner')
 	supplier_part=fields.Char(index=True)
 	manuf_part=fields.Char()
 	Class1=fields.Char()
@@ -203,6 +227,10 @@ class product_template(models.Model):
 	manuf_part=fields.Char(string="Partnr", index=True)
 	manufacturer=fields.Many2one('res.partner')
 	last_stats_id=fields.Many2one('lubon_suppliers.import_stats', string="Last Imported")
+	@api.multi
+	def activate_all(self):
+		for p in self:
+			p.active=True;
 
 class lubon_suppliers_import_stats(models.Model):
 	_name='lubon_suppliers.import_stats'
@@ -239,8 +267,9 @@ class lubon_suppliers_import_stats(models.Model):
 		for brand in tempcr.fetchall():
 			search=brand[0].encode('utf-8')
 
-			partner=table_partners.search([('name', '=', search),
+			partner=table_partners.search([('name', '=like', search),
 											('manufacturer','=',True)])
+			logger.info(search)
 			if not(partner):
 				partner=table_partners.create({'name': search,
 										'manufacturer': True,
@@ -252,7 +281,7 @@ class lubon_suppliers_import_stats(models.Model):
 				partner.customer=False
 		#update only brands of intrest for this supplier, to improve speed.		
 		for brand in self.supplier_id.brand_ids:		
-			parts=self.parts_ids.search([('manufacturer', '=', brand.name)])
+			parts=self.parts_ids.search([('manufacturer', '=ilike', brand.name)])
 
 			#if not parts:
 				#pdb.set_trace()
@@ -277,61 +306,70 @@ class lubon_suppliers_import_stats(models.Model):
 		self.numupdated=0
 
 		for part in parts:
-			self.numupdated+=1
-			search=self.supplier_id.supplier_prefix + ("0" * (8-len(part.supplier_part)) + part.supplier_part)
-			product=table_products.search(['&',('default_code','=',search),('active',"in", [True,False])])
-			if not product:
-				ean13=''
-				if part.eancode:
-					ean13= "0" * (13-len(part.eancode)) + part.eancode
-					if not barcodenumber.check_code('ean13',ean13):
+			try:
+				self.numupdated+=1
+				search=self.supplier_id.supplier_prefix + ("0" * (8-len(part.supplier_part)) + part.supplier_part)
+				product=table_products.search(['&',('default_code','=',search),('active',"in", [True,False])])
+				if len(product) >1:
+					logger.error("Multiple products found: "+ search)
+					for x in product:
+						x.unlink()
+					#parts.issue_id=self.supplier_id.id
+				else:
+					if not product:
 						ean13=''
-				product=product.create({'name': part.description,
-										'default_code': search,
-										'manufacturer': part.manufacturer_id.id,
-										'manuf_part': part.manuf_part,
-										'ean13': ean13,
-										'categ_id': self.supplier_id.supplier_product_category_id.id,
-										})
-				self.numcreated+=1
-				self.numupdated-=1
-			#else:
-			#pdb.set_trace()
-			if not product.seller_ids:
-				table_prod_supplier.create({'name':self.supplier_id.id,
-											'product_tmpl_id':product.id,
-											'product_code': part.supplier_part,
-											})
-			product.update({'manufacturer': part.manufacturer_id.id,
-							'manuf_part': part.manuf_part,
-							'active': True,
-							'categ_id': self.supplier_id.supplier_product_category_id.id,
-							#'ean13': ean13,
-							'route_ids': self.supplier_id.route_ids.ids,
-							'standard_price':part.purchase_price,
-							'type':self.supplier_id.supplier_product_type,
-							'cost_method':self.supplier_id.supplier_product_cost_method,
-							'valuation':self.supplier_id.supplier_product_valuation_method,
-							'last_stats_id': self.id,
-							'seller_id': self.supplier_id,
-							})
-			# product.manufacturer=part.manufacturer_id.id
-			# product.manuf_part=part.manuf_part
-			# product.categ_id=self.supplier_id.supplier_product_category_id.id
-			# product.ean13=ean13
-			# product.route_ids=self.supplier_id.route_ids.ids
-			# product.standard_price=part.purchase_price
-			# product.type=self.supplier_id.supplier_product_type
-			# 				#'costing_method':self.supplier_id.supplier_product_costing_method,
-			# product.valuation=self.supplier_id.supplier_product_valuation_method
-			# product.last_stats_id=self.id
-			# product.seller_id=self.supplier_id
-		
-		
-		parts=table_products.search(['&','&',('last_stats_id',"!=",False),('seller_id','=',self.supplier_id.id),('last_stats_id', "!=",self.id)])
+						if part.eancode:
+							ean13= "0" * (13-len(part.eancode)) + part.eancode
+							if not barcodenumber.check_code('ean13',ean13):
+								ean13=''
+						product=product.create({'name': part.description,
+												'default_code': search,
+												'manufacturer': part.manufacturer_id.id,
+												'manuf_part': part.manuf_part,
+												'ean13': ean13,
+												'categ_id': self.supplier_id.supplier_product_category_id.id,
+												})
+						self.numcreated+=1
+						self.numupdated-=1
+					#else:
+					#pdb.set_trace()
+					if not product.seller_ids:
+						table_prod_supplier.create({'name':self.supplier_id.id,
+													'product_tmpl_id':product.id,
+													'product_code': part.supplier_part,
+													})
+					product.update({'manufacturer': part.manufacturer_id.id,
+									'manuf_part': part.manuf_part,
+									'active': True,
+									'categ_id': self.supplier_id.supplier_product_category_id.id,
+									#'ean13': ean13,
+									'route_ids': self.supplier_id.route_ids.ids,
+									'standard_price':part.purchase_price,
+									'type':self.supplier_id.supplier_product_type,
+									'cost_method':self.supplier_id.supplier_product_cost_method,
+									'valuation':self.supplier_id.supplier_product_valuation_method,
+									'last_stats_id': self.id,
+									'seller_id': self.supplier_id,
+									})
+					# product.manufacturer=part.manufacturer_id.id
+					# product.manuf_part=part.manuf_part
+					# product.categ_id=self.supplier_id.supplier_product_category_id.id
+					# product.ean13=ean13
+					# product.route_ids=self.supplier_id.route_ids.ids
+					# product.standard_price=part.purchase_price
+					# product.type=self.supplier_id.supplier_product_type
+					# 				#'costing_method':self.supplier_id.supplier_product_costing_method,
+					# product.valuation=self.supplier_id.supplier_product_valuation_method
+					# product.last_stats_id=self.id
+					# product.seller_id=self.supplier_id
+			except:
+				logger.error("Exception: " + search)
+				#parts.issue_id=self.supplier_id.id	
+			
+		#parts=table_products.search(['&','&',('last_stats_id',"!=",False),('seller_id','=',self.supplier_id.id),('last_stats_id', "!=",self.id)])
 		
 		#parts=table_products.search([('default_code', "ilike",'TD%'),('seller_ids','not in',[self.supplier_id.id])])
-		self.numdeleted=len(parts)
+		#self.numdeleted=len(parts)
 		#for part in parts:
 		#	part.active=False
 		

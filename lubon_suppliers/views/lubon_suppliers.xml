@@ -39,18 +39,18 @@
   <field name="arch" type="xml">
     <form string="Import configuration">
      <group>
-     <group>           
-       <field name="name" readonly="True"/>
-       <field name="manufacturer" readonly="True"/>
-       <field name="supplier_fileimport" readonly="True"/>
-       <field name="supplier_cron_job" />
-       <field name="id" />
-     </group>
-     <group>
-      <button string="Process" name="retrieve_prices" type="object"/>
-     </group>
-     </group>
-     <notebook>
+       <group>           
+         <field name="name" readonly="True"/>
+         <field name="manufacturer" readonly="True"/>
+         <field name="supplier_fileimport" readonly="True"/>
+         <field name="supplier_cron_job" />
+         <field name="id" />
+       </group>
+       <group>
+        <button string="Process" name="retrieve_prices" type="object"/>
+      </group>
+    </group>
+    <notebook>
       <page name="lubon_suppliers" string="File retrieval">
         <group>
           <group string="File retrieval">
@@ -72,7 +72,10 @@
             <field name="supplier_file"/>
             <field name="supplier_prefix"/>
             <field name="supplier_num"/>
+            <field name="supplier_delimiter"/>
+            <field name="supplier_header_line"/>
             <button string="Process file" name="readfile" type="object"/>
+            <button string="Get fields" name="readfields" type="object"/>
           </group>
         </group>
       </page>
@@ -108,7 +111,17 @@
         </field>    
       </page>
       <page string="Brands selection">
-        <field name="brand_ids" /> <!--widget="many2many_checkboxes"/--> 
+        <field name="brand_ids" /> 
+      </page>
+      <page string="Field mapping">
+        <group>
+          <group>
+            <field name="supplier_field_part" />
+          </group> 
+        </group>
+      </page>
+      <page string="Issues">
+        <field name="issue_ids" /> 
       </page>
     </notebook>
   </form>
