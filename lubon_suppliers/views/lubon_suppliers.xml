@@ -45,51 +45,14 @@
          <field name="supplier_fileimport" readonly="True"/>
          <field name="supplier_cron_job" />
          <field name="id" />
+         <field name="supplier_debug" />
+         <field name="supplier_reinit" />
        </group>
        <group>
         <button string="Process" name="retrieve_prices" type="object"/>
       </group>
     </group>
     <notebook>
-      <page name="lubon_suppliers" string="File retrieval">
-        <group>
-          <group string="File retrieval">
-            <field name="supplier_transfermethod"/>
-            <field name="supplier_transferserver"/>
-            <field name="supplier_transferlogin"/>
-            <field name="supplier_transferpassword" password="True"/>
-            <field name="supplier_file_source"/>
-            <field name="supplier_file_zipped"/>
-            <field name="supplier_file_resulting"/>
-            <field name="supplier_delete_details"/>
-            <button string="Get file" name="getfile" type="object"/>
-          </group>
-        </group>
-      </page>
-      <page  string="File processing">
-        <group>
-          <group string="File import">
-            <field name="supplier_file"/>
-            <field name="supplier_prefix"/>
-            <field name="supplier_num"/>
-            <field name="supplier_delimiter"/>
-            <field name="supplier_header_line"/>
-            <button string="Process file" name="readfile" type="object"/>
-            <button string="Get fields" name="readfields" type="object"/>
-          </group>
-        </group>
-      </page>
-      <page string="File processing">
-        <group>
-          <group>
-            <field name="supplier_product_category_id"/>
-            <field name="supplier_product_type"/>
-            <field name="supplier_product_cost_method"/>
-            <field name="supplier_product_valuation_method"/>
-            <field name="route_ids" widget="many2many_checkboxes"/> 
-          </group>
-        </group>
-      </page>
       <page string="Import history">
         <field name="stats_ids">
           <tree string="Import history">
@@ -110,6 +73,45 @@
           </tree>
         </field>    
       </page>
+
+      <page name="lubon_suppliers" string="File retrieval">
+        <group>
+          <group string="File retrieval">
+            <field name="supplier_transfermethod"/>
+            <field name="supplier_transferserver"/>
+            <field name="supplier_transferlogin"/>
+            <field name="supplier_transferpassword" password="True"/>
+            <field name="supplier_file_source"/>
+            <field name="supplier_file_zipped"/>
+            <field name="supplier_file_resulting"/>
+            <field name="supplier_delete_details"/>
+            <button string="Get file" name="getfile" type="object"/>
+          </group>
+        </group>
+      </page>
+      <page  string="Raw import">
+        <group>
+          <group string="File import">
+            <field name="supplier_file"/>
+            <field name="supplier_prefix"/>
+            <field name="supplier_num"/>
+            <field name="supplier_delimiter"/>
+            <field name="supplier_header_line"/>
+            <button string="Process file" name="readfile" type="object"/>
+          </group>
+        </group>
+      </page>
+      <page string="File processing">
+        <group>
+          <group>
+            <field name="supplier_product_category_id"/>
+            <field name="supplier_product_type"/>
+            <field name="supplier_product_cost_method"/>
+            <field name="supplier_product_valuation_method"/>
+            <field name="route_ids" widget="many2many_checkboxes"/> 
+          </group>
+        </group>
+      </page>
       <page string="Brands selection">
         <field name="brand_ids" /> 
       </page>
@@ -118,6 +120,9 @@
           <group>
             <field name="supplier_field_part" />
           </group> 
+          <group>
+                        <button string="Get fields" name="readfields" type="object"/>
+                      </group>
         </group>
       </page>
       <page string="Issues">
