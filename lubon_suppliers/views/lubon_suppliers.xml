@@ -142,6 +142,7 @@
     <tree string="Imported supplier info">
       <field name="stats_id"/>         
       <field name="supplier_part"/>
+      <field name="default_code"/>
       <field name="manufacturer"/>
       <field name="manufacturer_id"/>
       <field name="description"/>

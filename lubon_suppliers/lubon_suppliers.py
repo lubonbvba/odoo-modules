@@ -168,8 +168,9 @@ class lubon_suppliers_info_import(models.Model):
 	stock=fields.Char()
 	BackorderDate=fields.Date()
 	ModifDate=fields.Datetime()
+	default_code=fields.Char(index=True)
 
-	eancode=fields.Char()
+	eancode=fields.Char(index=True)
 	manufacturer_id=fields.Many2one('res.partner', domain="[('manufacturer','=',True)]")
 
 	def processfile(self,stats):
@@ -211,16 +212,16 @@ class lubon_suppliers_info_import(models.Model):
 				except:
 					imported.ModifDate=datetime.strptime(row['ModifDate'],"%d/%m/%Y %H:%M:%S")
 
-
+				imported.default_code=stats.supplier_id.supplier_prefix + ("0" * (8-len(imported.supplier_part)) + imported.supplier_part)
+				if imported.eancode:
+					imported.eancode= "0" * (13-len(imported.eancode)) + imported.eancode
+					if not barcodenumber.check_code('ean13',imported.eancode):
+						imported.eancode=''
 				if (stats.supplier_id.supplier_num >0  and  n>stats.supplier_id.supplier_num):
 					break
 			cleanfile.close()
 			stats.numparts=n
 		logger.info("End processfile")
-
-
-
-		#pdb.set_trace()	
 
 
 
@@ -246,6 +247,7 @@ class product_template(models.Model):
 	def delete_products(self):
 		#pdb.set_trace()
 		for p in self:
+			logger.info(p.default_code)
 			if (p.default_code == ""):
 				if not (p.sales_order_lines or p.invoice_lines or p.procurement_order or p.stock_inventory_line):
 					p.unlink()
@@ -289,7 +291,8 @@ class lubon_suppliers_import_stats(models.Model):
 
 			partner=table_partners.search([('name', '=like', search),
 											('manufacturer','=',True)])
-			logger.info(search)
+			if self.supplier_id.supplier_debug:
+				logger.info(search)
 			if not(partner):
 				partner=table_partners.create({'name': search,
 										'manufacturer': True,
@@ -336,7 +339,8 @@ class lubon_suppliers_import_stats(models.Model):
 			part_starttime=datetime.now()
 			self.numupdated+=1
 			operation="Update"
-			search=self.supplier_id.supplier_prefix + ("0" * (8-len(part.supplier_part)) + part.supplier_part)
+			search=part.default_code
+			#self.supplier_id.supplier_prefix + ("0" * (8-len(part.supplier_part)) + part.supplier_part)
 
 			product=table_products.search([('default_code','=',search)])#,('active',"in", [True,False])])
 			
@@ -349,16 +353,11 @@ class lubon_suppliers_import_stats(models.Model):
 			else:
 				if not product:
 					operation="Create"
-					ean13=''
-					if part.eancode:
-						ean13= "0" * (13-len(part.eancode)) + part.eancode
-						if not barcodenumber.check_code('ean13',ean13):
-							ean13=''
 					product=product.create({'name': part.description,
 											'default_code': search,
 											#'manufacturer': part.manufacturer_id.id,
 											#'manuf_part': part.manuf_part,
-											'ean13': ean13,
+											'ean13': part.eancode,
 											#'categ_id': self.supplier_id.supplier_product_category_id.id,
 											})
 					table_prod_supplier.create({'name':self.supplier_id.id,
