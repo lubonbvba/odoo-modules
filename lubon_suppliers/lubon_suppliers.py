@@ -132,6 +132,12 @@ class res_partner(models.Model):
 								})
 					break
 		cleanfile.close()
+	@api.one
+	def initsupplier(self):
+		logger.info("Start reinit")
+		self.env['product.template'].search(['&',('seller_id','=',self.id),('default_code','=',False)]).delete_products()
+		logger.info("End reinit")
+
 
 
 class lubon_suppliers_fieldnames(models.Model):
@@ -246,9 +252,14 @@ class product_template(models.Model):
 	@api.multi
 	def delete_products(self):
 		#pdb.set_trace()
+		number=len(self)
+		n=0
 		for p in self:
-			logger.info(p.default_code)
-			if (p.default_code == ""):
+			n+=1
+#			if n> 1000:
+#				break
+			logger.info("processing:%s %d/%d",p.default_code,n,number)
+			if (p.default_code == False):
 				if not (p.sales_order_lines or p.invoice_lines or p.procurement_order or p.stock_inventory_line):
 					p.unlink()
 
@@ -302,17 +313,17 @@ class lubon_suppliers_import_stats(models.Model):
 			else:
 				partner.supplier=False
 				partner.customer=False
+
+		logger.info("Start updating brands on import")
+
 		#update only brands of intrest for this supplier, to improve speed.		
 		for brand in self.supplier_id.brand_ids:		
 			parts=self.parts_ids.search([('manufacturer', '=ilike', brand.name)])
-
-			#if not parts:
-				#pdb.set_trace()
 			for part in parts:
 				part.manufacturer_id=brand.id
+
 		self.stop_brands= datetime.now()
 		self.elap_brands= (datetime.now()-starttime).seconds
-		#pdb.set_trace()
 		logger.info("End processbrands")
 
 
@@ -322,11 +333,7 @@ class lubon_suppliers_import_stats(models.Model):
 		starttime=datetime.now()
 
 		table_products_products=self.env['product.product']
-		if self.supplier_id.supplier_reinit:
-			logger.info("Start reinit")
-			self.env['product.template'].search([('seller_id','=',self.supplier_id.id)]).delete_products()
-			self.supplier_id.supplier_reinit=False
-			logger.info("End reinit")
+
 
 
 		table_products=self.env['product.template']

@@ -50,6 +50,7 @@
        </group>
        <group>
         <button string="Process" name="retrieve_prices" type="object"/>
+        <button string="Init" name="initsupplier" type="object"/>
       </group>
     </group>
     <notebook>
