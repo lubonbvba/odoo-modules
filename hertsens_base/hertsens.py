@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #from openerp.osv import osv
-from openerp import models, fields, api, _
+from openerp import exceptions,models, fields, api, _
 import csv,os,string,pdb
 from path import path
 from datetime import date
@@ -206,11 +206,15 @@ class invoice(models.Model):
 	on=fields.Char(required=True,default="on")
 	@api.one
 	def action_cancel(self,vals=None,context=None):
-		for ride in self.rides_ids:
-			ride.state='toinvoice'
-			ride.invoice_id=""
-		#pdb.set_trace()	
-		return super(invoice, self.with_context(from_parent_object=True)).action_cancel()
+		
+		if self.state == 'draft':
+			for ride in self.rides_ids:
+				#self.env['hertsens.rit']
+				ride.sudo().state='toinvoice'
+				ride.sudo().invoice_id=""
+			return super(invoice, self.with_context(from_parent_object=True)).action_cancel()
+		else:
+			raise exceptions.Warning(_("Annuleren onmogelijk in deze factuurstatus."))
 
 class invoice_line(models.Model):
 	_inherit="account.invoice.line"

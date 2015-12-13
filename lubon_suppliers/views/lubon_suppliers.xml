@@ -119,11 +119,23 @@
       <page string="Field mapping">
         <group>
           <group>
-            <field name="supplier_field_part" />
+            <field name="supplier_field_description" />
+            <field name="supplier_field_part_supplier" />
+            <field name="supplier_field_part_manufacturer" />
+            <field name="supplier_field_ean" />
+            <field name="supplier_field_price_purchase" />
+            <field name="supplier_field_price_list" />
+            <field name="supplier_field_categ01" />
+            <field name="supplier_field_categ02" />
+            <field name="supplier_field_categ03" />
           </group> 
+          <group string="Manufacturer selection">
+            <field name="supplier_field_part_manufacturer" />
+            <field name="supplier_default_manufacturer" />
+          </group>
           <group>
-                        <button string="Get fields" name="readfields" type="object"/>
-                      </group>
+            <button string="Get fields" name="readfields" type="object"/>
+          </group>
         </group>
       </page>
       <page string="Issues">
