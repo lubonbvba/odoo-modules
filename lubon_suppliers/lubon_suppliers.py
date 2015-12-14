@@ -396,7 +396,7 @@ product_price_history as price on lastcostrecord.product_template_id = price.pro
 and maxcostdate=datetime) as prodprice 
 left join product_product as p on p.product_tmpl_id=prodprice.product_template_id
 left join lubon_suppliers_info_import as i on p.default_code=i.default_code
-where (activeprice != i.purchase_price) and stats_id=""" + str(self.id)
+where round(activeprice*100) <> round(i.purchase_price*100) and stats_id=""" + str(self.id)
 		self.sql_query02=sql_statement
 		tempcr2=self.env['lubon_suppliers.import_stats'].env.cr
 		tempcr2.execute(sql_statement)
