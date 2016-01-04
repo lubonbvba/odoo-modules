@@ -112,6 +112,14 @@ class add_hours_wizard(models.TransientModel):
 class invoice(models.Model):
 	_inherit="account.invoice"
 	analytic_lines=fields.One2many( "account.analytic.line" ,"invoice_id" , domain=[('journal_id.type',"=",'general') ])
+	has_discount=fields.Boolean(compute="_compute_has_discount", string="Discount?", help= "Contains line(s) with discount?")
+
+	@api.one
+	def _compute_has_discount(self):
+		self.has_discount=False
+		for line in self.invoice_line:
+			if line.discount > 0:
+				self.has_discount=True
 
 	@api.one
 	def remove_hours_from_invoice(self):

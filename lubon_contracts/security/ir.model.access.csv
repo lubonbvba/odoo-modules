@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_lubon_contracts_lubon_contracts,lubon_contracts.lubon_contracts,model_lubon_contracts_lubon_contracts,,1,0,0,0

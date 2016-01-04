@@ -64,6 +64,9 @@
                 <xpath expr="//button[@name='invoice_open']" position="after">
                     <button name="remove_hours_from_invoice" states="draft" string="Remove hours" type="object" groups="base.group_user"/>
                 </xpath>
+                <xpath expr="//field[@name='account_id']" position="after">
+                    <field name="has_discount"/>
+                </xpath>        
             </field>
         </record>
         <record model="ir.ui.view" id="lubon_qlan_add_hours_wizard">

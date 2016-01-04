@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
- <openerp>
+<openerp>
     <data>
         <!-- Add instructor field to existing view -->
         <record model="ir.ui.view" id="partner_instructor_form_view">
@@ -9,21 +9,28 @@
             <field name="arch" type="xml">
                 <notebook position="inside">
                     <page string="Lubon">
-			<group string="Rate settings">
-                            <field name="rate_hr"/>
-                            <field name="rate_day"/>
-                            <field name="rate_travel"/>
-                        </group>
-                        <group string="Specific e-mail settings">
-                            <field name="mail_invoice"/>
-                            <field name="mail_reminder"/>
+                    <group string="Specific e-mail settings">
+                        <group>
+                            <field name="partner_id_invoice" domain="[('parent_id','=',active_id)]" context="{'default_parent_id': active_id}"   />
+                            <field name="partner_id_reminder"/>
                             <field name="formal_communication"/>
                         </group>
+                        <group>
+                            <field name="mail_invoice"/>
+                            <field name="mail_reminder"/>
+                        </group>
+
                         <group string="Specific e-mail settings">
-				<field name="updateswindows"/>
-                                <field name="updateskluwer"/>
-                                <field name="updatestelephony"/>
-         		</group>
+                            <field name="updateswindows"/>
+                            <field name="updateskluwer"/>
+                            <field name="updatestelephony"/>
+                        </group>
+                    </group>
+                     <group string="Rate settings">
+                        <field name="rate_hr"/>
+                        <field name="rate_day"/>
+                        <field name="rate_travel"/>
+                    </group>                    
                     </page>
                 </notebook>
             </field>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <openerp>
+    <data>
+        <record model="ir.ui.view" id="lubon_contracts_lubon_contracts">
+            <field name="name">lubon_contracts</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account_analytic_analysis.account_analytic_account_form_form"/>
+            <field name="arch" type="xml">
+                <xpath expr='//field[@name="price_unit"]' position="after">
+                    <field name="line_discount_rate"/>
+                    <field name="line_reduced_price"/>
+                </xpath>
+                <xpath expr='//field[@name="price_subtotal"]' position="replace">
+                
+                    <field name="price_subtotal" sum="Total"/>
+                    <field name="add_to_prepaid"/>
+                    <field name="invoice_analytic_account_id"/>
+                    <field name="product_type"/>
+                </xpath>    
+            </field>
+        </record>
+        <record model="ir.ui.view" id="lubon_contracts_lubon__sale_contract">
+            <field name="name">lubon_sale_contract</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="lubon_sale.lubon_sale_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr='//field[@name="contract_start_date"]' position="after">
+                    <button string="Add to contract" name="add_to_contract" type="object" states="draft"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

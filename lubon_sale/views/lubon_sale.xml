@@ -39,9 +39,10 @@
       <field name="margin"/>
     </xpath>
     <xpath expr="//field[@name='order_line']/tree/field[@name='discount']"
-      position="after">
-      <field name="price_reduce"/>
-      <!--field name="discount"/ -->
+      position="replace">
+       <field name="discount"/>
+      <field name="price_reduce" string="Eff. Price"/>
+     
     </xpath>
 
                 <!-- xpath expr="//field[@name='order_line']/form/group/group/field[@name='price_unit']"
@@ -52,10 +53,10 @@
                   position="after">
                     <field name="margin" class="oe_inline"/>
                   </xpath -->
-                  <xpath expr="//field[@name='order_line']/form/group/group/field[@name='price_unit']"
+                  <!--xpath expr="//field[@name='order_line']/form/group/group/field[@name='price_unit']"
                     position="after">
                     <field name="price_reduce" class="oe_inline"/>
-                  </xpath>
+                  </xpath-->
                   <notebook position="inside">
                     <page string="Front cover">
                       <field name="frontcover">
