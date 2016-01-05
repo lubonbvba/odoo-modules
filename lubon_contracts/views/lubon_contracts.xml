@@ -9,6 +9,9 @@
                 <xpath expr='//tree' position="attributes">
                     <attribute name="default_order">sequence</attribute>
                 </xpath>
+               <xpath expr='//field[@name="quantity_max"]' position="after">
+                    <field name="quantity_hist"/>
+                </xpath> 
                 <xpath expr='//field[@name="recurring_next_date"]' position="after">
                     <field name="check_before_invoice"/>
                     <field name="ready_for_invoice"/>
@@ -29,7 +32,12 @@
                     <field name="add_to_prepaid"/>
                     <field name="invoice_analytic_account_id"/>
                     <field name="product_type"/>
-                </xpath>    
+                </xpath>
+                <xpath expr='//page[@name="contract_page"]' position="after">
+                    <page name="invoiced_lines" string="Invoiced lines">
+                        <field name="invoiced_lines"/>
+                    </page>
+                </xpath>      
             </field>
         </record>
         <record model="ir.ui.view" id="lubon_contracts_lubon__sale_contract">

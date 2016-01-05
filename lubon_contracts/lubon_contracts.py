@@ -46,6 +46,8 @@ class account_analytic_account(models.Model):
 	_inherit = "account.analytic.account"
 	check_before_invoice=fields.Boolean(help="If this field is set, invoice can only be made if ready for invoice is checked")
 	ready_for_invoice=fields.Boolean(help="This needs to be set to signal that the invoice can be made.")
+	invoiced_lines=fields.One2many("account.invoice.line",'account_analytic_id', readonly=True)
+	quantity_hist=fields.Float(string="Historic balance", help="Credit before using odoo contracts")
 	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:

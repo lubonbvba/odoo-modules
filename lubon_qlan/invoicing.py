@@ -3,6 +3,7 @@ from openerp.osv import osv
 from openerp import models, fields, api, _
 import csv,os,string,pdb
 from path import path
+import openerp.addons.decimal_precision as dp
 
 class account_analytic_line(models.Model):
 	_inherit= "account.analytic.line"
@@ -182,7 +183,7 @@ class account_analytic_line(osv.osv):
 
 class account_invoice_line(models.Model):
     _inherit = "account.invoice.line"
-    reduced_price=fields.Float(string="Eff. Price", compute="_compute_reduced_price")
+    reduced_price=fields.Float(string="Eff. Price", compute="_compute_reduced_price", digits= dp.get_precision('Account'))
 
     @api.multi
     def _compute_reduced_price(self):
