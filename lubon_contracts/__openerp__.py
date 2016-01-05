@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'account_analytic_analysis', 'lubon_sale'],
+    'depends': ['base', 'account_analytic_analysis', 'lubon_base','lubon_sale'],
 
     # always loaded
     'data': [

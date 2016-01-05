@@ -14,6 +14,7 @@ class account_analytic_invoice_line(models.Model):
 	price_subtotal=fields.Float(compute="_get_reduced_price")
 	sequence=fields.Integer()
 
+
 	@api.depends('line_discount_rate','price_unit', 'quantity')
 	def _get_reduced_price(self):
 		for record in self:
@@ -21,7 +22,7 @@ class account_analytic_invoice_line(models.Model):
 			record.price_subtotal=record.quantity * record.line_reduced_price
 	@api.multi
 	def new_recurring_line(self,line):
-		invoice_line=self.search(['&', ('analytic_account_id',"=",line.order_id.project_id.id ),('product_id',"=",line.product_id.id)])
+		invoice_line=self.search(['&', '&',('analytic_account_id',"=",line.order_id.project_id.id ),('product_id',"=",line.product_id.id),('name',"ilike",line.name)])
 		if not invoice_line:
 			self.create({'analytic_account_id': line.order_id.project_id.id,
 				'product_id': line.product_id.id,
@@ -43,6 +44,8 @@ class account_analytic_invoice_line(models.Model):
 class account_analytic_account(models.Model):
 	_name = "account.analytic.account"
 	_inherit = "account.analytic.account"
+	check_before_invoice=fields.Boolean(help="If this field is set, invoice can only be made if ready for invoice is checked")
+	ready_for_invoice=fields.Boolean(help="This needs to be set to signal that the invoice can be made.")
 	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:
@@ -51,17 +54,18 @@ class account_analytic_account(models.Model):
 	
 	def _prepare_invoice_line(self, cr, uid, line, fiscal_position, context=None):
 		
-	#    def _prepare_invoice_line(self, cr, uid, line, fiscal_position, context=None):
 		res=super(account_analytic_account, self)._prepare_invoice_line(cr, uid,line,fiscal_position)
-#		res['analytic_account_id'] = line.invoice_analytic_account_id.id
-#		if line.add_to_prepaid:
-#		
+
 		res.update({'account_analytic_id': line.invoice_analytic_account_id.id})
+		res.update({'discount': line.line_discount_rate})
 		#pdb.set_trace()
 		if line.add_to_prepaid:
 			line.analytic_account_id.quantity_max += line.quantity
 		return res
-
+	def _prepare_invoice_data(self, cr, uid, contract, context=None):
+		res=super(account_analytic_account, self)._prepare_invoice_data( cr, uid, contract)
+		res.update({'comment': contract.description})
+		return res
 
 
 class sale_order(models.Model):
@@ -74,7 +78,7 @@ class sale_order(models.Model):
 				'pricelist_id': quote.pricelist_id.id,
 				'description': quote.note
 				})
-			for line in quote.order_line:
+			for line in quote.order_line.sorted(key=lambda r: r.sequence):
 				quote.project_id.add_line_from_quote(line)
 			quote.state='done'
 

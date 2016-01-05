@@ -180,4 +180,11 @@ class account_analytic_line(osv.osv):
 #     	pdb.set_trace()
 #     	return super(account_invoice_cancel, self.with_context(from_parent_object=True)).invoice_cancel()
 
+class account_invoice_line(models.Model):
+    _inherit = "account.invoice.line"
+    reduced_price=fields.Float(string="Eff. Price", compute="_compute_reduced_price")
 
+    @api.multi
+    def _compute_reduced_price(self):
+    	for line in self:
+    		line.reduced_price=line.price_unit*(1-line.discount/100)

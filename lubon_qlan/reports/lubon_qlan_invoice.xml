@@ -56,7 +56,7 @@
                         <th class="text-right">Unit Price</th>
                         <!-- th class="text-right" groups="sale.group_discount_per_so_line">Discount (%)</th -->
                         <th class="text-right" t-if="o.has_discount">(%)</th>
-                        <!--th class="text-right">Eff. Price</th -->
+                        <th class="text-right" t-if="o.has_discount">Eff. Price</th>
                         <th class="text-right">Taxes</th>
                         <th class="text-right">Amount</th>
                     </tr>
@@ -74,9 +74,9 @@
                         <td  t-if="o.has_discount" class="text-right" >
                             <span t-field="l.discount"/>
                         </td>
-                        <!--td class="text-right">
-                            <span t-field="l.discount"/>
-                        </td-->
+                        <td class="text-right" t-if="o.has_discount">
+                            <span t-field="l.reduced_price"/>
+                        </td>
                         <td class="text-right">
                             <span t-esc="', '.join(map(lambda x: x.name, l.invoice_line_tax_id))"/>
                         </td>

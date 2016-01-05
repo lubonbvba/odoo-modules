@@ -66,7 +66,11 @@
                 </xpath>
                 <xpath expr="//field[@name='account_id']" position="after">
                     <field name="has_discount"/>
-                </xpath>        
+                </xpath>
+                <xpath expr="//field[@name='discount']" position="replace">
+                    <field name="discount"/>
+                    <field name="reduced_price"/>
+                </xpath>          
             </field>
         </record>
         <record model="ir.ui.view" id="lubon_qlan_add_hours_wizard">
