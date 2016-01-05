@@ -44,6 +44,7 @@ class account_analytic_invoice_line(models.Model):
 class account_analytic_account(models.Model):
 	_name = "account.analytic.account"
 	_inherit = "account.analytic.account"
+	name=fields.Char(translate=False)
 	check_before_invoice=fields.Boolean(help="If this field is set, invoice can only be made if ready for invoice is checked")
 	ready_for_invoice=fields.Boolean(help="This needs to be set to signal that the invoice can be made.")
 	invoiced_lines=fields.One2many("account.invoice.line",'account_analytic_id', readonly=True)
@@ -67,6 +68,7 @@ class account_analytic_account(models.Model):
 	def _prepare_invoice_data(self, cr, uid, contract, context=None):
 		res=super(account_analytic_account, self)._prepare_invoice_data( cr, uid, contract)
 		res.update({'comment': contract.description})
+		res.update({'origin': contract.name})
 		return res
 
 

@@ -3,21 +3,21 @@
     'name': "lubon_base",
 
     'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+        Trigger for lubon updates""",
 
     'description': """
-        Long description of module's purpose
+        By making other modules dependent on this on -u lubon_base makes sure that all
+        relevant modules are updated.
     """,
 
-    'author': "Your Company",
-    'website': "http://www.yourcompany.com",
+    'author': "Lubon bvba",
+    'website': "http://www.lubon.be",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
+    'category': 'Lubon bvba',
+    'version': '8.0.0.4.0',
 
     # any module necessary for this one to work correctly
     'depends': ['base'],
