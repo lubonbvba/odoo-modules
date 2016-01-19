@@ -3,7 +3,8 @@
     'name': "lubon_base",
 
     'summary': """
-        Trigger for lubon updates""",
+        Trigger for lubon updates
+        """,
 
     'description': """
         By making other modules dependent on this on -u lubon_base makes sure that all

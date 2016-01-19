@@ -688,8 +688,14 @@
               <field name="model">lubon_qlan.adaccounts</field>
               <field name="arch" type="xml">
                 <tree string="Ad accounts Tree">
+                  <field name="tenant_id"/>
                   <field name="samaccountname"/>
                   <field name="logonname"/>
+                  <field name="name"/>
+                  <field name="date_first"/>
+                  <field name="date_last"/>
+                  <field name="product"/>
+                  <field name="ad_enabled"/>
                   <field name="objectguid"/>
 
                 </tree>

@@ -159,6 +159,8 @@
             <h3>Rittenoverzicht voor factuur: <span t-field="o.number"/></h3>
             <table class="table table-condensed table-bordered">
                 <t t-set="total" t-value="0" />
+                <t t-set="total_vat" t-value="0" />
+                <t t-set="total_exvat" t-value="0" />
                         <thead>
                             <tr>
                                 <th>Datum</th>
@@ -169,6 +171,8 @@
                                 <th>Ritprijs</th>
                                 <th>Wachttijd</th>
                                 <th>Totaal</th>
+                                <th>Kosten m btw</th>
+                                <th>Kosten z btw</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -189,16 +193,31 @@
                                     </td>
                                     <td class="text-right">
                                         <span t-esc="t.total_ride_price" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
-                                    </td>                               
+                                    </td>
+                                  <td class="text-right">
+                                        <span t-esc="t.charges_vat" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                    </td>
+                                 <td class="text-right">
+                                        <span t-esc="t.charges_exvat" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                 </td>                                   
+
                                 <t t-set="total" t-value="total + t.total_ride_price" />
+                                <t t-set="total_exvat" t-value="total_exvat + t.charges_exvat" />
+                                <t t-set="total_vat" t-value="total_vat + t.charges_vat" />
                             </tr>
                             <!-- tfoot -->
                                 <tr>
-                                    <td  class="text-right" colspan="7">Totaal:</td>
-                                    <!--td class="text-right"><t t-esc="total"/></td-->
+                                    <td class="text-right" colspan="7">Totaal:</td>
                                     <td class="text-right">
                                         <span t-esc="total" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
                                     </td>
+                                    <td class="text-right">
+                                        <span t-esc="total_vat" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="total_exvat" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                    </td>
+
                                 </tr>
                             <!-- /tfoot -->
                         </tbody>
