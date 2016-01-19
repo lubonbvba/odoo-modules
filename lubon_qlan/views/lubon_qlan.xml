@@ -549,10 +549,10 @@
               <page string="Contract">
                 <field name="contract_ids" create="False"/>
               </page>
-<!--               <page string="Credentials">
-                <field name="credential_ids"/>
+               <page string="Pad">
+                <field name="site_pad" widget="pad"/>
               </page>
- -->
+
               <page string="Site config">
                 <group>
                   <field name="ipv4"/>

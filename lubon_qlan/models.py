@@ -246,6 +246,7 @@ class lubon_qlan_credentials(models.Model):
 
 class lubon_qlan_sites(models.Model):
 	_name='lubon_qlan.sites'
+	_inherit='pad.common'
 	name=fields.Char(string="Site name")
 	alfacode=fields.Char(string="Site Code")
 	filemaker_site_id=fields.Char(string='Filemaker site')
@@ -267,6 +268,9 @@ class lubon_qlan_sites(models.Model):
 	location_ids=fields.One2many('stock.location', 'site_id')
 	asset_ids=fields.One2many('lubon_qlan.assets','site_id')
 	notes=fields.Html()
+	site_pad_content=fields.Char()
+	site_pad=fields.Char(pad_content_field='site_pad_content')
+	
 	@api.one
 	def _vlan_count(self):
 		self.vlan_count=len(self.vlan_ids)
