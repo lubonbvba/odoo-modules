@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="lubon_hr_users">
+            <field name="name">lubon_base.hr_users</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <!-- field name="priority">90</field -->
+            <field name="arch" type="xml">
+                <xpath expr="//page[@string='HR Settings']" position="after">
+                    <page string="Pad">
+                        <field name="user_pad" widget="pad"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

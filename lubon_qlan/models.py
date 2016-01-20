@@ -268,8 +268,7 @@ class lubon_qlan_sites(models.Model):
 	location_ids=fields.One2many('stock.location', 'site_id')
 	asset_ids=fields.One2many('lubon_qlan.assets','site_id')
 	notes=fields.Html()
-	site_pad_content=fields.Char()
-	site_pad=fields.Char(pad_content_field='site_pad_content')
+	site_pad=fields.Char(pad_content_field='notes')
 	
 	@api.one
 	def _vlan_count(self):

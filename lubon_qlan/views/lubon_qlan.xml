@@ -151,6 +151,7 @@
           </group>
         </group>
         <field name="notes"/>
+
         <notebook>
           <page string="IP">
             <field name="ips" context="{'default_asset_id' : active_id, 'default_site_id' : site_id }"/>
@@ -498,7 +499,8 @@
                     </group>
 
                   </group>
-                  <field name="notes"/>
+                  <!-- field name="notes"/ -->
+                  <field name="site_pad" widget="pad"/>
                   <notebook>
 <!--                    <page string="Assets" invisible="True">
                     <field name="asset_ids" context="{'default_site_id' : active_id }">
@@ -549,8 +551,8 @@
               <page string="Contract">
                 <field name="contract_ids" create="False"/>
               </page>
-               <page string="Pad">
-                <field name="site_pad" widget="pad"/>
+               <page string="Pad (debug)">
+                <field name="notes"/>
               </page>
 
               <page string="Site config">

@@ -18,10 +18,10 @@
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
     'category': 'Lubon bvba',
-    'version': '8.0.0.4.0',
+    'version': '8.0.0.5.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base','pad','hr'],
 
     # always loaded
     'data': [
@@ -29,7 +29,8 @@
 #	'static/src/js/lubon_base.js',
 	   'static/src/css/lubon_base.css',
         'templates.xml',
-    	'views/lubon_base.xml',
+        'views/lubon_base.xml',
+    	'views/lubon_hr.xml',
         'reports/lubon_base_invoice.xml',
         'reports/lubon_base_header.xml',
 
