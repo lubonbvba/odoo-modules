@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="cron_dbname_dependent_form">
+            <field name="name">cron_dbname_dependent.cron_dbname_form</field>
+            <field name="model">ir.cron</field>
+            <field name="inherit_id" ref="base.ir_cron_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='doall']" position="after">
+                    <field name="valid_dbname"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="cron_dbname_dependent_tree">
+            <field name="name">cron_dbname_dependent.cron_dbname_dependent_tree</field>
+            <field name="model">ir.cron</field>
+            <field name="inherit_id" ref="base.ir_cron_view_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='interval_type']" position="after">
+                    <field name="valid_dbname"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
