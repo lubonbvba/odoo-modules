@@ -633,11 +633,12 @@
                   <page string="AD Accounts">
                     <field name="adaccounts_ids" context="{'default_tenant_id' : active_id }">
                       <tree string="Accounts" editable="bottom">
+                        <field name="tenant_id" invisible="True"/>
                         <field name="name"/>
                         <field name="samaccountname"/>                              
                         <field name="logonname"/>
                         <field name="product"/>
-                        <field name="tenant_id" invisible="True"/>
+                        <field name="contract_id"/>
                         <!-- field name="main_partner" invisible="False"/ -->
                         <field name="validcustomers_ids" invisible="True" />
                         <field name="person_id" domain="[('type','=','contact'),('parent_id.id','in', validcustomers_ids[0][2])]"/>
@@ -685,7 +686,29 @@
                 </form>
               </field>
             </record>
-            <record model="ir.ui.view" id="adaccounts_tree_view">
+            <record model="ir.ui.view" id="adaccounts_search_view">
+              <field name="name">adaccounts.search</field>
+              <field name="model">lubon_qlan.adaccounts</field>
+              <field name="arch" type="xml">
+                <search>
+                  <field name="date_first"/>
+                  <field name="date_last"/>
+                  <field name="name" string="Account name" filter_domain="['|',('samaccountname','ilike',self),('logonname','ilike',self)]"/>
+                  <field name="tenant_id" filter_domain="[('tenant_id','ilike',self)]"/>
+                  <filter name="notenant" string="No Tenant"
+                    domain="[('tenant_id', '=', False)]"/>
+                    <filter name="obsolete" string="Obsolete"
+                    domain="[('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') )]"/>
+                    <group string="Group By">
+                      <filter name="by_tenant" string="Tenant"
+                        context="{'group_by': 'tenant_id'}"/>
+                      <filter name="by_date_first" string="First Date"
+                        context="{'group_by': 'date_first'}"/>
+                      </group>
+                    </search>
+                  </field>
+                </record>            
+                <record model="ir.ui.view" id="adaccounts_tree_view">
               <field name="name">adaccounts.tree</field>
               <field name="model">lubon_qlan.adaccounts</field>
               <field name="arch" type="xml">
@@ -699,7 +722,6 @@
                   <field name="product"/>
                   <field name="ad_enabled"/>
                   <field name="objectguid"/>
-
                 </tree>
               </field>
             </record>
@@ -856,7 +878,7 @@
             parent="main_lubon_qlan_menu"/>
         <menuitem id="sites_menu" name="Sites" parent="lubon_qlan_sites_menu"
               action="zzqlan_sites_action"/>
-        <menuitem id="lubon_qlan_assets_sites_menu" name="Equipment" parent="lubon_qlan_sites_menu"
+        <menuitem id="lubon_qlan_equipment_sites_menu" name="Equipment" parent="lubon_qlan_sites_menu"
                 action="qlan_assets_action"/>     
 
 

@@ -53,7 +53,7 @@ class lubon_qlan_adaccounts(models.Model):
 	ad_enabled=fields.Boolean(string="Enabled",default=True)
 	tenant_id=fields.Many2one('lubon_qlan.tenants') #, required=True)
 	person_id=fields.Many2one('res.partner', string="Related person")
-
+	contract_id=fields.Many2one('account.analytic.account', string="Contract" )
 	validcustomers_ids=fields.Many2many('res.partner', compute='_getvalidcustomer_ids',)
 
 	@api.onchange('tenant_id')
@@ -372,7 +372,7 @@ class lubon_qlan_assets(models.Model):
 	product_id=fields.Many2one('product.product')
 	site_id=fields.Many2one('lubon_qlan.sites', required=True, help="Readonly if part of another eqpt or has parts.")
 	tenant_id=fields.Many2one('lubon_qlan.tenants', string="Tenant")
-	asset_name=fields.Char(required=True)
+	asset_name=fields.Char(required=True, string="Eqpt. name")
 	asset_type=fields.Selection([('switch','switch'),('server','server'),('firewall','firewall')])
 	asset_remarks=fields.Html(string="Remarks")
 	lot=fields.Char(string="Serial", help="Serial Number")
