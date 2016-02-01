@@ -21,6 +21,11 @@ class lubon_qlan_tenants(models.Model):
 	def _getvalidcustomer_ids(self):
 		for rec in self.contract_ids:
 			self.validcustomers_ids=self.validcustomers_ids + rec.partner_id
+	@api.one
+	def _adaccounts_count(self):
+		self.adaccounts_count=len(self.vlan_ids)
+	adaccounts_count=fields.Integer(compute=_adaccounts_count)
+
 
 class lubon_qlan_adaccounts(models.Model):
 	_name='lubon_qlan.adaccounts'

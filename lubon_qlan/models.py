@@ -26,6 +26,7 @@ class lubon_qlan_tenants(models.Model):
 	ip_ids=fields.One2many('lubon_qlan.ip','tenant_id')
 	vlan_ids=fields.One2many('lubon_qlan.vlan','tenant_id')
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
+
 	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id')
 	assets_ids=fields.One2many('lubon_qlan.assets', 'tenant_id')
 
@@ -39,6 +40,10 @@ class lubon_qlan_tenants(models.Model):
 	def _getvalidcustomer_ids(self):
 		for rec in self.contract_ids:
 			self.validcustomers_ids=self.validcustomers_ids + rec.partner_id
+	@api.one
+	def _adaccounts_count(self):
+		self.adaccounts_count=len(self.adaccounts_ids)
+	adaccounts_count=fields.Integer(compute=_adaccounts_count)
 
 class lubon_qlan_adaccounts(models.Model):
 	_name='lubon_qlan.adaccounts'
@@ -55,6 +60,12 @@ class lubon_qlan_adaccounts(models.Model):
 	person_id=fields.Many2one('res.partner', string="Related person")
 	contract_id=fields.Many2one('account.analytic.account', string="Contract" )
 	validcustomers_ids=fields.Many2many('res.partner', compute='_getvalidcustomer_ids',)
+	validcontract_ids=fields.Many2many('account.analytic.account', compute='_getvalidcontract_ids',)
+	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="['&',('name','ilike',product),('analytic_account_id','in', validcontract_ids[0][2])]")	
+	@api.onchange('tenant_id')
+	@api.one
+	def _getvalidcontract_ids(self):
+		self.validcontract_ids=self.tenant_id.contract_ids
 
 	@api.onchange('tenant_id')
 	@api.one

@@ -609,7 +609,11 @@
           <field name="model">lubon_qlan.tenants</field>
           <field name="arch" type="xml">
             <form string="Tenants form">
-              <sheet>  
+              <sheet>                    <div class="oe_right oe_button_box" name="buttons">
+                    <button type="action" class="oe_stat_button" name="%(qlan_adaccounts_action)d" icon="fa-shopping-cart" context="{'search_default_tenant_id': active_id, 'default_tenant_id': active_id}">
+                      <field name="adaccounts_count" string="Accounts" widget="statinfo"/>
+                    </button>
+                  </div>
                 <group col="3">
                   <group string="Admin">
                     <field name="code"/>
@@ -721,10 +725,37 @@
                   <field name="date_last"/>
                   <field name="product"/>
                   <field name="ad_enabled"/>
-                  <field name="objectguid"/>
+                  <field name="contract_line_id"/>
                 </tree>
               </field>
             </record>
+            <record model="ir.ui.view" id="adaccounts_form_view">
+              <field name="name">adaccounts.form</field>
+              <field name="model">lubon_qlan.adaccounts</field>
+              <field name="arch" type="xml">
+                <form string="Ad accounts">
+                  <group>
+                    <group>
+                  <field name="name"/>
+                  <field name="person_id"/>
+                  <field name="product"/>
+                  <field name="ad_enabled"/>
+                  <field name="contract_line_id" />
+                </group>
+                <group>
+                  <field name="tenant_id"/>
+                  <field name="samaccountname"/>
+                  <field name="logonname"/>
+                  <field name="date_first"/>
+                  <field name="date_last"/>
+                  <field name="objectguid"/>
+                  <field name="validcontract_ids" widget="many2many_tags"/>
+                </group>
+                </group>
+                </form>
+              </field>
+            </record>
+
             <record model="ir.ui.view" id="adaccounts_import_tree_view">
               <field name="name">adaccounts_import.tree</field>
               <field name="model">lubon_qlan.adaccounts_import</field>

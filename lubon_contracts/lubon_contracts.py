@@ -13,7 +13,43 @@ class account_analytic_invoice_line(models.Model):
 	line_reduced_price=fields.Float(string="Sales price",compute="_get_reduced_price")
 	price_subtotal=fields.Float(compute="_get_reduced_price")
 	sequence=fields.Integer()
+	line_ok=fields.Boolean(compute="_set_line_state")
+	adaccount_ids=fields.One2many('lubon_qlan.adaccounts','contract_line_id')
+	counted_items=fields.Integer(compute="_count_items", string="Counted", help="This number is the total of items counted in the tenant")
 
+	@api.multi
+	@api.depends('adaccount_ids')
+	def _count_items(self):
+		for line in self:
+			#pdb.set_trace()
+			line.counted_items=len(line.adaccount_ids)
+	@api.multi
+	@api.depends('counted_items')
+	def _set_line_state(self):
+		for line in self:
+			line.line_ok=True
+			if line.adaccount_ids:
+				if line.counted_items != line.quantity:
+					line.line_ok=False
+
+	@api.one
+	@api.depends('name')
+	def _compute_display_name(self):
+		pdb.set_trace()
+		self.display_name=""
+		if self.name:
+			self.display_name=self.name
+		self.display_name+=' -' + str(self.analytic_account_id.name) + '-'
+	@api.multi
+	def name_get(self):
+		res=[]
+		for line in self:
+			text=''
+			if line.name:
+				text=line.name
+			text+=' (' + str(line.analytic_account_id.name) + ')'
+			res.append((line.id,text ))
+		return res 	
 
 	@api.depends('line_discount_rate','price_unit', 'quantity')
 	def _get_reduced_price(self):
@@ -46,13 +82,23 @@ class account_analytic_account(models.Model):
 	_inherit = "account.analytic.account"
 	name=fields.Char(translate=False)
 	check_before_invoice=fields.Boolean(help="If this field is set, invoice can only be made if ready for invoice is checked")
-	ready_for_invoice=fields.Boolean(help="This needs to be set to signal that the invoice can be made.")
+	ready_for_invoice=fields.Boolean(Store=True, compute="_set_ready_for_invoice",help="This needs to be set to signal that the invoice can be made.")
 	invoiced_lines=fields.One2many("account.invoice.line",'account_analytic_id', readonly=True)
 	quantity_hist=fields.Float(string="Historic balance", help="Credit before using odoo contracts")
 	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:
 			self.env['account.analytic.invoice.line'].new_recurring_line(line)
+	
+	@api.multi
+	@api.depends('recurring_invoice_line_ids')
+	def _set_ready_for_invoice(self):
+		for item in self:
+			item.ready_for_invoice=True
+			for line in item.recurring_invoice_line_ids:
+				if not(line.line_ok):
+					item.ready_for_invoice=False
+
 
 	
 	def _prepare_invoice_line(self, cr, uid, line, fiscal_position, context=None):

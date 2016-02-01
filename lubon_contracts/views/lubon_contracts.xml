@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
+<record model="ir.ui.view" id="lubon_contracts_lubon_contracts_tree">
+            <field name="name">lubon_contracts_tree</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account.view_account_analytic_account_list"/>
+            <field name="arch" type="xml">
+                <field name="date" position="after">
+                    <field name="ready_for_invoice"/>
+                </field> 
+                <field name="state" position="replace">
+                    <field name="state"/>
+                </field> 
+
+            </field>
+        </record>
+
+
         <record model="ir.ui.view" id="lubon_contracts_lubon_contracts">
             <field name="name">lubon_contracts</field>
             <field name="model">account.analytic.account</field>
@@ -26,6 +42,10 @@
                     <field name="line_discount_rate"/>
                     <field name="line_reduced_price"/>
                 </xpath>
+                <xpath expr='//field[@name="uom_id"]' position="before">
+                    <field name="counted_items"/>
+                    <field name="line_ok"/>
+                </xpath>
                 <xpath expr='//field[@name="price_subtotal"]' position="replace">
 
                     <field name="price_subtotal" sum="Total"/>
@@ -37,7 +57,9 @@
                     <page name="invoiced_lines" string="Invoiced lines">
                         <field name="invoiced_lines"/>
                     </page>
-                </xpath>      
+                </xpath> 
+                <xpath expr="//field[@name='recurring_invoice_line_ids']/tree" position="attributes">
+       <attribute name="colors">red:line_ok==False</attribute>  </xpath>   
             </field>
         </record>
         <record model="ir.ui.view" id="lubon_contracts_lubon__sale_contract">
@@ -46,7 +68,7 @@
             <field name="inherit_id" ref="lubon_sale.lubon_sale_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr='//field[@name="contract_start_date"]' position="after">
-                    <button string="Add to contract" name="add_to_contract" type="object" states="draft"/>
+                    <button string="Add to contract" name="add_to_contract" type="object" states="draft,sent"/>
                 </xpath>
             </field>
         </record>
