@@ -737,7 +737,7 @@
                   <group>
                     <group>
                   <field name="name"/>
-                  <field name="person_id"/>
+                  <field name="person_id" context="{'default_email': logonname}"/>
                   <field name="product"/>
                   <field name="ad_enabled"/>
                   <field name="contract_line_id" />

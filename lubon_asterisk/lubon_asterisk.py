@@ -60,3 +60,53 @@ class PhoneCommon(orm.AbstractModel):
 #            raise orm.except_orm(
 #                _('Error:'),
 #                _('Missing phone number'))
+
+    def _get_calling_number(self, cr, uid, context=None):
+
+        user, ast_server, ast_manager = self._connect_to_asterisk(
+            cr, uid, context=context)
+        calling_party_number = False
+        try:
+            list_chan = ast_manager.Status()
+            from pprint import pprint
+            pprint(list_chan)
+            _logger.debug("Result of Status AMI request: %s", list_chan)
+            for chan in list_chan.values():
+                sip_account = user.asterisk_chan_type + '/' + user.resource
+                # 4 = Ring
+                if (
+                        chan.get('ChannelState') == '4' and
+                        chan.get('ConnectedLineNum') == user.internal_number):
+                    _logger.debug("Found a matching Event in 'Ring' state")
+                    calling_party_number = chan.get('CallerIDNum')
+                    break
+                # 6 = Up
+                if (
+                        chan.get('ChannelState') == '6'
+                        and sip_account in chan.get('BridgedChannel', '')):
+                    _logger.debug("Found a matching Event in 'Up' state")
+                    calling_party_number = chan.get('CallerIDNum')
+                    break
+                # Compatibility with Asterisk 1.4
+                if (
+                        chan.get('State') == 'Up'
+                        and sip_account in chan.get('Link', '')):
+                    _logger.debug("Found a matching Event in 'Up' state")
+                    calling_party_number = chan.get('CallerIDNum')
+                    break
+        except Exception, e:
+            _logger.error(
+                "Error in the Status request to Asterisk server %s"
+                % ast_server.ip_address)
+            _logger.error(
+                "Here are the details of the error: '%s'" % unicode(e))
+            raise orm.except_orm(
+                _('Error:'),
+                _("Can't get calling number from  Asterisk.\nHere is the "
+                    "error: '%s'" % unicode(e)))
+
+        finally:
+            ast_manager.Logoff()
+
+        _logger.debug("Calling party number: '%s'" % calling_party_number)
+        return calling_party_number

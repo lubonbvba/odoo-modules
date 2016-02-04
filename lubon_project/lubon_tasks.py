@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, fields, api,_
+import pdb
 
 class lubon_tasks(models.Model):
 	_inherit="project.task"
@@ -19,3 +20,13 @@ class lubon_tasks(models.Model):
 		else:
 			self.contact_person_phone=self.contact_person_id.parent_id.phone
 		self.contact_person_mobile=self.contact_person_id.mobile
+		if self.contact_person_id.parent_id:
+			self.partner_id=self.contact_person_id.parent_id
+		else:
+			self.partner_id=self.contact_person_id
+	
+	@api.onchange('partner_id')
+	@api.one
+	def check_partner_id(self):
+		if not(self.partner_id == self.project_id.partner_id):
+			self.project_id=""
