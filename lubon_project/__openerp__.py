@@ -7,7 +7,7 @@
         """,
 
     'description': """
-        Long description of module's purpose
+        This module implements all qlan specific features.
     """,
 
     'author': "Lubon bvba",
@@ -16,11 +16,11 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
+    'category': 'Lubon',
+    'version': '8.0.0.5.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'project', ],
+    'depends': ['base', 'project','pad'],
 
     # always loaded
     'data': [

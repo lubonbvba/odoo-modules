@@ -57,7 +57,7 @@ class lubon_qlan_adaccounts(models.Model):
 	date_last=fields.Datetime(help="Date last seen")
 	ad_enabled=fields.Boolean(string="Enabled",default=True)
 	tenant_id=fields.Many2one('lubon_qlan.tenants') #, required=True)
-	person_id=fields.Many2one('res.partner', string="Related person", domain="[('parent_id','in', validcustomers_ids[0][2])]")
+	person_id=fields.Many2one('res.partner', string="Related person", domain="['&',('type','=','contact'),('parent_id','in', validcustomers_ids[0][2])]")
 	contract_id=fields.Many2one('account.analytic.account', string="Contract" )
 	validcustomers_ids=fields.Many2many('res.partner', compute='_getvalidcustomer_ids',)
 	validcontract_ids=fields.Many2many('account.analytic.account', compute='_getvalidcontract_ids',)

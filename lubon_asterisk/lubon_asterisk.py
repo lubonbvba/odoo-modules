@@ -87,6 +87,12 @@ class PhoneCommon(orm.AbstractModel):
                     _logger.debug("Found a matching Event in 'Up' state")
                     calling_party_number = chan.get('CallerIDNum')
                     break
+                if (
+                        chan.get('ChannelState') == '6' and
+                        chan.get('ConnectedLineNum') == user.internal_number):
+                    _logger.debug("Found a matching Event in 'Ring' state")
+                    calling_party_number = chan.get('CallerIDNum')
+                    break
                 # Compatibility with Asterisk 1.4
                 if (
                         chan.get('State') == 'Up'

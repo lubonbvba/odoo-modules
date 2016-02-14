@@ -7,11 +7,14 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+                <field name="phone" position="after">
+                    <field name="phone_office" widget="phone"/>
+                </field>
                 <notebook position="inside">
                     <page string="Lubon">
                     <group string="Specific e-mail settings">
                         <group>
-                            <field name="partner_id_invoice" domain="[('parent_id','=',active_id)]" context="{'default_parent_id': active_id}"   />
+                            <field name="partner_id_invoice" />
                             <field name="partner_id_reminder"/>
                             <field name="formal_communication"/>
                         </group>

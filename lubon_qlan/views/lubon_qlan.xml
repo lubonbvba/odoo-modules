@@ -750,6 +750,7 @@
                   <field name="date_last"/>
                   <field name="objectguid"/>
                   <field name="validcontract_ids" widget="many2many_tags"/>
+                  <field name="validcustomers_ids" widget="many2many_tags"/>
                 </group>
                 </group>
                 </form>

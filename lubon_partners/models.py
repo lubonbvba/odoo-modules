@@ -13,29 +13,33 @@ from openerp import fields, models
 class Partner(models.Model):
 	_inherit = 'res.partner'
 
-    # Add a new column to the res.partner model, by default partners are not
-    # instructors
 	mail_invoice = fields.Char(string="Invoice e-mail", help="e-mail adress used to send invoices")
 	mail_reminder = fields.Char(string="Reminder e-mail", help="e-mail used to send reminders")
 	partner_id_invoice = fields.Many2one('res.partner', string="Invoice e-mail", help="e-mail adress used to send invoices")
 	partner_id_reminder = fields.Many2one('res.partner', string="Reminder e-mail", help="e-mail used to send reminders")
 	rate_hr=fields.Float(string="Hourly rate")
 	rate_travel=fields.Float(string="Travel rate")
-        rate_day=fields.Float(string="Daily rate")
-#	credential_ids=fields.One2many('lubon_credentials.credentials','partner_id',string='credentials')
+	rate_day=fields.Float(string="Daily rate")
 	formal_communication = fields.Boolean(String="Formal", help="Tick to use formal communication")
 	updateswindows = fields.Boolean(String="Windows Updates", help="Get notified of windows updates")
-        updateskluwer = fields.Boolean(String="Kluwer Updates", help="Get notified of kluwer updates")
-        updatestelephony = fields.Boolean(String="Telephony Updates", help="Get notified of telephony updates")
+	updateskluwer = fields.Boolean(String="Kluwer Updates", help="Get notified of kluwer updates")
+	updatestelephony = fields.Boolean(String="Telephony Updates", help="Get notified of telephony updates")
+	phone_office = fields.Char(String="Company phone", help="General office phone", compute="_compute_phone_office")
+	@api.one
+	def _compute_phone_office(self):
+		if self.parent_id.phone:
+			self.phone_office=self.parent_id.phone
 
+
+
+			
 
 class partner_title(models.Model):
 	_inherit = "res.partner.title"
 	formal_saluation = fields.Char(string="Formal saluation", help="Saluation on formal letter", translate=True)
 	casual_saluation = fields.Char(string="Casual saluation", help="Saluation on casual letter", translate=True)
 
-
 class Credentials(models.Model):
 	_inherit='lubon_credentials.credentials'
 	partner_id = fields.Many2one('res.partner',  ondelete='set null', string="Partner", index=True)
-	
+

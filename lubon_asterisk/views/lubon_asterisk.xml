@@ -23,8 +23,8 @@
             <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
             <field name="arch" type="xml">
                <field name="tz" position="after">
-                <field name="internal_number"/>
-                <field name="resource"/>
+                <field name="internal_number" readonly="0"/>
+                <field name="resource" readonly="0"/>
             </field>                   
         </field>
     </record>
