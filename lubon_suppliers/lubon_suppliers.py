@@ -78,7 +78,7 @@ class res_partner(models.Model):
 								'name': self.supplier_prefix + "-" +datetime.now().strftime("%A, %d. %B %Y %I:%M%p") })
 		self.getfile(stats)
 		self.readfile(1,stats)
-		stats.processbrands()
+		#stats.processbrands()
 		stats.processproducts()
 		stats.elap_total=(datetime.now()-starttime).seconds
 		logger.info("End retrieve_prices")
@@ -172,6 +172,7 @@ class lubon_suppliers_info_import(models.Model):
 #	supplier_info_id=fields.Many2one('product.supplierinfo')
 	description=fields.Char()
 	issue_id=fields.Many2one('res.partner')
+	product_id=fields.Many2one('product.template')
 	supplier_part=fields.Char(index=True)
 	manuf_part=fields.Char()
 	Class1=fields.Char()
@@ -196,55 +197,124 @@ class lubon_suppliers_info_import(models.Model):
 
 	eancode=fields.Char(index=True)
 	manufacturer_id=fields.Many2one('res.partner', domain="[('manufacturer','=',True)]")
+	def loadbrands(self,stats):
+		brandslist={}
+		for brand in stats.supplier_id.brand_ids:
+			brandslist.update({brand.name.upper():brand.id})
+		return brandslist
+	def loadcurrentproducts(self,stats):
+		productslist={}
+		products=self.env['product.product'].search([('seller_id','=',stats.supplier_id.id)])
+		for product in products:
+			line={product.default_code:{'product_id': product.id,'product_template_id':product.product_tmpl_id.id,'Found': False}}
+			productslist.update(line)
+		return productslist
+
+	def loadfieldnames(self,stats):
+		fieldlist={}
+		fieldlist.update({'description':stats.supplier_id.supplier_field_description.name})
+		fieldlist.update({'SKU':stats.supplier_id.supplier_field_part_supplier.name})
+		fieldlist.update({'part':stats.supplier_id.supplier_field_part_manufacturer.name})
+		fieldlist.update({'ean':stats.supplier_id.supplier_field_ean.name})
+		fieldlist.update({'price_purchase':stats.supplier_id.supplier_field_price_purchase.name})
+		fieldlist.update({'price_list':stats.supplier_id.supplier_field_price_list.name})
+		fieldlist.update({'manufacturer':stats.supplier_id.supplier_field_manufacturer.name})
+		fieldlist.update({'default_manufacturer':stats.supplier_id.supplier_default_manufacturer.name})
+		#fieldlist.update({'description':stats.supplier_id.supplier_field_categ01.name})
+		#fieldlist.update({'description':stats.supplier_id.supplier_field_categ02.name})
+		#fieldlist.update({'description':stats.supplier_id.supplier_field_categ03.name})
+		#pdb.set_trace()
+		return fieldlist
 
 	def processfile(self,stats):
 		logger.info("Start processfile")
 		n=0
 		dummy=0
+		fieldlist=self.loadfieldnames(stats)
+		brandslist=self.loadbrands(stats)
+		productslist=self.loadcurrentproducts(stats)
+		lines=[]
 		with open (stats.supplier_id.supplier_file, 'rb') as cleanfile:
 			reader = csv.DictReader(cleanfile, delimiter=';')
 			for row in reader:
 				n+=1
+				newline= {'stats_id':stats.id, 
+					'description':row[fieldlist['description']],
+					'supplier_part': row[fieldlist['SKU']],
+					'manuf_part':row[fieldlist['part']],
+					'manufacturer':row[fieldlist['manufacturer']],
+					'LP_Eur':row[fieldlist['price_list']].replace(",","."),
+					'purchase_price':row[fieldlist['price_purchase']].replace(",","."),
+					}	
 				#pdb.set_trace()
-				imported=self.create({'stats_id':stats.id, 
-					'description':row['Description'],
-					'supplier_part': row['ArtID'],
-					'manuf_part':row['PartID'],
-					'Class1':row['Class1'],
-					'Class2':row['Class2'],
-					'Class3':row['Class3'],
-					'manufacturer':row['PublisherName'],
-					'Version':row['Version'],
-					'Language':row['Language'],
-					'LP_Eur':row['LP_Eur'],
-					'Trend':row['Trend'],
-					'PriceGroup':row['PriceGroup'],
-					'purchase_price':row['PricePersonal_Eur'].replace(",","."),
-					'stock':row['Stock'],
-					'eancode':row['EanCode'],
-					})
-				try:
-					imported.BackorderDate=datetime.strptime(row['BackorderDate'],"%d/%m/%Y").date()
-				except:
-					dummy+=1
+				# newline= {'stats_id':stats.id, 
+				# 	'description':row['Description'],
+				# 	'supplier_part': row['ArtID'],
+				# 	'manuf_part':row['PartID'],
+				# 	'Class1':row['Class1'],
+				# 	'Class2':row['Class2'],
+				# 	'Class3':row['Class3'],
+				# 	'manufacturer':row['PublisherName'],
+				# 	'Version':row['Version'],
+				# 	'Language':row['Language'],
+				# 	'LP_Eur':row['LP_Eur'],
+				# 	'Trend':row['Trend'],
+				# 	'PriceGroup':row['PriceGroup'],
+				# 	'purchase_price':row['PricePersonal_Eur'].replace(",","."),
+				# 	'stock':row['Stock'],
+				# 	}
 
-					# do nothing
-					#imported.BackorderDate=datetime.now().date()
-
-				try:
-					imported.ModifDate=datetime.strptime(row['ModifDate'],"%d/%m/%Y %H:%M:%S")
-				except:
-					imported.ModifDate=datetime.strptime(row['ModifDate'],"%d/%m/%Y %H:%M:%S")
-
-				imported.default_code=stats.supplier_id.supplier_prefix + ("0" * (8-len(imported.supplier_part)) + imported.supplier_part)
-				if imported.eancode:
-					imported.eancode= "0" * (13-len(imported.eancode)) + imported.eancode
-					if not barcodenumber.check_code('ean13',imported.eancode):
-						imported.eancode=''
-				if (stats.supplier_id.supplier_num >0  and  n>stats.supplier_id.supplier_num):
-					break
+				manuf_check=newline['manufacturer'].upper()	
+				if manuf_check in brandslist:
+					eancode=row['EanCode']
+					supplier_part=newline['supplier_part']	
+					default_code=stats.supplier_id.supplier_prefix + ("0" * (8-len(supplier_part)) + supplier_part)
+					newline.update({'default_code':default_code})
+					newline.update({'manufacturer_id':brandslist[manuf_check]})
+					if eancode:
+						eancode= "0" * (13-len(eancode)) + eancode
+						if barcodenumber.check_code('ean13',eancode):
+							newline.update({'eancode':eancode})
+					if default_code in productslist:
+						newline.update({'product_id': productslist[default_code]['product_template_id']})
+						productslist[default_code]['Found']=True
+					try:								
+						self.create(newline)
+					except:
+						pdb.set_trace()	
+					if (stats.supplier_id.supplier_num >0  and  n>stats.supplier_id.supplier_num):
+						break
 			cleanfile.close()
+#			pdb.set_trace()
+#			try:
+#			imported=self.create(lines)
+#			except:
+#				logger.error("Adding newline failed: %s",supplier_part)
+ 			to_delete=[]
+ 			for product in productslist.keys():
+ 				if not(productslist[product]['Found']):
+ 					to_delete.append(productslist[product]['product_template_id'])
+# 			obsolete_products=self.env['product.template'].browse(to_delete)
+# 			pdb.set_trace()
+# 			for p in obsolete_products:
+# #				if not (p.sales_order_lines or p.purchase_order_lines or p.invoice_lines or p.procurement_order or p.stock_inventory_line):
+# #					p.unlink()
+# #				else:
+# 				#pdb.set_trace()
+# 				try:
+# 					p.unlink()
+# 					# if not (p.sales_order_lines or p.purchase_order_lines or p.invoice_lines or p.procurement_order or p.stock_inventory_line):
+# 					# 	logger.error("Trying to delete product: %d", p.id)
+# 					# 	p.unlink()
+# 					# else:
+# 					# 	logger.error("Trying to modify product: %d", p.id)
+# 					# 	p.sale_ok=False
+# 					# 	p.purchase_ok=False
+# 				except:
+# 					logger.error("Problem with product: %d", p.id)						
+
 			stats.numparts=n
+			stats.numdeleted=len(to_delete)
 		logger.info("End processfile")
 
 

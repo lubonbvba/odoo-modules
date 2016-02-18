@@ -121,6 +121,7 @@
           <group>
             <field name="supplier_field_description" />
             <field name="supplier_field_part_supplier" />
+            <field name="supplier_field_manufacturer" />
             <field name="supplier_field_part_manufacturer" />
             <field name="supplier_field_ean" />
             <field name="supplier_field_price_purchase" />
@@ -130,7 +131,6 @@
             <field name="supplier_field_categ03" />
           </group> 
           <group string="Manufacturer selection">
-            <field name="supplier_field_part_manufacturer" />
             <field name="supplier_default_manufacturer" />
           </group>
           <group>
@@ -154,6 +154,7 @@
   <field name="arch" type="xml">
     <tree string="Imported supplier info">
       <field name="stats_id"/>         
+      <field name="product_id"/>
       <field name="supplier_part"/>
       <field name="default_code"/>
       <field name="manufacturer"/>
@@ -174,6 +175,7 @@
   <field name="arch" type="xml">
     <search string="Imported supplier info">
       <field name="stats_id"/>         
+      <field name="product_id"/>
       <field name="supplier_part"/>
       <field name="manufacturer"/>
       <field name="description"/>
