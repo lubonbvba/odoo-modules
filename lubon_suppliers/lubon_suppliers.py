@@ -4,7 +4,7 @@ from openerp import models, fields, api, registry, _
 from os.path import expanduser
 from datetime import datetime,date,timedelta
 import ftplib, zipfile, logging,csv,tempfile,shutil, barcodenumber
-import pdb
+import pdb, base64
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +53,10 @@ class res_partner(models.Model):
 	supplier_field_names=fields.One2many('lubon_suppliers.fieldnames','supplier_id')
 	supplier_debug=fields.Boolean(string="Full debug", default=False)
 	supplier_reinit=fields.Boolean(string="Reinit", default=False, help="Delete all non used products")
+
+	supplier_file_data=fields.Binary()
+	supplier_fname=fields.Char()
+
 	@api.one
 	def process_schedule(self):
 		logger.info("Executing Schedule for:" + str(self.id))
@@ -94,10 +98,23 @@ class res_partner(models.Model):
 									'start': datetime.now(),
 									'name': self.supplier_prefix + "-" +datetime.now().strftime("%A, %d. %B %Y %I:%M%p") })
 		table_import=self.env['lubon_suppliers.info_import']
+		if self.supplier_file_data:
+			self.processupload()
 		table_import.processfile(supplier_stats)
 		supplier_stats.stop_csv= datetime.now()
 		supplier_stats.elap_csv=(datetime.now()-starttime).seconds
 		logger.info("End readfile")
+	@api.multi	
+	def processupload(self):
+		recordlist = base64.decodestring(self.supplier_file_data).split('\n')
+		fo = open(self.supplier_file, 'wb')
+		n=1
+		for line in recordlist:
+			if n >= self.supplier_header_line:
+				fo.write(str(line)+'\n')
+			n+=1	
+		fo.close()
+
 	@api.multi
 	def getfile(self, stats=None):
 		logger.info("Start getfile")
@@ -138,17 +155,14 @@ class res_partner(models.Model):
 		for field in self.supplier_field_names:
 			field.unlink()
 		with open (self.supplier_file, 'rb') as cleanfile:
-			n=0
-			reader = csv.reader(cleanfile, delimiter=str(self.supplier_delimiter))
-			for row in reader:
-				n+=1;
-				if n>=self.supplier_header_line:
-					for field in row:
-						self.env['lubon_suppliers.fieldnames'].create({
-								'supplier_id':self.id,
-								'name':str(field),
-								})
-					break
+			reader= csv.DictReader(cleanfile, delimiter=str(self.supplier_delimiter))
+			for line in reader:
+				for field in line.keys():
+					self.env['lubon_suppliers.fieldnames'].create({
+							'supplier_id':self.id,
+							'name':str(field),
+							})
+				break
 		cleanfile.close()
 	@api.one
 	def initsupplier(self):
@@ -194,23 +208,33 @@ class lubon_suppliers_info_import(models.Model):
 	BackorderDate=fields.Date()
 	ModifDate=fields.Datetime()
 	default_code=fields.Char(index=True)
+	price_db=fields.Float(help="Current price in database")
+	price_change=fields.Integer(default=-1)
 
 	eancode=fields.Char(index=True)
 	manufacturer_id=fields.Many2one('res.partner', domain="[('manufacturer','=',True)]")
 	def loadbrands(self,stats):
+		logger.info("Loading brands")
 		brandslist={}
 		for brand in stats.supplier_id.brand_ids:
 			brandslist.update({brand.name.upper():brand.id})
+		if stats.supplier_id.supplier_default_manufacturer:
+			brandslist.update({stats.supplier_id.supplier_default_manufacturer.name.upper():stats.supplier_id.supplier_default_manufacturer.id})	
 		return brandslist
 	def loadcurrentproducts(self,stats):
+		logger.info("Loading products")
 		productslist={}
-		products=self.env['product.product'].search([('seller_id','=',stats.supplier_id.id)])
+		products=self.env['product.product'].search([('seller_id','=',stats.supplier_id.id),('purchase_ok',"=",True)])
 		for product in products:
-			line={product.default_code:{'product_id': product.id,'product_template_id':product.product_tmpl_id.id,'Found': False}}
+			line={product.default_code:{'product_id': product.id,
+			'product_template_id':product.product_tmpl_id.id,
+			'Found': False,
+			'price_db':product.standard_price}}
 			productslist.update(line)
 		return productslist
 
 	def loadfieldnames(self,stats):
+		logger.info("Loading field names")
 		fieldlist={}
 		fieldlist.update({'description':stats.supplier_id.supplier_field_description.name})
 		fieldlist.update({'SKU':stats.supplier_id.supplier_field_part_supplier.name})
@@ -234,39 +258,31 @@ class lubon_suppliers_info_import(models.Model):
 		brandslist=self.loadbrands(stats)
 		productslist=self.loadcurrentproducts(stats)
 		lines=[]
+		logger.info("Opening CSV")
+		fi = open(stats.supplier_id.supplier_file, 'rb')
+		data = fi.read()
+		fi.close()
+#		fo = open(stats.supplier_id.supplier_file, 'wb')
+#		fo.write(data.replace('\x00', ''))
+#		fo.close()
 		with open (stats.supplier_id.supplier_file, 'rb') as cleanfile:
-			reader = csv.DictReader(cleanfile, delimiter=';')
+			reader = csv.DictReader(cleanfile, delimiter=str(stats.supplier_id.supplier_delimiter))
 			for row in reader:
 				n+=1
 				newline= {'stats_id':stats.id, 
 					'description':row[fieldlist['description']],
 					'supplier_part': row[fieldlist['SKU']],
 					'manuf_part':row[fieldlist['part']],
-					'manufacturer':row[fieldlist['manufacturer']],
-					'LP_Eur':row[fieldlist['price_list']].replace(",","."),
-					'purchase_price':row[fieldlist['price_purchase']].replace(",","."),
-					}	
-				#pdb.set_trace()
-				# newline= {'stats_id':stats.id, 
-				# 	'description':row['Description'],
-				# 	'supplier_part': row['ArtID'],
-				# 	'manuf_part':row['PartID'],
-				# 	'Class1':row['Class1'],
-				# 	'Class2':row['Class2'],
-				# 	'Class3':row['Class3'],
-				# 	'manufacturer':row['PublisherName'],
-				# 	'Version':row['Version'],
-				# 	'Language':row['Language'],
-				# 	'LP_Eur':row['LP_Eur'],
-				# 	'Trend':row['Trend'],
-				# 	'PriceGroup':row['PriceGroup'],
-				# 	'purchase_price':row['PricePersonal_Eur'].replace(",","."),
-				# 	'stock':row['Stock'],
-				# 	}
-
+					'manufacturer':stats.supplier_id.supplier_default_manufacturer.name or row[fieldlist['manufacturer']] ,
+					'LP_Eur':row[fieldlist['price_list']].replace(".","").replace(",","."),
+					'purchase_price':row[fieldlist['price_purchase']].replace(".","").replace(",","."),
+					}
 				manuf_check=newline['manufacturer'].upper()	
 				if manuf_check in brandslist:
-					eancode=row['EanCode']
+					if 'EanCode' in row.keys():
+						eancode=row['EanCode']
+					else:
+						eancode=False
 					supplier_part=newline['supplier_part']	
 					default_code=stats.supplier_id.supplier_prefix + ("0" * (8-len(supplier_part)) + supplier_part)
 					newline.update({'default_code':default_code})
@@ -277,6 +293,8 @@ class lubon_suppliers_info_import(models.Model):
 							newline.update({'eancode':eancode})
 					if default_code in productslist:
 						newline.update({'product_id': productslist[default_code]['product_template_id']})
+						newline.update({'price_db': productslist[default_code]['price_db']})
+						newline.update({'price_change': int(100*(productslist[default_code]['price_db'] - float(newline['purchase_price'])))})
 						productslist[default_code]['Found']=True
 					try:								
 						self.create(newline)
@@ -285,34 +303,23 @@ class lubon_suppliers_info_import(models.Model):
 					if (stats.supplier_id.supplier_num >0  and  n>stats.supplier_id.supplier_num):
 						break
 			cleanfile.close()
-#			pdb.set_trace()
-#			try:
-#			imported=self.create(lines)
-#			except:
-#				logger.error("Adding newline failed: %s",supplier_part)
- 			to_delete=[]
- 			for product in productslist.keys():
- 				if not(productslist[product]['Found']):
- 					to_delete.append(productslist[product]['product_template_id'])
-# 			obsolete_products=self.env['product.template'].browse(to_delete)
-# 			pdb.set_trace()
-# 			for p in obsolete_products:
-# #				if not (p.sales_order_lines or p.purchase_order_lines or p.invoice_lines or p.procurement_order or p.stock_inventory_line):
-# #					p.unlink()
-# #				else:
-# 				#pdb.set_trace()
-# 				try:
-# 					p.unlink()
-# 					# if not (p.sales_order_lines or p.purchase_order_lines or p.invoice_lines or p.procurement_order or p.stock_inventory_line):
-# 					# 	logger.error("Trying to delete product: %d", p.id)
-# 					# 	p.unlink()
-# 					# else:
-# 					# 	logger.error("Trying to modify product: %d", p.id)
-# 					# 	p.sale_ok=False
-# 					# 	p.purchase_ok=False
-# 				except:
-# 					logger.error("Problem with product: %d", p.id)						
-
+			logger.info("Determining obsolete products")
+			to_delete=[]
+			for product in productslist.keys():
+				if not(productslist[product]['Found']):
+					to_delete.append(productslist[product]['product_template_id'])
+			obsolete_products=self.env['product.template'].browse(to_delete)
+			for p in obsolete_products:
+					deletethis=True
+					for v in p.product_variant_ids:
+						deletethis = not(v.sales_order_lines or v.purchase_order_lines or v.invoice_lines or v.procurement_order or v.stock_inventory_line)
+					if deletethis:
+						#logger.warning("Deleting product: %d, %s", p.id,p.name)
+						p.unlink()
+					else:
+						p.sale_ok=False
+						p.purchase_ok=False
+						#logger.warning("Deleting product not possible: %d, %s", p.id,p.name)
 			stats.numparts=n
 			stats.numdeleted=len(to_delete)
 		logger.info("End processfile")
@@ -422,63 +429,41 @@ class lubon_suppliers_import_stats(models.Model):
 		logger.info("End processbrands")
 
 
-	@api.multi
+	@api.one
 	def processproducts(self):
 		logger.info("Start processproducts")
 		starttime=datetime.now()
-	#	self.env.invalidate_all()
-		tempcr=self.env['lubon_suppliers.import_stats'].env.cr
-		sql_statement="""select i.id, manufacturer_id,stats_id, i.default_code,i.description,i.eancode,i.supplier_part  from lubon_suppliers_info_import as i 
-		left outer join product_product as p  on(p.default_code = i.default_code) 
-		where manufacturer_id is not null and p.id is null and 
-		stats_id=""" + str(self.id)
-		self.sql_query01=sql_statement
-		tempcr.execute(sql_statement)
-		newparts=tempcr.fetchall()
-		table_products_products=self.env['product.product']
+		newparts=self.parts_ids.search([('product_id','=', False),('stats_id','=', self.id)])
+		logger.info('Start adding %d new parts', len(newparts))
 		table_products=self.env['product.template']
 		table_prod_supplier=self.env['product.supplierinfo']
-		parts=self.parts_ids.search(['&',('manufacturer_id','in',self.supplier_id.brand_ids.ids),('stats_id',"=",self.id)])
 		self.numcreated=0
 		self.numupdated=0
-		#process newparts
-		for part in newparts:
-			#pdb.set_trace()
+		for newpart in newparts:
 			part_starttime=datetime.now()
 			self.numcreated+=1
 			operation="Direct create - without search"
-			product=table_products.create({'name': part[4],
-									'default_code': part[3],										#'manufacturer': part.manufacturer_id.id,
-									'ean13': part[5],
+			product=table_products.create({'name': newpart.description,
+									'default_code': newpart.default_code,										
+									'ean13': newpart.eancode,
 									})
+			newpart.product_id=product
 			table_prod_supplier.create({'name':self.supplier_id.id,
 												'product_tmpl_id':product.id,
-												'product_code': part[6],
+												'product_code': newpart.supplier_part,
 												})
 			if self.supplier_id.supplier_debug:
-				logger.info("Number: %d, Part: %s,Operation: %s, Duration:, %d",self.numupdated,part[3], operation, (datetime.now()-part_starttime).microseconds)
-		#process changed parts
-		sql_statement="""select p.product_tmpl_id, p.default_code, purchase_price, i.manuf_part,i.manufacturer_id, prodprice.product_template_id, maxcostdate, activeprice  from
-(select lastcostrecord.product_template_id, price.cost as activeprice, maxcostdate from 
-(select product_template_id, max(datetime) as maxcostdate from product_price_history as pr group by product_template_id) as lastcostrecord
-left join
-product_price_history as price on lastcostrecord.product_template_id = price.product_template_id
-and maxcostdate=datetime) as prodprice 
-left join product_product as p on p.product_tmpl_id=prodprice.product_template_id
-left join lubon_suppliers_info_import as i on p.default_code=i.default_code
-where round(activeprice*100) <> round(i.purchase_price*100) and stats_id=""" + str(self.id)
-		self.sql_query02=sql_statement
-		tempcr2=self.env['lubon_suppliers.import_stats'].env.cr
-		tempcr2.execute(sql_statement)
-		changedparts=tempcr2.fetchall()
-		#pdb.set_trace()
-		for part in changedparts:
+				logger.info("Number: %d, Part: %s,Operation: %s, Duration:, %d",self.numupdated,newpart.description, operation, (datetime.now()-part_starttime).microseconds)
+
+		changedparts=self.parts_ids.search([('price_change','!=',0),('stats_id','=', self.id)])
+		logger.info('Start updating %d changed parts', len(changedparts))
+		for changedpart in changedparts:
 			part_starttime=datetime.now()
 			self.numupdated+=1
-			product=table_products.browse(part[0])
-			product.update({'standard_price': part[2],
-							'manuf_part': part[3],
-							'manufacturer': part[4],
+			product=changedpart.product_id
+			product.update({'standard_price': changedpart.purchase_price,
+							'manuf_part': changedpart.manuf_part,
+							'manufacturer': changedpart.manufacturer_id.id,
 							'active': True,
 							'categ_id': self.supplier_id.supplier_product_category_id.id,
 							'route_ids': self.supplier_id.route_ids.ids,
@@ -489,73 +474,8 @@ where round(activeprice*100) <> round(i.purchase_price*100) and stats_id=""" + s
 							'seller_id': self.supplier_id,
 							})
 			if self.supplier_id.supplier_debug:
-					logger.info("Number: %d Part: %s, Duration: %d",self.numupdated, part[1], (datetime.now()-part_starttime).microseconds)
-
-
-
-
-
-		# for part in parts:
-		# 	part_starttime=datetime.now()
-		# 	self.numupdated+=1
-		# 	operation="Update"
-		# 	search=part.default_code
-		# 	#self.supplier_id.supplier_prefix + ("0" * (8-len(part.supplier_part)) + part.supplier_part)
-
-		# 	product=table_products.search([('default_code','=',search)])#,('active',"in", [True,False])])
-			
-		# 	if len(product) >1:
-		# 		logger.error("Multiple products found: "+ search)
-		# 		pdb.set_trace()
-		# 		for x in product:
-		# 			x.unlink()
-		# 		#parts.issue_id=self.supplier_id.id
-		# 	else:
-		# 		if not product:
-		# 			operation="Create"
-		# 			product=product.create({'name': part.description,
-		# 									'default_code': search,
-		# 									#'manufacturer': part.manufacturer_id.id,
-		# 									#'manuf_part': part.manuf_part,
-		# 									'ean13': part.eancode,
-		# 									#'categ_id': self.supplier_id.supplier_product_category_id.id,
-		# 									})
-		# 			table_prod_supplier.create({'name':self.supplier_id.id,
-		# 										'product_tmpl_id':product.id,
-		# 										'product_code': part.supplier_part,
-		# 										})
-		# 			self.numcreated+=1
-		# 			self.numupdated-=1
-
-		# 		product.update({'manufacturer': part.manufacturer_id.id,
-		# 						'manuf_part': part.manuf_part,
-		# 						'active': True,
-		# 						'categ_id': self.supplier_id.supplier_product_category_id.id,
-		# 						'route_ids': self.supplier_id.route_ids.ids,
-		# 						'standard_price':part.purchase_price,
-		# 						'type':self.supplier_id.supplier_product_type,
-		# 						'cost_method':self.supplier_id.supplier_product_cost_method,
-		# 						'valuation':self.supplier_id.supplier_product_valuation_method,
-		# 						'last_stats_id': self.id,
-		# 						'seller_id': self.supplier_id,
-		# 						})
-		# 		if self.supplier_id.supplier_debug:
-		# 			logger.info("Part: %s,Operation: %s, Duration:, %d",search, operation, (datetime.now()-part_starttime).microseconds)
-
-
-			
-		#parts=table_products.search(['&','&',('last_stats_id',"!=",False),('seller_id','=',self.supplier_id.id),('last_stats_id', "!=",self.id)])
-		
-		#parts=table_products.search([('default_code', "ilike",'TD%'),('seller_ids','not in',[self.supplier_id.id])])
-		#self.numdeleted=len(parts)
-		#for part in parts:
-		#	part.active=False
-		
-#		self.stop_products= datetime.now()
+					logger.info("Number: %d Part: %s, Duration: %d",self.numupdated, changedpart.description, (datetime.now()-part_starttime).microseconds)
 		self.elap_products= (datetime.now()-starttime).seconds
 		logger.info("End processproducts")
 	
-#class supplierbrands(models.Model):
-#	_inherit="lubon_suppliers.supplierbrands"
-#	fullyimported=fields.Boolean(default=False)
 

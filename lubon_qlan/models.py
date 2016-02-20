@@ -3,7 +3,7 @@
 from openerp import models, fields, api,exceptions,_
 import csv,os,string,datetime,logging
 from path import path
-import pdb
+import pdb, base64
 from os.path import expanduser
 
 logger = logging.getLogger(__name__)
