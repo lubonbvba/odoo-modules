@@ -697,15 +697,22 @@
                 <search>
                   <field name="date_first"/>
                   <field name="date_last"/>
-                  <field name="name" string="Account name" filter_domain="['|',('samaccountname','ilike',self),('logonname','ilike',self)]"/>
+                  <field name="name" string="Name, product ..." filter_domain="['|','|',('samaccountname','ilike',self),('logonname','ilike',self),('product','ilike',self)]"/>
+                  <field name="product" filter_domain="[('product','ilike',self)]"/>
                   <field name="tenant_id" filter_domain="[('tenant_id','ilike',self)]"/>
                   <filter name="notenant" string="No Tenant"
                     domain="[('tenant_id', '=', False)]"/>
+                  <filter name="notenant" string="No Product"
+                    domain="[('product', '=', False)]"/>
                     <filter name="obsolete" string="Obsolete"
                     domain="[('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') )]"/>
                     <group string="Group By">
                       <filter name="by_tenant" string="Tenant"
                         context="{'group_by': 'tenant_id'}"/>
+                      <filter name="by_product" string="Product"
+                        context="{'group_by': 'product'}"/>
+                      <filter name="by_contract_line_id" string="Contract line"
+                        context="{'group_by': 'contract_line_id'}"/>
                       <filter name="by_date_first" string="First Date"
                         context="{'group_by': 'date_first'}"/>
                       </group>
