@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Task-related subtypes for messaging / Chatter -->
+        <record id="mt_adaccount_new" model="mail.message.subtype">
+            <field name="name">Account Created</field>
+            <field name="res_model">lubon_qlan.adaccounts</field>
+            <field name="default" eval="False"/>
+            <field name="hidden" eval="True"/>
+            <field name="description">Account created</field>
+        </record>
+        <record id="mt_adaccount_changed" model="mail.message.subtype">
+            <field name="name">Account Changed on account</field>
+            <field name="res_model">lubon_qlan.adaccounts</field>
+            <field name="default" eval="True"/>
+            <field name="hidden" eval="True"/>
+            <field name="description">Account changed</field>
+        </record>
+        <record id="mt_adaccount_deactivated" model="mail.message.subtype">
+            <field name="name">Account deactivated</field>
+            <field name="res_model">lubon_qlan.adaccounts</field>
+            <field name="default" eval="True"/>
+            <field name="hidden" eval="True"/>
+            <field name="description">Account deactivated</field>
+        </record>   
+        <record id="mt_adaccount_activated" model="mail.message.subtype">
+            <field name="name">Account activated</field>
+            <field name="res_model">lubon_qlan.adaccounts</field>
+            <field name="default" eval="True"/>
+            <field name="hidden" eval="True"/>
+            <field name="description">Account activated</field>
+        </record>             
+        <record id="mt_tenant_adaccount_new" model="mail.message.subtype">
+            <field name="name">Account Created</field>
+            <field name="sequence">10</field>
+            <field name="res_model">lubon_qlan.tenants</field>
+            <field name="default" eval="True"/>
+            <field name="parent_id" eval="ref('mt_adaccount_new')"/>
+            <field name="relation_field">tenant_id</field>
+        </record>
+        <record id="mt_tenant_adaccount_changed" model="mail.message.subtype">
+            <field name="name">Account changed</field>
+            <field name="sequence">10</field>
+            <field name="res_model">lubon_qlan.tenants</field>
+            <field name="default" eval="True"/>
+            <field name="parent_id" eval="ref('mt_adaccount_changed')"/>
+            <field name="relation_field">tenant_id</field>
+        </record>
+        <record id="mt_tenant_adaccount_deactivated" model="mail.message.subtype">
+            <field name="name">Account deactivated</field>
+            <field name="sequence">10</field>
+            <field name="res_model">lubon_qlan.tenants</field>
+            <field name="default" eval="True"/>
+            <field name="parent_id" eval="ref('mt_adaccount_deactivated')"/>
+            <field name="relation_field">tenant_id</field>            
+        </record>
+        <record id="mt_tenant_adaccount_activated" model="mail.message.subtype">
+            <field name="name">Account activated</field>
+            <field name="sequence">10</field>
+            <field name="res_model">lubon_qlan.tenants</field>
+            <field name="default" eval="True"/>
+            <field name="parent_id" eval="ref('mt_adaccount_activated')"/>
+            <field name="relation_field">tenant_id</field>            
+        </record>        
+    </data>
+</openerp>

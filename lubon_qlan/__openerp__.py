@@ -30,6 +30,7 @@
         'views/lubon_qlan.xml',
         'views/lubon_invoicing.xml',
         'reports/lubon_qlan_invoice.xml',
+        'data/lubon_qlan_data.xml',
 
 #	    'lubon_qlan.py',
     ],

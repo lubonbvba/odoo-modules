@@ -16,7 +16,7 @@ class lubon_tasks(models.Model):
 	contact_person_phone_office=fields.Char(string="Office phone")
 	description_edit=fields.Boolean(string="Edit")
 	description_pad=fields.Char('Description PAD', pad_content_field='description')
-
+	related_tasks_ids=fields.One2many('project.task.related','parent_task')
 	
 	def _calculate_date_deadline(self):
 		#pdb.set_trace()
@@ -53,3 +53,33 @@ class lubon_tasks(models.Model):
 		# set edit field to false
 		vals.update({'description_edit':False})
 		return super(lubon_tasks, self).write(vals)
+
+	@api.multi
+	@api.onchange('partner_id')
+	def set_related_tasks(self):
+		#for task in self.related_tasks_ids:
+		#	task.unlink()
+		if self.partner_id and (len(self.related_tasks_ids)==0):
+			tasks=self.search([('partner_id',"=", self.partner_id.id),('stage_id.closed',"=", False)])
+			self.env['project.task.related'].create_related_tasks(self,tasks)
+		#self.env.invalidate_all()	
+		return "Ok"
+
+	tasks_related_dummy=fields.Char(compute=set_related_tasks,help="Dummy field to force calculation of related tasks")
+
+class project_tasks_related(models.TransientModel):
+	_name="project.task.related"
+	parent_task=fields.Many2one('project.task')
+	name=fields.Char()
+	related_task_id=fields.Many2one('project.task')
+	@api.multi
+	def create_related_tasks(self,task_id,tasks):
+		for task in tasks:
+			if task_id.id != task.id:
+				self.create({'parent_task':task_id.id,
+					'related_task_id':task.id,
+					'name':task.name})
+	@api.multi
+	def merge_task(self):
+		for message in self.related_task_id.message_ids:
+ 			pdb.set_trace()

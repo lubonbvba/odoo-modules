@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 
 class lubon_qlan_tenants(models.Model):
 	_name = 'lubon_qlan.tenants'
+	_inherit = 'mail.thread'
+	_description = 'Tenant'
 	_rec_name = 'code'
 	_sql_constraints = [('code_unique','UNIQUE(code)','Code has to be unique')]
 	code = fields.Char(oldname='name', required=True, help='Tenant code', index=True )
@@ -46,17 +48,39 @@ class lubon_qlan_tenants(models.Model):
 	adaccounts_count=fields.Integer(compute=_adaccounts_count)
 
 class lubon_qlan_adaccounts(models.Model):
-	_name='lubon_qlan.adaccounts'
+	_name = 'lubon_qlan.adaccounts'
+	_description = "AD Account"
+	_inherit = ['mail.thread','ir.needaction_mixin']
 	_sql_constraints = [('guid_unique','UNIQUE(objectguid)','objectguid has to be unique')]
+	_rec_name = 'logonname'
+	_mail_post_access = 'read'
+	_track = {
+        'product': {
+            'lubon_qlan.mt_adaccount_changed': lambda self, cr, uid, obj, ctx=None: True,
+        },
+         'tenant_id': {
+            'lubon_qlan.mt_adaccount_created': lambda self, cr, uid, obj, ctx=None: True,
+        },
+         'ad_enabled': {
+            'lubon_qlan.mt_adaccount_deactivated': lambda self, cr, uid, obj, ctx=None: not obj.ad_enabled,
+            'lubon_qlan.mt_adaccount_activated': lambda self, cr, uid, obj, ctx=None: obj.ad_enabled,
+        },
+
+    }
+
+
+
+
+	account_created=fields.Boolean(default=True, track_visibility='onchange')
 	name=fields.Char()
 	samaccountname=fields.Char()
 	logonname=fields.Char()
-	product=fields.Char()
+	product=fields.Char(track_visibility='onchange')
 	objectguid=fields.Char(required=True)
 	date_first=fields.Datetime(help="Date of first import")
 	date_last=fields.Datetime(help="Date last seen")
-	ad_enabled=fields.Boolean(string="Enabled",default=True)
-	tenant_id=fields.Many2one('lubon_qlan.tenants') #, required=True)
+	ad_enabled=fields.Boolean(string="Enabled",default=True,track_visibility='onchange')
+	tenant_id=fields.Many2one('lubon_qlan.tenants',track_visibility='onchange') #, required=True)
 	person_id=fields.Many2one('res.partner', string="Related person", domain="['&',('type','=','contact'),('parent_id','in', validcustomers_ids[0][2])]")
 	contract_id=fields.Many2one('account.analytic.account', string="Contract" )
 	validcustomers_ids=fields.Many2many('res.partner', compute='_getvalidcustomer_ids',)
@@ -146,9 +170,9 @@ class lubon_qlan_adaccounts_import(models.TransientModel):
 		
 	@api.one		
 	def process_import(self):
-		
 		table_accounts=self.env['lubon_qlan.adaccounts']
 		account=table_accounts.search([('objectguid', '=', self.objectguid)])
+
 		if not account:
 			account=table_accounts.create({'objectguid': self.objectguid,
 											'date_first': datetime.datetime.now(),
@@ -158,8 +182,11 @@ class lubon_qlan_adaccounts_import(models.TransientModel):
 						'logonname': self.logonname,	
 						'date_last':datetime.datetime.now(),
 						'product': self.product,
-						'tenant_id': self.env['lubon_qlan.tenants'].search([('code','=', self.tenant)])
+						'tenant_id': self.env['lubon_qlan.tenants'].search([('code','=', self.tenant)]),
+						'ad_enabled': self.enabled,
 						})
+
+
 
 
 

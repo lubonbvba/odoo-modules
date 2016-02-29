@@ -685,8 +685,11 @@
                       </page>
                     </notebook>
                   </sheet>
-                  <div class="oe_chatter">
-                  </div>    
+                        <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                        </div>
+                    
                 </form>
               </field>
             </record>
@@ -703,7 +706,9 @@
                   <filter name="notenant" string="No Tenant"
                     domain="[('tenant_id', '=', False)]"/>
                   <filter name="notenant" string="No Product"
-                    domain="[('product', '=', False)]"/>
+                    domain="[('product', 'not ilike', '-')]"/>
+                  <filter name="account_to_complete" string="To complete"
+                    domain="['|', ('product', 'not ilike', '-'),('tenant_id', '=', False)]"/>                    
                     <filter name="obsolete" string="Obsolete"
                     domain="[('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') )]"/>
                     <group string="Group By">
@@ -741,12 +746,14 @@
               <field name="model">lubon_qlan.adaccounts</field>
               <field name="arch" type="xml">
                 <form string="Ad accounts">
+                  <sheet>
                   <group>
                     <group>
                   <field name="name"/>
                   <field name="person_id" context="{'default_email': logonname}"/>
                   <field name="product"/>
                   <field name="ad_enabled"/>
+                  <field name="account_created"/>
                   <field name="contract_line_id" />
                 </group>
                 <group>
@@ -760,6 +767,11 @@
                   <field name="validcustomers_ids" widget="many2many_tags"/>
                 </group>
                 </group>
+              </sheet>
+                        <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                        </div>
                 </form>
               </field>
             </record>
