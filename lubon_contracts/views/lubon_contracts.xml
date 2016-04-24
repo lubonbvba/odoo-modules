@@ -22,6 +22,9 @@
             <field name="model">account.analytic.account</field>
             <field name="inherit_id" ref="account_analytic_analysis.account_analytic_account_form_form"/>
             <field name="arch" type="xml">
+               <field name="partner_id" position="after">
+                    <field name="partner_related_ids" widget="many2many_tags"/>
+                </field> 
                 <xpath expr='//tree' position="attributes">
                     <attribute name="default_order">sequence</attribute>
                 </xpath>

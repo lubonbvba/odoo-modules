@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, fields, api,_
+from openerp import tools
 import pdb
 import datetime
+
+class lubon_task_type(models.Model):
+	_name="project.task.type"
+	_inherit="project.task.type"
+	days_to_add=fields.Integer(string="Days to add", help="Business days starting from today to add to the duedate")
+
 
 class lubon_tasks(models.Model):
 	_name="project.task"
@@ -60,6 +67,22 @@ class lubon_tasks(models.Model):
 #		pdb.set_trace()	
 #		self.env['project.task'].browse(self.env.context['params']['id']).message_subscribe([self.contact_person_id.id])
 
+
+	
+
+	@api.one
+	def check_due_date(self,new_stage_id):
+		new_stage=self.env['project.task.type'].browse(new_stage_id)
+		days_to_add=new_stage.days_to_add
+		if (self.stage_id != new_stage_id) and days_to_add>0:
+			new_date=datetime.datetime.now()
+			while days_to_add>0:
+				new_date+=datetime.timedelta(days=1)
+				if new_date.weekday() < 5:
+					days_to_add-=1
+			self.date_deadline=new_date
+			#pdb.set_trace()
+
 	
 	@api.onchange('partner_id')
 	@api.one
@@ -72,9 +95,32 @@ class lubon_tasks(models.Model):
 		# set edit field to false
 		vals.update({'description_edit':False})
 		#pdb.set_trace()
-		if 'contact_person_id' in vals.keys():
-			self.message_subscribe([vals['contact_person_id']])
+		#if 'contact_person_id' in vals.keys():
+		#	self.message_subscribe([vals['contact_person_id']])
+		if 'stage_id' in vals.keys():
+			self.check_due_date(vals['stage_id'])
 		return super(lubon_tasks, self).write(vals)
+	@api.multi
+	def message_get_email_values(self, id, notif_mail=None, context=None):
+#		pdb.set_trace()
+#		res = super(lubon_tasks, self).message_get_email_values(id, notif_mail=notif_mail, context=context)
+		res = super(lubon_tasks, self).message_get_email_values(id)[0]
+		project_info= "<hr></b>Details: </b><br>"
+		if self.project_id.name:
+			project_info+= "Project: " + self.project_id.name + "<br>"
+		if self.partner_id.name:	
+			project_info+= "Customer: " + self.partner_id.name + "<br>"
+		if self.contact_person_id.name:
+			project_info+= "Contact: " + self.contact_person_id.name + "<br>"
+		if self.date_deadline:
+			project_info+= "Due date: " + self.date_deadline + "<br>"
+		project_info+= "<hr>"
+
+		new_body=tools.append_content_to_html(id.body, project_info, plaintext=False, container_tag='div')
+#		pdb.set_trace()
+		res.update({'body_html': new_body})
+		#pdb.set_trace()
+		return res
 
 	# @api.multi
 	# @api.onchange('partner_id')

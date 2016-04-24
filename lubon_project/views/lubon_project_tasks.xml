@@ -21,8 +21,8 @@
                     <field name="id"/>
                     <field name="contact_person_id" required="True"/>
                     <field name="contact_person_phone" widget="phone"/>
-                    <field name="partner_id" invisible="True"/>
-                    <field name="project_id" domain="[('partner_id','=',partner_id)]" required="True" options="{'no_create': True}"/>
+                    <field name="partner_id" invisible="False"/>
+                    <field name="project_id" domain="['|','&amp;', ('state', 'in', ['open']),('partner_related_ids','in',partner_id), ('partner_id','=',partner_id)]" required="True" options="{'no_create': True}"/>
                 </xpath>
 <!--                 <xpath expr="//notebook/page[@string='Extra Info']" position="after">
                     <page string="Related">
@@ -56,11 +56,37 @@
             <field name="arch" type="xml">
                 <xpath expr="//div[@name='buttons']" position="inside"> -->
                    <button class="oe_inline oe_stat_button" type="action" name="%(project.action_view_task)d" 
-                    context="{'search_default_partner_id': parent_id,  'default_contact_person_id': active_id}"
+                    context="{'search_default_partner_id': parent_id or active_id,  'default_contact_person_id': active_id}"
                     icon="fa-tasks">
-                    <field  string="Tasks 2" name="task_count" widget="statinfo"/>
+                    <field  string="Related Tasks" name="task_count" widget="statinfo"/>
                 </button>   
             </xpath>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="lubon_project_search_form">
+        <field name="name">lubon_project.search_form</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+ <!--            <field name="partner_id" string="Related" filter_domain= "[('project_id.partner_related_ids','in', self)]" /> -->
+        </field>
+
+            <filter string="My Tasks" position="after">
+                <filter string="Overdue" name="Overdue" domain="[ '&amp;',('stage_id.closed','!=' , True), '|',('date_deadline', '=' , False),('date_deadline', '&lt;=', ((context_today().strftime('%Y-%m-%d'))))]" />
+            </filter>
+
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="lubon_task_type_form">
+        <field name="name">lubon_project.lubon_task_type_form"</field>
+        <field name="model">project.task.type</field>
+        <field name="inherit_id" ref="project.task_type_edit"/>
+        <field name="arch" type="xml">
+            <field name="sequence" position="after">
+                <field name="days_to_add"/>
+            </field>
         </field>
     </record>
 

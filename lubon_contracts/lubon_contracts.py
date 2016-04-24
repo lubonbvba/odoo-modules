@@ -16,7 +16,6 @@ class account_analytic_invoice_line(models.Model):
 	line_ok=fields.Boolean(compute="_set_line_state")
 	adaccount_ids=fields.One2many('lubon_qlan.adaccounts','contract_line_id')
 	counted_items=fields.Integer(compute="_count_items", string="Counted", help="This number is the total of items counted in the tenant")
-
 	@api.multi
 	@api.depends('adaccount_ids')
 	def _count_items(self):
@@ -85,6 +84,7 @@ class account_analytic_account(models.Model):
 	ready_for_invoice=fields.Boolean(Store=True, compute="_set_ready_for_invoice",help="This needs to be set to signal that the invoice can be made.")
 	invoiced_lines=fields.One2many("account.invoice.line",'account_analytic_id', readonly=True)
 	quantity_hist=fields.Float(string="Historic balance", help="Credit before using odoo contracts")
+	partner_related_ids=fields.Many2many('res.partner')
 	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:
