@@ -21,7 +21,7 @@
                     <field name="id"/>
                     <field name="contact_person_id" required="True"/>
                     <field name="contact_person_phone" widget="phone"/>
-                    <field name="partner_id" invisible="False"/>
+                    <field name="partner_id" invisible="True"/>
                     <field name="project_id" domain="['|','&amp;', ('state', 'in', ['open']),('partner_related_ids','in',partner_id), ('partner_id','=',partner_id)]" required="True" options="{'no_create': True}"/>
                 </xpath>
 <!--                 <xpath expr="//notebook/page[@string='Extra Info']" position="after">
