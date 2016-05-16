@@ -25,6 +25,19 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>  
+    <record model="ir.actions.act_window" id="qlan_assets_action">
+                      <field name="name">Equipment</field>
+                      <field name="res_model">lubon_qlan.assets</field>
+                      <field name="view_type">form</field>
+                      <field name="view_mode">tree,form</field>
+    </record>
+                        <record model="ir.actions.act_window" id="qlan_adaccounts_action">
+                      <field name="name">AD Accounts</field>
+                      <field name="res_model">lubon_qlan.adaccounts</field>
+                      <field name="view_type">form</field>
+                      <field name="view_mode">tree,form</field>
+                      <!--field name="domain">[["type","=",'delivery']]</field -->
+                    </record>
     <act_window id="act_add_interfaces_to_assets" name="Add interfaces to asset" res_model="add_interfaces_to_asset.wizard"
       view_mode="form"
       target="new"/>  
@@ -847,7 +860,7 @@
 
 
 
-                    <record model="ir.actions.act_window" id="zzqlan_sites_action">
+                    <record model="ir.actions.act_window" id="qlan_sites_action">
                       <field name="name">Sites</field>
                       <field name="res_model">lubon_qlan.sites</field>
                       <!-- field name="views">sites_tree_view"</field -->
@@ -872,13 +885,7 @@
                       <field name="view_mode">tree,form</field>
                       <!--field name="domain">[["type","=",'delivery']]</field -->
                     </record>
-                    <record model="ir.actions.act_window" id="qlan_adaccounts_action">
-                      <field name="name">AD Accounts</field>
-                      <field name="res_model">lubon_qlan.adaccounts</field>
-                      <field name="view_type">form</field>
-                      <field name="view_mode">tree,form</field>
-                      <!--field name="domain">[["type","=",'delivery']]</field -->
-                    </record>
+
                     <record model="ir.actions.act_window" id="qlan_adaccounts_import_action">
                       <field name="name">AD Accounts Import</field>
                       <field name="res_model">lubon_qlan.adaccounts_import</field>
@@ -900,12 +907,7 @@
                       <field name="view_type">form</field>
                       <field name="view_mode">tree,form</field>
                     </record>
-                    <record model="ir.actions.act_window" id="qlan_assets_action">
-                      <field name="name">Equipment</field>
-                      <field name="res_model">lubon_qlan.assets</field>
-                      <field name="view_type">form</field>
-                      <field name="view_mode">tree,form</field>
-                    </record>
+
 
                     <record model="ir.actions.act_window" id="qlan_memberships_action">
                       <field name="name">VLAN Memberships</field>
@@ -928,7 +930,7 @@
         <menuitem id="lubon_qlan_tenants_menu" name="Tenants"
             parent="main_lubon_qlan_menu"/>
         <menuitem id="sites_menu" name="Sites" parent="lubon_qlan_sites_menu"
-              action="zzqlan_sites_action"/>
+              action="qlan_sites_action"/>
         <menuitem id="lubon_qlan_equipment_sites_menu" name="Equipment" parent="lubon_qlan_sites_menu"
                 action="qlan_assets_action"/>     
 
