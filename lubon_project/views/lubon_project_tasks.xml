@@ -24,30 +24,32 @@
                     <field name="id"/>
                     <field name="contact_person_id" required="True"/>
                     <field name="contact_person_phone" widget="phone"/>
-                    <field name="partner_id" />
+
                     <field name="project_id" domain="['|','&amp;', ('state', 'in', ['open']),('partner_related_ids','in',partner_id), ('partner_id','=',partner_id)]" required="True" options="{'no_create': True}"/>
                 </xpath>
-<!--                 <xpath expr="//notebook/page[@string='Extra Info']" position="after">
-                    <page string="Related">
+                 <xpath expr="//notebook/page[@string='Extra Info']" position="after">
+                    <page string="Debug">
                         <group>
-                            <field name="tasks_related_dummy"/>
-                            <button name='set_related_tasks' string="Search related" type="object"/>
+<!--                             <field name="tasks_related_dummy"/>
+                            <button name='set_related_tasks' string="Search related" type="object"/> -->
+                            <field name="partner_id" />
+                            <field name="requester_partner_id"/>
                         </group>
-                        <field name="related_tasks_ids">
+<!--                         <field name="related_tasks_ids">
                             <tree>
                                 <field name="id"/>
                                 <field name="related_task_id"/>
                                 <field name="name"/>
                                 <button name="merge_task" string="Merge" type="object"/>
                             </tree>
-                        </field>
+                        </field> -->
                     </page>
-                </xpath> -->
+                </xpath>
 
                 <field name="date_deadline" position="before">
                     <field name="contact_person_mobile"  widget="phone"/>
                     <field name="contact_person_phone_office"  widget="phone"/>
-                    <field name="requester_partner_id"/>
+
                    </field>
                </field>
 
