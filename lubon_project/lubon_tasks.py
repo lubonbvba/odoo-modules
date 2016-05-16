@@ -102,8 +102,8 @@ class lubon_tasks(models.Model):
 			self.check_due_date(vals['stage_id'])
 		return super(lubon_tasks, self).write(vals)
 
-	@api.one	
-	def message_new(self, msg, custom_values=None, context=None):
+	#@api.one	
+	def message_new(self,cr,uid, msg, custom_values=None, context=None):
 		#pdb.set_trace()
 		if custom_values is None:
 			custom_values = {}
@@ -112,7 +112,7 @@ class lubon_tasks(models.Model):
 			'contact_person_id': msg.get('author_id'),
 			}
 		defaults.update(custom_values)
-		return super(lubon_tasks, self).message_new(custom_values=defaults, context=context)	
+		return super(lubon_tasks, self).message_new(cr,uid, msg,custom_values=defaults, context=context)	
 	@api.multi
 	def message_get_email_values(self, id, notif_mail=None, context=None):
 #		pdb.set_trace()
