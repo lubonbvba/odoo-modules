@@ -18,6 +18,7 @@ class lubon_tasks(models.Model):
 
 #     name = fields.Char()
 	contact_person_id=fields.Many2one('res.partner',help="Contact person for this ticket", string="Contact")
+	requester_partner_id=fields.Many2one('res.partner',help="Who sent the original e-mail", string="Contact")
 	contact_person_phone=fields.Char(string="Phone", compute="set_contact_person_phone", help="User ddi or company phone")
 	contact_person_mobile=fields.Char(string="Mobile", compute="set_contact_person_phone_mobile")
 	contact_person_phone_office=fields.Char(string="Office phone" , compute = "set_contact_person_phone_office")
@@ -100,6 +101,16 @@ class lubon_tasks(models.Model):
 		if 'stage_id' in vals.keys():
 			self.check_due_date(vals['stage_id'])
 		return super(lubon_tasks, self).write(vals)
+	@api.multi
+	
+	def message_new(self, msg, custom_values=None, context=None):
+		if custom_values is None:
+			custom_values = {}
+		defaults = {
+			'requester_partner_id': msg.get('author_id'),
+			}
+		defaults.update(custom_values)
+		return super(lubon_tasks, self).message_new(msg, custom_values=defaults, context=context)	
 	@api.multi
 	def message_get_email_values(self, id, notif_mail=None, context=None):
 #		pdb.set_trace()
