@@ -104,12 +104,13 @@ class lubon_tasks(models.Model):
 
 	#@api.one	
 	def message_new(self,cr,uid, msg, custom_values=None, context=None):
-		#pdb.set_trace()
+		pdb.set_trace()
 		if custom_values is None:
 			custom_values = {}
 		defaults = {
 			'requester_partner_id': msg.get('author_id'),
 			'contact_person_id': msg.get('author_id'),
+			'date_start': msg.get('date'),
 			}
 		defaults.update(custom_values)
 		return super(lubon_tasks, self).message_new(cr,uid, msg,custom_values=defaults, context=context)	

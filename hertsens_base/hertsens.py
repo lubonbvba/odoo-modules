@@ -206,7 +206,11 @@ class invoice(models.Model):
 	on=fields.Char(required=True,default="on")
 	@api.one
 	def action_cancel(self,vals=None,context=None):
-		
+		#pdb.set_trace()	
+		# code om te vermijden dat uitgaande facturen worden geannuleerd als er al ritten aanhangen.
+		# voor inkomende facturen verandert er niets.
+		if self.type == 'in_invoice':
+			return super(invoice, self.with_context(from_parent_object=True)).action_cancel()
 		if self.state == 'draft':
 			for ride in self.rides_ids:
 				#self.env['hertsens.rit']
