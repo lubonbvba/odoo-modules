@@ -210,6 +210,7 @@ class lubon_suppliers_info_import(models.Model):
 	default_code=fields.Char(index=True)
 	price_db=fields.Float(help="Current price in database")
 	price_change=fields.Integer(default=-1)
+	processed=fields.Boolean(help="This field is true if the product is processed.")
 
 	eancode=fields.Char(index=True)
 	manufacturer_id=fields.Many2one('res.partner', domain="[('manufacturer','=',True)]")
@@ -464,7 +465,7 @@ class lubon_suppliers_import_stats(models.Model):
 					logger.info("process products manually activated, exiting loop")
 					break
 
-		changedparts=self.parts_ids.search([('price_change','!=',0),('stats_id','=', self.id),('product_id','!=', False)])
+		changedparts=self.parts_ids.search([('price_change','!=',0),('stats_id','=', self.id),('product_id','!=', False),('processed','=', False)])
 		logger.info('Start updating %d changed parts', len(changedparts))
 		for changedpart in changedparts:
 			part_starttime=datetime.now()
@@ -482,6 +483,7 @@ class lubon_suppliers_import_stats(models.Model):
 							'last_stats_id': self.id,
 							'seller_id': self.supplier_id,
 							})
+			changedpart.processed=True
 			if self.supplier_id.supplier_debug:
 					logger.info("Number: %d Part: %s, Duration: %d",self.numupdated, changedpart.description, (datetime.now()-part_starttime).microseconds)
 		self.elap_products= (datetime.now()-starttime).seconds

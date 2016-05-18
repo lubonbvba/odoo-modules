@@ -169,6 +169,7 @@
       <field name="stock"/>
       <field name="BackorderDate"/>
       <field name="ModifDate"/>
+      <field name="processed"/>
     </tree>
   </field>
 </record>
