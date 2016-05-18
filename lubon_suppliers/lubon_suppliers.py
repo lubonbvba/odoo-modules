@@ -464,7 +464,7 @@ class lubon_suppliers_import_stats(models.Model):
 					logger.info("process products manually activated, exiting loop")
 					break
 
-		changedparts=self.parts_ids.search([('price_change','!=',0),('stats_id','=', self.id)])
+		changedparts=self.parts_ids.search([('price_change','!=',0),('stats_id','=', self.id),('product_id','!=', False)])
 		logger.info('Start updating %d changed parts', len(changedparts))
 		for changedpart in changedparts:
 			part_starttime=datetime.now()
