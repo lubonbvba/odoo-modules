@@ -104,7 +104,7 @@ class lubon_tasks(models.Model):
 
 	#@api.one	
 	def message_new(self,cr,uid, msg, custom_values=None, context=None):
-		pdb.set_trace()
+		#pdb.set_trace()
 		if custom_values is None:
 			custom_values = {}
 		defaults = {
