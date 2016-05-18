@@ -433,15 +433,19 @@ class lubon_suppliers_import_stats(models.Model):
 	def processproducts(self):
 		logger.info("Start processproducts")
 		starttime=datetime.now()
+		if "manual_activation" in self.env.context.keys():
+			logger.info("process products manually activated, exiting loop after 1000 products")
 		newparts=self.parts_ids.search([('product_id','=', False),('stats_id','=', self.id)])
 		logger.info('Start adding %d new parts', len(newparts))
 		table_products=self.env['product.template']
 		table_prod_supplier=self.env['product.supplierinfo']
 		self.numcreated=0
 		self.numupdated=0
+		numteller=0
 		for newpart in newparts:
 			part_starttime=datetime.now()
 			self.numcreated+=1
+			numteller+=1
 			operation="Direct create - without search"
 			product=table_products.create({'name': newpart.description,
 									'default_code': newpart.default_code,										
@@ -452,8 +456,13 @@ class lubon_suppliers_import_stats(models.Model):
 												'product_tmpl_id':product.id,
 												'product_code': newpart.supplier_part,
 												})
-			if self.supplier_id.supplier_debug:
+
+			if self.supplier_id.supplier_debug or numteller>=1000:
+				numteller=0;
 				logger.info("Number: %d, Part: %s,Operation: %s, Duration:, %d",self.numupdated,newpart.description, operation, (datetime.now()-part_starttime).microseconds)
+				if "manual_activation" in self.env.context.keys():
+					logger.info("process products manually activated, exiting loop")
+					break
 
 		changedparts=self.parts_ids.search([('price_change','!=',0),('stats_id','=', self.id)])
 		logger.info('Start updating %d changed parts', len(changedparts))

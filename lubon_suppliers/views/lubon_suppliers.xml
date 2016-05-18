@@ -70,7 +70,7 @@
             <field name="numdeleted"/>
             <field name="numbrands"/>
             <button string="Brands" name="processbrands" type="object"/>
-            <button string="Products" name="processproducts" type="object"/>
+            <button string="Products" name="processproducts" type="object" context="{'manual_activation': True}"/>
           </tree>
         </field>    
       </page>

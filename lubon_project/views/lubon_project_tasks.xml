@@ -34,6 +34,8 @@
                             <button name='set_related_tasks' string="Search related" type="object"/> -->
                             <field name="partner_id" />
                             <field name="requester_partner_id"/>
+                            <field name="reviewer_id"/>
+                            <field name="create_date"/>
                         </group>
 <!--                         <field name="related_tasks_ids">
                             <tree>
