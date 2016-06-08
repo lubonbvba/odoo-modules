@@ -335,7 +335,8 @@ class product_template(models.Model):
 	#ean13=fields.Char(index=True)
 	manuf_part=fields.Char(string="Partnr", index=True)
 	manufacturer=fields.Many2one('res.partner')
-	last_stats_id=fields.Many2one('lubon_suppliers.import_stats', string="Last Imported")
+	last_stats_id=fields.Many2one('lubon_suppliers.import_stats', string="Last Imported ID")
+	last_imported_date=fields.Datetime(string="Last import date")
 
 class product_product(models.Model):
 	_inherit = 'product.product'
@@ -434,6 +435,7 @@ class lubon_suppliers_import_stats(models.Model):
 	def processproducts(self):
 		logger.info("Start processproducts")
 		starttime=datetime.now()
+		modif_timestamp=datetime.now()
 		if "manual_activation" in self.env.context.keys():
 			logger.info("process products manually activated, exiting loop after 1000 products")
 		newparts=self.parts_ids.search([('product_id','=', False),('stats_id','=', self.id)])
@@ -481,6 +483,7 @@ class lubon_suppliers_import_stats(models.Model):
 							'cost_method':self.supplier_id.supplier_product_cost_method,
 							'valuation':self.supplier_id.supplier_product_valuation_method,
 							'last_stats_id': self.id,
+							'last_imported_date': modif_timestamp,
 							'seller_id': self.supplier_id,
 							})
 			changedpart.processed=True

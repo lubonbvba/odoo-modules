@@ -26,6 +26,8 @@
         # 'security/ir.model.access.csv',
         'templates.xml',
         'views/lubon_contracts.xml',
+        'views/contracts_state_wizard.xml',
+        'reports/lubon_contracts_state.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

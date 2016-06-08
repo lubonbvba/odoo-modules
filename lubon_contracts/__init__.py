@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
 import controllers
-import lubon_contracts
+import models
+import wizard

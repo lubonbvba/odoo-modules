@@ -235,6 +235,7 @@
      <field name="manuf_part"/> 
      <field name="seller_id"/> 
      <field name="last_stats_id"/> 
+     <field name="last_imported_date"/> 
    </xpath>
  </field>
 </record>

@@ -28,9 +28,12 @@
                 <xpath expr='//tree' position="attributes">
                     <attribute name="default_order">sequence</attribute>
                 </xpath>
+                <xpath expr='//field[@name="date_start"]' position="after">
+                    <field name="date_cutoff"/>
+                </xpath>
                <xpath expr='//field[@name="quantity_max"]' position="after">
                     <field name="quantity_hist"/>
-                </xpath> 
+                </xpath>
                 <xpath expr='//field[@name="recurring_next_date"]' position="after">
                     <field name="check_before_invoice"/>
                     <field name="ready_for_invoice"/>

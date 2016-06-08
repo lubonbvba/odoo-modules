@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<report 
+			id="lubon_contracts_report_contract_state"
+			string="Contract state"
+			model="lubon.contracts.state.wizard" 
+			report_type="qweb-pdf"
+			file="lubon_contracts.report_contract_state" 
+			name="lubon_contracts.report_contract_state" 
+			/>
+		</data>
+		<data>
+			<template id="report_contract_state_document">
+				<t t-name="lubon_contracts.report_contract_state_document">
+					<t t-call="report.external_layout" >
+						<div class="page">
+							<div class="row" align="center">
+								<span>
+									Contract overview:
+									<h1><span t-field="o.contract_id.name"/></h1>
+								</span>
+							</div>
+							<t t-set="total" t-value="0" />
+							<table class="table table-condensed table-bordered ">
+								<thead>
+									<tr>
+										<th colspan="2">From: <span t-field="o.date_start"/></th>
+										<th colspan="2">To: <span t-field="o.date_end"/>, Printed: <span t-field="o.date_printed"/></th>
+									</tr>
+									<tr>
+										<th>Date</th>
+										<!-- th>Taxes</th -->
+										<th class="text-left">Who</th>
+										<th class="text-left">Work performed</th>
+										<th class="text-right">Quantity</th>
+									</tr>
+								</thead>
+								<tbody class="sale_tbody">
+									<tr t-foreach="o.contract_lines" t-as="l">
+										<td>
+											<span t-field="l.date"/>
+										</td>
+										<td>
+											<span t-field="l.user_id"/>
+										</td>
+										<td>
+											<span t-field="l.name"/>
+										</td>										
+										<td class="text-right">
+											<span t-esc="'{0:.2f}'.format(round(l.unit_amount,2))"/>
+											<t t-set="total" t-value="total+l.unit_amount" />
+										</td>
+									</tr>
+									<tr>
+										<td class="text-right" colspan="3">Total:</td>
+										<td class="text-right"><t t-esc="'{0:.2f}'.format(round(total,2))"/></td>
+									</tr>
+								</tbody>
+							</table>		
+						</div>
+
+					</t>
+				</t>        
+			</template>    
+
+			<template id="report_contract_state">
+				<t t-call="report.html_container">
+					<t t-foreach="doc_ids" t-as="doc_id">
+						<t t-raw="translate_doc(doc_id, doc_model, 'contract_id.partner_id.lang', 'lubon_contracts.report_contract_state_document')"/>
+					</t>
+				</t>
+			</template>
+		</data>
+	</openerp>

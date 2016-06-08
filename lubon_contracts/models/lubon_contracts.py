@@ -85,6 +85,7 @@ class account_analytic_account(models.Model):
 	invoiced_lines=fields.One2many("account.invoice.line",'account_analytic_id', readonly=True)
 	quantity_hist=fields.Float(string="Historic balance", help="Credit before using odoo contracts")
 	partner_related_ids=fields.Many2many('res.partner')
+	date_cutoff=fields.Date(string="Last renewal date", help="Date to use as a start date for reporting and counting hours.")
 	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:

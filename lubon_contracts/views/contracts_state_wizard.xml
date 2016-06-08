@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+
+		<record id="contracts_state_wizard" model="ir.ui.view">
+			<field name="name">Contract State Report</field>
+			<field name="model">lubon.contracts.state.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Reveal Credentials">
+					<group>
+						<field name="date_start"/>
+						<field name="date_end"/>
+						<field name="omit_invoiced"/>
+					</group>
+					<footer>
+						<button string="Run report" name="run_contracts_state" type="object" />
+						<button string="Close" class="oe_link" special="cancel"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+
+
+
+		<act_window id="action_contracts_state_wizard"
+				    name="Contracts state report"
+				    src_model="account.analytic.account"
+				    res_model="lubon.contracts.state.wizard"
+				    view_mode="form"
+				    target="new"
+				    key2="client_action_multi"/>
+
+	</data>
+</openerp>

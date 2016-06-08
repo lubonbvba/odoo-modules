@@ -104,16 +104,27 @@ class lubon_tasks(models.Model):
 
 	#@api.one	
 	def message_new(self,cr,uid, msg, custom_values=None, context=None):
-		#pdb.set_trace()
+		#self.message_new_v8(cr,uid,msg)
+		
 		if custom_values is None:
 			custom_values = {}
+		#partner = self.pool.get('res.partner').browse(msg.get('author_id'))	
+		
 		defaults = {
 			'requester_partner_id': msg.get('author_id'),
 			'contact_person_id': msg.get('author_id'),
+			'partner_id': self.pool.get('res.partner').browse(cr,uid,msg.get('author_id')).parent_id.id,
 			'date_start': msg.get('date'),
 			}
 		defaults.update(custom_values)
+		#pdb.set_trace()
 		return super(lubon_tasks, self).message_new(cr,uid, msg,custom_values=defaults, context=context)	
+	
+	@api.multi
+	def message_new_v8(self,msg=None):
+		pdb.set_trace()
+
+
 	@api.multi
 	def message_get_email_values(self, id, notif_mail=None, context=None):
 #		pdb.set_trace()
