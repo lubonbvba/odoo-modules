@@ -8,9 +8,7 @@
 			<field name="arch" type="xml">
 				<form string="Reveal Credentials">
 					<group>
-						<field name="date_start"/>
-						<field name="date_end"/>
-						<field name="omit_invoiced"/>
+						<field name="name"/>
 					</group>
 					<footer>
 						<button string="Run report" name="run_contracts_state" type="object" />

@@ -17,7 +17,7 @@
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
     'category': 'Lubon',
-    'version': '8.0.0.14.0',
+    'version': '8.0.0.15.0',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'project','pad'],
@@ -27,6 +27,7 @@
         # 'security/ir.model.access.csv',
         'templates.xml',
         'views/lubon_project_tasks.xml',
+        
     ],
     # only loaded in demonstration mode
     'demo': [

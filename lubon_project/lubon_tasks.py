@@ -10,6 +10,17 @@ class lubon_task_type(models.Model):
 	_inherit="project.task.type"
 	days_to_add=fields.Integer(string="Days to add", help="Business days starting from today to add to the duedate")
 
+class lubon_project_partner(models.Model):
+	_name='res.partner'
+	_inherit='res.partner'
+
+	tasks_related_count=fields.Integer('Related tasks',compute="_calculate_tasks_related_count")
+
+	@api.one
+	def _calculate_tasks_related_count(self):
+		tasks_related_count=self.env['project.task'].search_count([('partner_id',"=",self.parent_id.id or self.id)])
+		#pdb.set_trace()
+
 
 class lubon_tasks(models.Model):
 	_name="project.task"
@@ -25,7 +36,9 @@ class lubon_tasks(models.Model):
 	description_edit=fields.Boolean(string="Edit")
 	description_pad=fields.Char('Description PAD', pad_content_field='description')
 	related_tasks_ids=fields.One2many('project.task.related','parent_task')
-	
+
+	tickets_related_count=fields.Integer(string="Open tasks", compute="_calculate_tickets_related_count")	
+
 	def _calculate_date_deadline(self):
 		#pdb.set_trace()
 		#self.date_deadline=fields.Date.context_today(self)
@@ -34,6 +47,14 @@ class lubon_tasks(models.Model):
 
 	date_deadline=fields.Date(default=_calculate_date_deadline)
 
+	@api.one
+	def _calculate_tickets_related_count(self):
+		self.tickets_related_count=self.project_id.tasks.search_count([('stage_id.closed','=',False),('project_id','=',self.project_id.id)])
+
+
+		#pdb.set_trace()
+
+	
 	@api.depends('contact_person_id')
 	@api.one
 	def set_contact_person_phone(self):
@@ -120,10 +141,6 @@ class lubon_tasks(models.Model):
 		#pdb.set_trace()
 		return super(lubon_tasks, self).message_new(cr,uid, msg,custom_values=defaults, context=context)	
 	
-	@api.multi
-	def message_new_v8(self,msg=None):
-		pdb.set_trace()
-
 
 	@api.multi
 	def message_get_email_values(self, id, notif_mail=None, context=None):
@@ -147,15 +164,15 @@ class lubon_tasks(models.Model):
 		#pdb.set_trace()
 		return res
 
-	# @api.multi
-	# @api.onchange('partner_id')
-	# def set_related_tasks(self):
-	# 	#for task in self.related_tasks_ids:
-	# 	#	task.unlink()
-	# 	if self.partner_id and (len(self.related_tasks_ids)==0):
-	# 		tasks=self.search([('partner_id',"=", self.partner_id.id),('stage_id.closed',"=", False)])
-	# 		self.env['project.task.related'].create_related_tasks(self,tasks)
-	# 	#self.env.invalidate_all()	
+	@api.multi
+	def set_related_tasks(self):
+		for task in self.related_tasks_ids:
+			task.unlink()
+
+		if self.project_id and (len(self.related_tasks_ids)==0):
+			tasks=self.search([('project_id',"=", self.project_id.id),('stage_id.closed',"=", False)])
+			self.env['project.task.related'].create_related_tasks(self,tasks)
+		#self.env.invalidate_all()	
 	# 	return "Ok"
 
 	# tasks_related_dummy=fields.Char(compute=set_related_tasks,help="Dummy field to force calculation of related tasks")
@@ -183,7 +200,20 @@ class project_tasks_related(models.TransientModel):
 				self.create({'parent_task':task_id.id,
 					'related_task_id':task.id,
 					'name':task.name})
+	
 	@api.multi
 	def merge_task(self):
-		for message in self.related_task_id.message_ids:
- 			pdb.set_trace()
+		for attachment in self.env['ir.attachment'].search([('res_model','like','project.task'),('res_id','=',self.parent_task.id)]):
+			attachment.res_id=self.related_task_id.id		
+		for message in self.parent_task.message_ids:
+			message.res_id=self.related_task_id
+ 			
+ 		self.parent_task.message_post(body= '%s %d'%(_("Merged with:"),self.related_task_id.id))
+ 		self.related_task_id.message_post(body= '%s %d'%(_("Added info from:"),self.parent_task.id))
+
+
+
+
+
+
+

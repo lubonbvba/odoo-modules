@@ -440,6 +440,8 @@
           <field name="code"/>
           <field name="ipv4"/>
           <field name="main_contact"/>
+          <field name="partner_id" string="Customer" filter_domain="[('main_contact.parent_id','child_of',self)]"/>
+
           <filter name="my_sytes" string="My Sites"
             domain="[('main_contact', '=', uid)]"/>
             <group string="Group By">
