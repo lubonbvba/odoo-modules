@@ -38,7 +38,7 @@ class hertsens_rit(models.Model):
 	invoice_id=fields.Many2one('account.invoice')
 	destination_ids=fields.One2many('hertsens.destination','rit_id')
 	finished=fields.Boolean(help="Tick if ride is finished")
-	state=fields.Selection([('quoted','Quote'),('planned','Planned'),('cancelled', 'Cancelled'),('completed','Completed'),('waiting','Waiting for info'),('toinvoice','To be invoiced'),('invoiced','Invoiced')], required=True, default='planned')
+	state=fields.Selection([('quoted','Quote'),('planned','Planned'),('dispatched','Dispatched'),('cancelled', 'Cancelled'),('completed','Completed'),('waiting','Waiting for info'),('toinvoice','To be invoiced'),('invoiced','Invoiced')], required=True, default='planned')
 	on=fields.Char(required=True,default="on")
 	# @api.onchange('partner_id')
 	# def _checkcompany(self):

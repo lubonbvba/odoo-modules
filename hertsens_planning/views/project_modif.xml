@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+
+		<record model='ir.ui.view' id='hertsens_project_rit_tree'>
+			<field name="name">hertsens.project.rit.tree</field>
+			<field name="model">hertsens.rit</field>
+			<field name="arch" type="xml">
+				<tree string="Rides to dispatch">
+					<field name="datum"/>
+					<field name="vertrek"/>
+					<field name="bestemming"/>
+					<field name="vehicle_type_id"/>
+					<field name="state"/>
+					<field name="partner_id"/>
+					<field name="company_id"/>
+				</tree>
+			</field>
+		</record>
+
+		<record model='ir.ui.view' id='hertsens_project_rit_form'>
+			<field name="name">hertsens.project.rit.form</field>
+			<field name="model">hertsens.rit</field>
+			<field name="arch" type="xml">
+				<form string="Dispatch">
+					<header>
+						<button name="dispatch_wizard" string="Dispatch" type="object"/>
+					</header>
+					<group>
+						<field name="datum"/>
+						<field name="vertrek"/>
+						<field name="bestemming"/>
+						<field name="vehicle_type_id"/>
+						<field name="state"/>
+						<field name="partner_id"/>
+						<field name="company_id"/>
+					</group>
+					<notebook>
+						<page string="Dispatches">
+							<field name="task_ids">
+								<tree>
+								<field name="project_id"/>
+								<field name="name"/>
+								<field name="user_id"/>
+							</tree>
+							</field>
+						</page>
+					</notebook>	
+				</form>
+			</field>
+		</record>
+
+
+
+		<record model="ir.actions.act_window" id="project_all_ritten_action">
+			<field name="name">Ritten</field>
+			<field name="res_model">hertsens.rit</field>
+			<field name="domain">[('state','ilike', 'Planned')]</field> 
+			<!--            <field name="context">{'default_partner_id':ref('res.partner.partner_id'), 'default_company_id':ref('res.partner.company_id')}></field> -->
+			<field name="view_type">form</field>
+			<!--field name="view_id" ref="hertsens_project_rit_tree"></field-->
+			<field name="view_mode">tree,form</field>
+			<!-- field name="search_view_id" ref="lubon_suppliers_import_search_view"/ -->
+
+		</record>
+
+
+		<record id="view_act_object_form" model="ir.actions.act_window.view">
+			<field name="view_mode">form</field>
+			<field name="sequence" eval="1"/>
+			<!-- field name="view_id" ref="planning_wizard_form" / -->
+			<field name="view_id" ref="hertsens_project_rit_form"/>
+			<field name="act_window_id" ref="project_all_ritten_action" />
+		</record>
+		<record id="view_act_object_tree" model="ir.actions.act_window.view">
+			<field name="view_mode">tree</field>
+			<field name="sequence" eval="0"/>
+			<field name="view_id" ref="hertsens_project_rit_tree" />
+			<field name="act_window_id" ref="project_all_ritten_action" />
+		</record>
+
+		<menuitem id="project_ritten_menu" name="Rides" parent="base.menu_main_pm" sequence="1" />
+		<menuitem id="project_all_ritten_menu" name="Rides" parent="project_ritten_menu" sequence="0" action="project_all_ritten_action" />
+
+
+
+
+
+		<record id="view_fleet_project_kanban_inherited" model="ir.ui.view">
+			<field name="name">hertsens_planning.project.kanban.inherited</field>
+			<field name="model">project.project</field>
+			<field name="inherit_id" ref="project.view_project_kanban"/>
+			<field name="arch" type="xml">
+				<field name="use_tasks" position="after">
+					<field name="kanban_state"/>
+					<field name="driver_id"/>
+					<field name="origin"/>
+					<field name="destination"/>
+				</field>
+
+				<xpath expr='//div[@class="oe_kanban_footer_left"]' position='before'>
+                                    <div> <!--class="oe_kanban_bottom_right" -->
+                                    	<small><field name="origin"/></small>
+                                    	<small><i class="fa fa-chevron-right"></i> <field name="destination"/></small>
+                                    </div>
+                                    <div class="oe_kanban_footer_left"> 
+                                        <!-- img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)" t-att-title="record.user_id.value" width="24" height="24" class="oe_kanban_avatar pull-right"/ -->
+                                        <!--div class="pull-left" groups="base.group_user"-->
+                                            <field name="kanban_state" widget="kanban_state_selection"/>
+                                            <!-- field name="priority" widget="priority"/-->
+                                        <!--/div-->
+                                    </div>
+                                </xpath>
+
+
+			</field>
+		</record>
+		<record id="view_fleet_project_form_inherited" model="ir.ui.view">
+			<field name="name">hertsens_planning.project.form.inherited</field>
+			<field name="model">project.project</field>
+			<field name="inherit_id" ref="project.edit_project"/>
+			<field name="arch" type="xml">
+				<!-- xpath expr='//sheet[@string="Project"]' position='after' -->
+				<field name="analytic_account_id" position="replace">	
+					<div class="oe_right">
+						<field name="kanban_state"  class="oe_inline" widget="kanban_state_selection"/>
+					</div>
+				</field>
+				<xpath expr='//div[@name="options_active"]' position='replace'>
+					<field name="use_tasks" invisible="True"/>
+
+				</xpath>
+				<xpath expr='//group' position='replace'>
+					<!-- This replaces all fields -->
+					<group>
+					<field name="vehicle_type_id" readonly="True"/>
+					<field name="driver_id" readonly="False"/>
+					<field name="origin" readonly="False"/>
+					<field name="destination" readonly="False"/>
+				</group>
+				</xpath>
+				<xpath expr='//field[@name="name"]' position='attributes'>
+					<attribute name="readonly">True</attribute>
+				</xpath>
+			</field>
+		</record>
+	</data>
+</openerp>
+
+
+
+

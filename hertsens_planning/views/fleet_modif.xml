@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+		<record model="ir.ui.view" id="fleet_vehicle_modif_form">
+			<field name="name">fleet.vehicle.modif.form</field>
+			<field name="model">fleet.vehicle</field>
+			<field name="inherit_id" ref="fleet.fleet_vehicle_form"/>
+			<field name="arch" type="xml">
+				<field name="driver_id" position="before">
+					<field name="vehicle_type_id" />
+					<field name="vehicle_length"/>
+					<field name="vehicle_width"/>
+					<field name="vehicle_heigth"/>
+					<field name="vehicle_heigth"/>
+					<field name="vehicle_load"/>
+					<field name="vehicle_pallets"/>
+					<field name="vehicle_license"/>
+				</field>
+
+			</field>
+		</record>
+
+
+		<record model='ir.ui.view' id='fleet_vehicle_type_form'>
+			<field name="name">fleet.vehicle.type.form</field>
+			<field name="model">fleet.vehicle.type</field>
+			<field name="arch" type="xml">
+				<form string="Vehicle type">
+					<sheet>
+						<group>
+							<field name="name"/>
+							<field name="type_code"/>
+							<field name="color_index"/>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record model='ir.ui.view' id='fleet_vehicle_type_tree'>
+			<field name="name">fleet.vehicle.type.tree</field>
+			<field name="model">fleet.vehicle.type</field>
+			<field name="arch" type="xml">
+				<tree string="Vehicle type">
+					<field name="name"/>
+					<field name="type_code"/>
+					<field name="color_index"/>
+				</tree>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="fleet_vehicle_type_kanban">
+			<field name="name">fleet.vehicle.type.kanban</field>
+			<field name="model">fleet.vehicle.type</field>
+			<field name="arch" type="xml">
+				<kanban class="oe_background_grey">
+					<field name="name"/>
+					<field name="color_index"/>
+					<field name="type_code"/>
+					<templates>
+						<t t-name="kanban-box">
+							<div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color_index.raw_value)} oe_kanban_card oe_kanban_project oe_kanban_global_click">
+								<div class="oe_dropdown_toggle oe_dropdown_kanban" groups="base.group_user">
+									<span class="oe_e">í</span>
+									<ul class="oe_dropdown_menu">
+										<t t-if="widget.view.is_action_enabled('edit')"><li><a type="edit">Settings</a></li></t>
+										<t t-if="widget.view.is_action_enabled('delete')"><li><a type="delete">Delete</a></li></t>
+										<li><ul class="oe_kanban_colorpicker" data-field="color_index"/></li>
+									</ul>
+								</div>
+								<div class="oe_kanban_content">
+									<h4 class="text-center"><strong><field name="name"/></strong></h4>
+									<small><i class="fa fa-envelope-o"></i> <field name="type_code"/></small>
+								</div>
+							</div>
+						</t>
+					</templates>
+				</kanban>
+			</field>
+		</record>
+		<record model='ir.actions.act_window' id='fleet_vehicle_type_act'>
+			<field name="name">Vehicle Type</field>
+			<field name="res_model">fleet.vehicle.type</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">kanban,tree,form</field>
+			<!-- field name="context">{"search_default_groupby_brand" : True,}</field-->
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Click to create a new model.
+				</p><p>
+				You can define several types.
+			</p>
+		</field>
+	</record>
+
+	<menuitem action="fleet_vehicle_type_act" parent="fleet.fleet_configuration" id="fleet_vehicle_type_menu" groups="base.group_no_one"/> 
+</data>
+
+
+
+
+
+</openerp>

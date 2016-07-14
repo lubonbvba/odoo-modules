@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+		<record model="ir.ui.view" id="hertsens_planning.ritten_tree_view">
+			<field name="name">hertsens_planning.ritten_tree_view</field>
+			<field name="model">hertsens.rit</field>
+			<field name="inherit_id" ref="hertsens_base.ritten_tree_view"/>
+			<field name="arch" type="xml">
+				<field name="state" position="after">
+					<field name="vehicle_type_id" />
+				</field>
+
+			</field>
+		</record>
+	</data>
+</openerp>

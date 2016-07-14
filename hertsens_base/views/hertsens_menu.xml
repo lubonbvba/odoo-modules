@@ -126,6 +126,8 @@
 <record model="ir.ui.view" id="ritten_tree_view">
     <field name="name">ritten.tree</field>
     <field name="model">hertsens.rit</field>
+        <field name="priority">1</field>
+
     <field name="arch" type="xml">
         <tree string="Ritten Tree" editable="top" default_order="datum desc"  colors="blue:state == 'planned';black:state in ('completed');red:state=='waiting';green:state=='toinvoice';gray:state == 'invoiced'"  >
            <field name="partner_id" options="{'no_quick_create':True,'no_create_edit':True}" attrs="{'readonly': [('state', '=', 'invoiced')]}"/> 
@@ -148,6 +150,7 @@
 <record model="ir.ui.view" id="ritten_form_view">
     <field name="name">ritten.form</field>
     <field name="model">hertsens.rit</field>
+    <field name="priority">1</field>
     <field name="arch" type="xml">
         <form string="Ritten form">
            <header>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+         <!-- Task Stages -->
+
+        <record id="project_tt_assigned" model="project.task.type">
+            <field name="sequence">1</field>
+            <field name="name">Assigned</field>
+            <field name="case_default" eval="True"/>
+        </record>
+
+        <record id="project_tt_exception" model="project.task.type">
+            <field name="sequence">5</field>
+            <field name="name">Exception</field>
+            <field name="case_default" eval="True"/>
+        </record>
+        <record id="project_tt_accepted" model="project.task.type">
+            <field name="sequence">9</field>
+            <field name="name">Accepted</field>
+            <field name="case_default" eval="True"/>
+        </record>
+
+    </data>
+</openerp>

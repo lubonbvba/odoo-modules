@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+		<record model="ir.ui.view" id="planning_wizard_form">
+			<field name="name">plannig.wizard.form</field>
+			<field name="model">vehicle.planning.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Vehicle selection">
+					<group>
+						<group>
+							<field name="id" />
+							<field name="ride_id" readonly="True" context="{'detailed':1}"/>
+							<field name="vehicle_type_id" readonly="True"/>
+						</group>
+						<group string="Selections">
+							<field name="show_type_only" />
+							<field name="show_free_only" />
+							<button name="set_candidates" string="Search" type="object"/>
+						</group>
+					</group>
+					<notebook>
+						<page string="Vehicles">
+							<field name="planning_vehicles_ids">
+								<tree>
+									<field name="name"/>
+									<field name="vehicle_type_id"/>
+									<field name="kanban_state" widget="kanban_state_selection"/>
+									<button name="select_candidate" string="Select" type="object"/>
+								</tree>
+							</field>
+						</page>
+					</notebook>
+				</form>
+					  <footer>
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+
+			</field>
+		</record>
+		<record model="ir.ui.view" id="dispatch_wizard_form">
+			<field name="name">dispatch.wizard.form</field>
+			<field name="model">vehicle.dispatch.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Vehicle selection">
+					<group>
+						<group>
+							<field name="ride_id" readonly="True" context="{'detailed':1}"/>
+							<field name="project_id" readonly="True" context="{'detailed':1}"/>
+							<field name="driver_id" />
+						</group>
+					</group>
+					<group>
+						<field name="dispatch_message" />
+					</group>
+					  <footer>
+                        <button name="confirm_dispatch" type="object"
+                                string="Confirm - send sms" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+				</form>
+			</field>
+		</record>
+	</data>
+</openerp>
