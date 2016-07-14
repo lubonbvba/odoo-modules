@@ -30,11 +30,10 @@
 							</field>
 						</page>
 					</notebook>
+				<footer>
+					<button special="cancel" string="Cancel"/>
+				</footer>
 				</form>
-					  <footer>
-                        <button special="cancel" string="Cancel"/>
-                    </footer>
-
 			</field>
 		</record>
 		<record model="ir.ui.view" id="dispatch_wizard_form">
@@ -52,14 +51,14 @@
 					<group>
 						<field name="dispatch_message" />
 					</group>
-					  <footer>
-                        <button name="confirm_dispatch" type="object"
-                                string="Confirm - send sms" class="oe_highlight"/>
-                        or
-                        <button special="cancel" string="Cancel"/>
-                    </footer>
-				</form>
-			</field>
-		</record>
-	</data>
-</openerp>
+					<footer>
+						<button name="confirm_dispatch" type="object"
+							string="Confirm - send sms" class="oe_highlight"/>
+							or
+							<button special="cancel" string="Cancel"/>
+						</footer>
+					</form>
+				</field>
+			</record>
+		</data>
+	</openerp>
