@@ -148,6 +148,7 @@
           <group>
             <!--field name="asset_name"/-->
             <!--field name="asset_remarks"/-->
+            <field name="asset_type"/>    
             <field name="ip_display"/>    
             <field name="lot"/>
             <field name="parent_id" domain="[('site_id','=',site_id),('is_container','=',True),('id','!=',active_id)]" options="{'no_quick_create':True,'no_create_edit':True}"/>
@@ -176,8 +177,26 @@
           <page string="Credentials">
             <field name="credentials_ids" context="{'default_asset_id' : active_id, 'default_site_id' : site_id }"/>
           </page>
-          <page string="Parts">
+          <page string="Parts" attrs="{'invisible': [('is_container','=', False)]}">
             <field name="child_ids" context="{'default_parent_id' : active_id, 'default_site_id' : site_id }"/>
+          </page>
+          <page string="VM info" attrs="{'invisible': [('asset_type','!=', 'vm')]}">
+            <group>
+            <field name="vm_path_name"/>
+            <field name="vm_uuid_instance"/>
+            <field name="vm_uuid_bios"/>
+            <field name="vm_cpu"/>
+            <field name="vm_memory"/>
+          </group>
+          </page>
+          <page string="Vcenter" attrs="{'invisible': [('asset_type','!=', 'vc')]}">
+            <group string="vcenter info">
+              <field name="vc_dns"/>
+              <field name="vc_port"/>
+              <field name="vc_password_id" domain="[('asset_id','=',active_id)]"/>
+              <button name="vc_test_login" type="object" string="Test login"/>
+              <button name="vc_get_vms" type="object" string="Get virtual machines"/>
+            </group>
           </page>
           <!-- page string="Config">
             <button name="act_add_interfaces_to_assets"  string="Add interfaces" type="action" context="{'default_asset_id': active_id}" groups="base.group_user"/>
@@ -195,6 +214,7 @@
         <field name="asset_name"  string="Search Name, Serial, IP" filter_domain="['|','|',('asset_name','ilike',self),('lot','ilike',self),('ip_display','ilike',self)]" />
         <field name="site_id" filter_domain="['&amp;',('site_id','ilike',self),('show_in_site','=',1)]"/>
         <field name="parent_id"/>
+        <field name="asset_type"/>
       </search>
     </field>
   </record>
@@ -671,8 +691,8 @@
                   </page>
                   <page string="Settings">
                    <group string="Security">
-                     <field name="qtest_password"/>
-                     <field name="qadm_password"/>
+                     <field name="qtest_password" />
+                     <field name="qadm_password" />
                      </group>
 
                      <!-- field name="credential_ids" domain="[('tenant_id','=',active_id),(credentials_type','ilike','tenant_admin')]" context="{'default_credentials_type':'tenant_admin'}"/ -->

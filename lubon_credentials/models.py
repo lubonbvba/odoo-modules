@@ -113,7 +113,15 @@ class lubon_qlan_credentials(models.Model):
             self.encrypt_password(True)
             self.password=''
         return True
-
+    @api.one
+    def decrypt(self):
+        if self.encrypted:
+            f= open('/home/odoo/.odoo/private_key.pem','r')
+            r = RSA.importKey(f.read())
+            f.close()
+            encrypted= ast.literal_eval(str(self.encrypted))
+            password=r.decrypt(encrypted) 
+        return password
 
     
     @api.one
