@@ -313,14 +313,14 @@ class lubon_suppliers_info_import(models.Model):
 			for p in obsolete_products:
 					deletethis=True
 					for v in p.product_variant_ids:
-						deletethis = not(v.sales_order_lines or v.purchase_order_lines or v.invoice_lines or v.procurement_order or v.stock_inventory_line)
+						deletethis = not(v.sales_order_lines or v.purchase_order_lines or v.invoice_lines or v.procurement_order or v.stock_inventory_line or v.stock_move)
 					if deletethis:
-						#logger.warning("Deleting product: %d, %s", p.id,p.name)
+						logger.warning("Deleting product: %d, %s", p.id,p.name)
 						p.unlink()
 					else:
 						p.sale_ok=False
 						p.purchase_ok=False
-						#logger.warning("Deleting product not possible: %d, %s", p.id,p.name)
+						logger.warning("Deleting product not possible: %d, %s", p.id,p.name)
 			stats.numparts=n
 			stats.numdeleted=len(to_delete)
 		logger.info("End processfile")
@@ -346,6 +346,7 @@ class product_product(models.Model):
 	purchase_order_lines=fields.One2many('purchase.order.line','product_id')
 	procurement_order=fields.One2many('procurement.order','product_id')
 	stock_inventory_line=fields.One2many('stock.inventory.line','product_id')
+	stock_move=fields.One2many('stock.move','product_id')
 
 	@api.multi
 	def activate_all(self):
@@ -361,8 +362,8 @@ class product_product(models.Model):
 			if (supplier_debug and n> 1000):
 				break
 			if 	supplier_debug:
-				logger.info("processing:%s %d/%d",p.default_code,n,number)
-			if not (p.sales_order_lines or p.purchase_order_lines or p.invoice_lines or p.procurement_order or p.stock_inventory_line):
+				logger.info("processing delete:%s %d/%d",p.default_code,n,number)
+			if not (p.sales_order_lines or p.purchase_order_lines or p.invoice_lines or p.procurement_order or p.stock_inventory_line or p.stock_move):
 				p.unlink()
 
 			

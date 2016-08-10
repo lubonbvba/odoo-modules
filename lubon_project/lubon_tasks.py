@@ -117,8 +117,15 @@ class lubon_tasks(models.Model):
 		# set edit field to false
 		vals.update({'description_edit':False})
 		#pdb.set_trace()
-		#if 'contact_person_id' in vals.keys():
-		#	self.message_subscribe([vals['contact_person_id']])
+		if 'user_id' in vals.keys():
+			self.message_subscribe_users(
+				[vals['user_id']],
+				[self.env['ir.model.data'].xmlid_lookup('project.mt_task_assigned')[2],
+				self.env['ir.model.data'].xmlid_lookup('project.mt_task_stage')[2],
+				self.env['ir.model.data'].xmlid_lookup('mail.mt_comment')[2]])
+			if self.user_id != self.reviewer_id:
+				self.message_unsubscribe_users([self.user_id.id])
+			
 		if 'stage_id' in vals.keys():
 			self.check_due_date(vals['stage_id'])
 		return super(lubon_tasks, self).write(vals)
@@ -144,9 +151,10 @@ class lubon_tasks(models.Model):
 
 	@api.multi
 	def message_get_email_values(self, id, notif_mail=None, context=None):
-#		pdb.set_trace()
 #		res = super(lubon_tasks, self).message_get_email_values(id, notif_mail=notif_mail, context=context)
 		res = super(lubon_tasks, self).message_get_email_values(id)[0]
+#		pdb.set_trace()
+
 		project_info= "<hr></b>Details: </b><br>"
 		if self.project_id.name:
 			project_info+= "Project: " + self.project_id.name + "<br>"
@@ -163,6 +171,15 @@ class lubon_tasks(models.Model):
 		res.update({'body_html': new_body})
 		#pdb.set_trace()
 		return res
+
+	@api.multi	
+	def send_get_mail_body(self, mail, partner=None, context=None):
+		pdb.set_trace()	
+		body=super(lubon_tasks, self).send_get_mail_body(cr, uid, mail, partner)
+		pdb.set_trace()	
+		return body
+
+
 
 	@api.multi
 	def set_related_tasks(self):

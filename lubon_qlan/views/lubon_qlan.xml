@@ -25,7 +25,7 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>  
-    <record model="ir.actions.act_window" id="qlan_assets_action">
+    <record model="ir.actions.act_window" id="qlan_equipment_action">
       <field name="name">Equipment</field>
       <field name="res_model">lubon_qlan.assets</field>
       <field name="view_type">form</field>
@@ -129,6 +129,7 @@
       <field name="model">lubon_qlan.assets</field>
       <field name="arch" type="xml">
         <form string="Asset Details">
+          <sheet>
           <div class="oe_title oe_left">
             <div class="oe_edit_only">
               <label for="asset_name"/> 
@@ -202,7 +203,11 @@
             <button name="act_add_interfaces_to_assets"  string="Add interfaces" type="action" context="{'default_asset_id': active_id}" groups="base.group_user"/>
           </page -->
         </notebook>
-
+                  </sheet>
+                        <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                        </div>
       </form>
     </field>
   </record>
@@ -505,7 +510,7 @@
                   </div>
                   <field name="location_ids" invisible="True"/>
                   <div class="oe_right oe_button_box" name="buttons">
-                    <button type="action" class="oe_stat_button" name="%(qlan_assets_action)d" icon="fa-shopping-cart" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
+                    <button type="action" class="oe_stat_button" name="%(qlan_equipment_action)d" icon="fa-shopping-cart" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
                       <field name="assets_count" string="Equipment" widget="statinfo"/>
                     </button>
                     <button type="action" class="oe_stat_button" name="%(qlan_ip_action)d" icon="fa-th-list" context="{'search_default_site_id': active_id, 'default_site_id': active_id}">
@@ -954,7 +959,7 @@
         <menuitem id="sites_menu" name="Sites" parent="lubon_qlan_sites_menu"
               action="qlan_sites_action"/>
         <menuitem id="lubon_qlan_equipment_sites_menu" name="Equipment" parent="lubon_qlan_sites_menu"
-                action="qlan_assets_action"/>     
+                action="qlan_equipment_action"/>     
 
 
         <menuitem id="adtenants_menu" name="AD Tenants" parent="lubon_qlan_tenants_menu"
@@ -972,8 +977,8 @@
                 action="qlan_messages_action"/>
         <menuitem id="lubon_qlan_credentials_menu" name="Credentials" parent="lubon_qlan_tables_menu"
                   action="qlan_credentials_action"/>
-        <menuitem id="lubon_qlan_assets_menu" name="Equipment" parent="lubon_qlan_tables_menu"
-                    action="qlan_assets_action"/>
+        <menuitem id="lubon_qlan_equipent_menu" name="Equipment" parent="lubon_qlan_tables_menu"
+                    action="qlan_equipment_action"/>
         <menuitem id="lubon_qlan_ipss_menu" name="IP" parent="lubon_qlan_tables_menu" action="qlan_ip_action"/>
         <menuitem id="lubon_qlan_interfaces_menu" name="Interfaces" parent="lubon_qlan_tables_menu"
                         action="qlan_interfaces_action"/>

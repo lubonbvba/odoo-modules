@@ -32,6 +32,7 @@ class Partner(models.Model):
 
 
 
+
 			
 
 class partner_title(models.Model):

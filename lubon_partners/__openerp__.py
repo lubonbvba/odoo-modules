@@ -20,7 +20,7 @@
     'version': '0.2',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'lubon_credentials', ],
+    'depends': ['base', 'lubon_credentials'],
 
     # always loaded
     'data': [

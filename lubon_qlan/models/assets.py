@@ -15,9 +15,11 @@ import pdb
 
 
 class lubon_qlan_assets(models.Model):
-#	_inherits={'stock.quant': 'quant_id'}
 	_name="lubon_qlan.assets"
+	_description = 'zzEquipment'
 	_rec_name="asset_name"
+	_inherit = ['mail.thread','ir.needaction_mixin']
+	
 	parent_id=fields.Many2one('lubon_qlan.assets', string="Part of")
 
 	child_ids=fields.One2many('lubon_qlan.assets','parent_id')
@@ -39,11 +41,11 @@ class lubon_qlan_assets(models.Model):
 	ips=fields.One2many('lubon_qlan.ip','asset_id')
 	interfaces_ids=fields.One2many('lubon_qlan.interfaces','asset_id')
 	credentials_ids=fields.One2many('lubon_credentials.credentials','asset_id')
-	vm_memory=fields.Char()
-	vm_cpu=fields.Integer()
-	vm_uuid_instance=fields.Char()
-	vm_uuid_bios=fields.Char()
-	vm_path_name=fields.Char()
+	vm_memory=fields.Char(track_visibility='onchange')
+	vm_cpu=fields.Integer(track_visibility='onchange')
+	vm_uuid_instance=fields.Char(track_visibility='onchange')
+	vm_uuid_bios=fields.Char(track_visibility='onchange')
+	vm_path_name=fields.Char(track_visibility='onchange')
 
 	#vcenter fields
 	vc_dns=fields.Char(string="vcenter dns")
@@ -93,13 +95,13 @@ class lubon_qlan_assets(models.Model):
 	@api.one
 	def _vc_login(self):
 		try:
-			context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-			context.verify_mode = ssl.CERT_NONE
+			#context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+			#context.verify_mode = ssl.CERT_NONE
 			service_instance = connect.SmartConnect(host=self.vc_dns,
 				user=self.vc_password_id.user,
 				pwd=self.vc_password_id.decrypt()[0],
-				port=self.vc_port,
-				sslContext=context)
+				port=self.vc_port)
+				#sslContext=context)
 
 #			atexit.register(connect.Disconnect, service_instance)
 #			pdb.set_trace()
@@ -151,15 +153,17 @@ class lubon_qlan_assets(models.Model):
 		else:
 			if not asset.asset_type:
 				asset.asset_type='vm'
-			if not self.vm_uuid_bios:
-				self.vm_uuid_bios=virtual_machine.summary.config.uuid
-			if not self.vm_uuid_instance:
-				self.vm_uuid_instance=virtual_machine.summary.config.instanceUuid
-			if not self.parent_id:
-				self.parent_id=self.id
+			if not asset.vm_uuid_bios:
+				asset.vm_uuid_bios=virtual_machine.summary.config.uuid
+			if not asset.vm_uuid_instance:
+				asset.vm_uuid_instance=virtual_machine.summary.config.instanceUuid
+			if not asset.parent_id:
+				asset.parent_id=self.id
 		asset.vm_memory=virtual_machine.summary.config.memorySizeMB
 		asset.vm_cpu=virtual_machine.summary.config.numCpu
 		asset.vm_path_name=virtual_machine.summary.config.vmPathName
+		#pdb.set_trace()
+
 
 
 
