@@ -261,7 +261,7 @@ password=passwordLogin)
                     delta  = now - createtime
                     if delta.days >= rec.daystokeep:
                         #Only delete files (which are .dump), no directories.
-                        if os.path.isfile(fullpath) and ".dump" in f:
+                        if os.path.isfile(fullpath) and ".zip" in f:
                             print("Delete: " + fullpath)
                             os.remove(fullpath)
 
