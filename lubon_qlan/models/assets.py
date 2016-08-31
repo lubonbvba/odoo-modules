@@ -12,7 +12,7 @@ from pyVmomi import vim
 from openerp import models, fields, api
 from openerp.exceptions import Warning
 import pdb
-
+from veeam import get_restorepoints
 
 class lubon_qlan_assets(models.Model):
 	_name="lubon_qlan.assets"
@@ -46,7 +46,8 @@ class lubon_qlan_assets(models.Model):
 	vm_uuid_instance=fields.Char(track_visibility='onchange')
 	vm_uuid_bios=fields.Char(track_visibility='onchange')
 	vm_path_name=fields.Char(track_visibility='onchange')
-
+	vm_check_backup=fields.Boolean(default=True)
+	vm_restorepoints_ids=fields.One2many('lubon_qlan.restorepoints',"asset_id")
 	#vcenter fields
 	vc_dns=fields.Char(string="vcenter dns")
 	vc_port=fields.Integer(string="vcenter tcp port", default=443)
@@ -164,6 +165,25 @@ class lubon_qlan_assets(models.Model):
 		asset.vm_path_name=virtual_machine.summary.config.vmPathName
 		#pdb.set_trace()
 
-
+	@api.multi
+	def get_restorepoints(self):
+		points = get_restorepoints(self.asset_name)
+		for point in points:
+			if not self.env['lubon_qlan.restorepoints'].search([('uid','like',point['uid'])]):
+				self.env['lubon_qlan.restorepoints'].create({
+					'uid':point['uid'],
+					'asset_id': self.id,
+					'creationtimeutc': point['creationtimeutc'],
+					'BackupServerReference': point['BackupServerReference'],
+					'algorithm':point['algorithm'],
+					'pointtype':point['pointtype'],
+					'hierarchyobjref':point['hierarchyobjref'],
+					})
+	@api.multi			
+	def get_all_restorepoints(self,fake=None):
+		vms=self.search([("vm_check_backup","=",True),("asset_type","=",'vm')])
+		#pdb.set_trace()
+		for vm in vms:
+			vm.get_restorepoints()
 
 

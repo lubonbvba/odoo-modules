@@ -17,7 +17,7 @@
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
     'category': 'Lubon customer',
-    'version': '8.0.0.5.0',
+    'version': '8.0.0.6.0',
 
     # any module necessary for this one to work correctly
     'depends': ['base','pad', 'analytic','stock','hr_timesheet_invoice', 'lubon_base','lubon_credentials', 'lubon_partners'],
@@ -31,6 +31,7 @@
         'views/lubon_invoicing.xml',
         'reports/lubon_qlan_invoice.xml',
         'data/lubon_qlan_data.xml',
+        'data/lubon_qlan_cron.xml',
 
 #	    'lubon_qlan.py',
     ],

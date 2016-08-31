@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="ir_cron_lubon_qlan_get_all_restorepoints" model="ir.cron">
+            <field name="name">Update all restore points</field>
+            <field name="interval_number">12</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="model">lubon_qlan.assets</field>
+            <field name="function">get_all_restorepoints</field>
+            <field name="args">[0]</field>
+            <!-- Active flag is set on fetchmail_server.create/write -->
+            <field name="active" eval="False"/>
+        </record>
+    </data>
+</openerp>

@@ -9,6 +9,7 @@ access_lubon_qlan_assets,access_lubon_qlan_assets,model_lubon_qlan_assets,,1,1,1
 access_lubon_qlan_memberships,access_lubon_qlan_memberships,model_lubon_qlan_memberships,,1,1,1,1
 access_lubon_qlan_interfaces,access_lubon_qlan_interfaces,model_lubon_qlan_interfaces,,1,1,1,1
 access_lubon_qlan_interface_type,access_lubon_qlan_interface_type,model_lubon_qlan_interface_type,,1,1,1,1
+access_lubon_qlan_restorepoints,access_lubon_qlan_restorepoints,model_lubon_qlan_restorepoints,,1,1,1,1
 
 
 

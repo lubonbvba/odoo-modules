@@ -25,6 +25,7 @@ class Partner(models.Model):
 	updateskluwer = fields.Boolean(String="Kluwer Updates", help="Get notified of kluwer updates")
 	updatestelephony = fields.Boolean(String="Telephony Updates", help="Get notified of telephony updates")
 	phone_office = fields.Char(String="Company phone", help="General office phone", compute="_compute_phone_office")
+	#name=fields.Char(required=False)
 	@api.one
 	def _compute_phone_office(self):
 		if self.parent_id.phone:

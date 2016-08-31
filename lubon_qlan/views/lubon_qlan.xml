@@ -188,7 +188,19 @@
             <field name="vm_uuid_bios"/>
             <field name="vm_cpu"/>
             <field name="vm_memory"/>
+            <field name="vm_check_backup"/>
           </group>
+          <button type="object" name="get_restorepoints" string="Get restore points"/>
+        </page>
+          <page string="Restore points" attrs="{'invisible': [('asset_type','!=', 'vm')]}">
+            <field name="vm_restorepoints_ids">
+              <tree>
+                <field name="uid"/>
+                <field name="creationtimeutc"/>
+                <field name="algorithm"/>
+                <field name="BackupServerReference"/>
+              </tree>
+            </field>
           </page>
           <page string="Vcenter" attrs="{'invisible': [('asset_type','!=', 'vc')]}">
             <group string="vcenter info">
