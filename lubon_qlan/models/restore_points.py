@@ -8,7 +8,7 @@ import openerp.addons.decimal_precision as dp
 class lubon_qlan_restorepoints(models.Model):
 	_name = 'lubon_qlan.restorepoints'
 	_description = 'Restorepoints'
-
+	_order = 'creationtimeutc desc'
 	asset_id=fields.Many2one('lubon_qlan.assets')
 
 	uid=fields.Char(required=True, index=True)

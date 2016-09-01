@@ -125,7 +125,7 @@ class lubon_qlan_adaccounts_import(models.TransientModel):
 		self.importadaccounts(self)
 	
 	@api.multi
- 	def importadaccounts(self): # , cr=None, uid=None, context=None, arg5=None):
+ 	def importadaccounts(self,dummy=None): # , cr=None, uid=None, context=None, arg5=None):
 		logger.info('Importing ad accounts')
 		table_import=self.env['lubon_qlan.adaccounts_import']
 		basepath=expanduser("~")

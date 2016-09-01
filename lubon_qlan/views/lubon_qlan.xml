@@ -194,7 +194,7 @@
         </page>
           <page string="Restore points" attrs="{'invisible': [('asset_type','!=', 'vm')]}">
             <field name="vm_restorepoints_ids">
-              <tree>
+              <tree default_order="creationtimeutc desc" >
                 <field name="uid"/>
                 <field name="creationtimeutc"/>
                 <field name="algorithm"/>
