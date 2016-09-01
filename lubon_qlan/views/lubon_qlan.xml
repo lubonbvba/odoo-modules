@@ -188,6 +188,7 @@
             <field name="vm_uuid_bios"/>
             <field name="vm_cpu"/>
             <field name="vm_memory"/>
+            <field name="vm_latest_restore_point"/>
             <field name="vm_check_backup"/>
           </group>
           <button type="object" name="get_restorepoints" string="Get restore points"/>

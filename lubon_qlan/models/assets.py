@@ -48,6 +48,7 @@ class lubon_qlan_assets(models.Model):
 	vm_path_name=fields.Char(track_visibility='onchange')
 	vm_check_backup=fields.Boolean(default=True)
 	vm_restorepoints_ids=fields.One2many('lubon_qlan.restorepoints',"asset_id")
+	vm_latest_restore_point=fields.Datetime()
 	#vcenter fields
 	vc_dns=fields.Char(string="vcenter dns")
 	vc_port=fields.Integer(string="vcenter tcp port", default=443)
@@ -168,6 +169,7 @@ class lubon_qlan_assets(models.Model):
 	@api.multi
 	def get_restorepoints(self):
 		points = get_restorepoints(self.asset_name)
+		newest = ""
 		for point in points:
 			if not self.env['lubon_qlan.restorepoints'].search([('uid','like',point['uid'])]):
 				self.env['lubon_qlan.restorepoints'].create({
@@ -179,6 +181,12 @@ class lubon_qlan_assets(models.Model):
 					'pointtype':point['pointtype'],
 					'hierarchyobjref':point['hierarchyobjref'],
 					})
+			if point['creationtimeutc'] > newest:
+				newest=point['creationtimeutc']
+		if len(newest) > 0:
+			self.vm_latest_restore_point=newest.replace('T',' ')		
+
+				
 	@api.multi			
 	def get_all_restorepoints(self,fake=None):
 		vms=self.search([("vm_check_backup","=",True),("asset_type","=",'vm')])
