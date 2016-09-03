@@ -20,6 +20,7 @@
 						<field name="number_succeeded"/>
 						<field name="rate_succeeded"/>
 						<field name="number_requests_failed"/>
+						<field name="re_evaluate"/>
 					</group>
 					<notebook>
 						<page string="Expected restore points">
