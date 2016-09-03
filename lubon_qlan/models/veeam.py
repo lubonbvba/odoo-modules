@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from lxml import etree as LET
 from lxml import objectify
 import pdb,logging
+from datetime import datetime,timedelta
 
 logger = logging.getLogger(__name__)
 api_url = 'http://q02mon002.q.lan:9399/api'
@@ -42,10 +43,10 @@ def veeam_get(href):
     if r.status_code is 200:
         return r
     else:
-        #print "error"
-        #print r.status_code
-        logger.info("url: %s" % href)
- #       pdb.set_trace()
+#        print "error"
+#        print r.status_code
+        logger.error("url: %s" % href)
+#        pdb.set_trace()
         return r
 
 
@@ -54,6 +55,7 @@ def veeam_get(href):
 def veeam_decode(href,attrname=None,attrvalue=None):
     result=[]
     r= veeam_get(href)
+
     b=LET.fromstring(r.content)
     for ref in b:
         #print ref.attrib
@@ -68,11 +70,11 @@ def veeam_decode(href,attrname=None,attrvalue=None):
                 #s=veeam_get(link.attrib['Href'])
                 #c=LET.fromstring(s.content)
     #db.set_trace()        
-    return result
+    return {'result': result,'href':href, 'response': r }
 
 
 
-def get_restorepoints(vmname):
+def get_restorepoints(vmname,date=None):
 
 #    print "start create session"
     create_session()
@@ -94,11 +96,16 @@ def get_restorepoints(vmname):
     #restorePoints/1950be56-45c9-4d24-8e65-00169f748253?format=Entity
     #links=veeam_decode(api_url + "/backupSessions","Rel","Alternate")
     #links=veeam_decode(api_url + "/lookupSvc","Type", "HierarchyItemList")
+    if not date:
+        date=datetime.today() - timedelta(days=1)
+        date=datetime.strftime(date, "%Y-%m-%d")
+    date_start=date + " 12:00:00"
+    date_end=datetime.strptime(date, "%Y-%m-%d").date() + timedelta(days=1)
+    date_end=datetime.strftime(date_end, "%Y-%m-%d") + " 12:00:00"
+  #  pdb.set_trace()
 
-
-
-    links=veeam_decode(api_url + '/query?type=VmRestorePoint&format=entities&filter=VmDisplayName=="'+ vmname +'"','Type','VmRestorePoint')
-
+    result=veeam_decode(api_url + '/query?type=VmRestorePoint&format=entities&filter=VmDisplayName=="'+ vmname +'";CreationTime>="'+date_start+'";CreationTime<"'+date_end+'"','Type','VmRestorePoint')
+    links=result['result']
  #   print "nr of results:", len(links)
     res=[]
     for r in links:
@@ -128,10 +135,10 @@ def get_restorepoints(vmname):
                         restorepoint['BackupServerReference']=u.attrib['Name']
                         #print u.attrib
         res.append(restorepoint)
-    return res    
+    return {'res': res,'href':result['href'], 'response':result['response']}    
 
 
 
-#points = get_restorepoints("Q01DFS002")
+#points = get_restorepoints("Q01SQL001","2016-08-15")
 #print len (points)
 #pdb.set_trace()

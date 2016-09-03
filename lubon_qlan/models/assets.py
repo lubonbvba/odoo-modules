@@ -46,9 +46,11 @@ class lubon_qlan_assets(models.Model):
 	vm_uuid_instance=fields.Char(track_visibility='onchange')
 	vm_uuid_bios=fields.Char(track_visibility='onchange')
 	vm_path_name=fields.Char(track_visibility='onchange')
-	vm_check_backup=fields.Boolean(default=True)
+	vm_check_backup=fields.Boolean(track_visibility='onchange', default=True)
 	vm_restorepoints_ids=fields.One2many('lubon_qlan.restorepoints',"asset_id")
 	vm_latest_restore_point=fields.Datetime()
+#	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances','asset_id')
+	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances',"asset_id")
 	#vcenter fields
 	vc_dns=fields.Char(string="vcenter dns")
 	vc_port=fields.Integer(string="vcenter tcp port", default=443)
@@ -167,12 +169,17 @@ class lubon_qlan_assets(models.Model):
 		#pdb.set_trace()
 
 	@api.multi
-	def get_restorepoints(self):
-		points = get_restorepoints(self.asset_name)
+	def get_restorepoints(self,instance_id=None):
+		if instance_id:
+			target_date=instance_id.stats_id.date
+		#pdb.set_trace()
+		result = get_restorepoints(self.asset_name, target_date)
+		points=result['res']
 		newest = ""
 		for point in points:
-			if not self.env['lubon_qlan.restorepoints'].search([('uid','like',point['uid'])]):
-				self.env['lubon_qlan.restorepoints'].create({
+			rec=self.env['lubon_qlan.restorepoints'].search([('uid','like',point['uid'])])
+			if not rec:
+				rec= self.env['lubon_qlan.restorepoints'].create({
 					'uid':point['uid'],
 					'asset_id': self.id,
 					'creationtimeutc': point['creationtimeutc'],
@@ -183,6 +190,14 @@ class lubon_qlan_assets(models.Model):
 					})
 			if point['creationtimeutc'] > newest:
 				newest=point['creationtimeutc']
+			if instance_id:
+				rec.restorepoints_instances_id=instance_id
+		instance_id.result_href=result['href']	
+		instance_id.result_code=result['response'].status_code	
+		instance_id.result_response=result['response'].content
+
+#		pdb.set_trace()
+
 		if len(newest) > 0:
 			self.vm_latest_restore_point=newest.replace('T',' ')		
 
@@ -193,5 +208,4 @@ class lubon_qlan_assets(models.Model):
 		#pdb.set_trace()
 		for vm in vms:
 			vm.get_restorepoints()
-
 

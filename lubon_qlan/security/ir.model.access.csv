@@ -11,8 +11,6 @@ access_lubon_qlan_interfaces,access_lubon_qlan_interfaces,model_lubon_qlan_inter
 access_lubon_qlan_interface_type,access_lubon_qlan_interface_type,model_lubon_qlan_interface_type,,1,1,1,1
 access_lubon_qlan_restorepoints,access_lubon_qlan_restorepoints,model_lubon_qlan_restorepoints,,1,1,1,1
 
-
-
-
-
+access_lubon_qlan_restore_points_stats,access_lubon_qlan_restore_points_stats,model_lubon_qlan_restore_points_stats,,1,1,1,1
+access_lubon_qlan_restorepoints_instances,access_lubon_qlan_restorepoints_instances,model_lubon_qlan_restorepoints_instances,,1,1,1,1
 

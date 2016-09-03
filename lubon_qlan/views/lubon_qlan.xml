@@ -38,6 +38,16 @@
       <field name="view_mode">tree,form</field>
       <!--field name="domain">[["type","=",'delivery']]</field -->
     </record>
+    <record model="ir.actions.act_window" id="qlan_restore_points_stats_action">
+      <field name="name">Restore points stats</field>
+      <field name="res_model">lubon_qlan.restore_points_stats</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+
     <act_window id="act_add_interfaces_to_assets" name="Add interfaces to asset" res_model="add_interfaces_to_asset.wizard"
       view_mode="form"
       target="new"/>  
@@ -109,6 +119,20 @@
         </form>   
       </field>
     </record>
+  <record model="ir.ui.view" id="assets_search_view">
+    <field name="name">assets.search</field>
+    <field name="model">lubon_qlan.assets</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="asset_name"  string="Search Name, Serial, IP" filter_domain="['|','|',('asset_name','ilike',self),('lot','ilike',self),('ip_display','ilike',self)]" />
+        <field name="site_id" filter_domain="['&amp;',('site_id','ilike',self),('show_in_site','=',1)]"/>
+        <field name="parent_id"/>
+        <field name="asset_type"/>
+        <filter name="Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',True)]" />
+        <filter name="Excluded from Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',False)]" />
+      </search>
+    </field>
+  </record>
     <record model="ir.ui.view" id="lubon_qlan_assets_tree">
       <field name="name">lubon_qlan.assets_tree</field>
       <field name="model">lubon_qlan.assets</field>
@@ -121,9 +145,13 @@
           <field name="ip_display"/>
           <field name="site_id"/>
           <field name="tenant_id"/>
+          <field name="asset_type"/>          
+          <field name="vm_latest_restore_point"/>          
+          <field name="vm_check_backup"/>          
         </tree>
       </field>
     </record>
+
     <record model="ir.ui.view" id="lubon_qlan_assets_form">
       <field name="name">lubon_qlan.assets_form</field>
       <field name="model">lubon_qlan.assets</field>
@@ -203,6 +231,17 @@
               </tree>
             </field>
           </page>
+           <page string="Restore point instances" attrs="{'invisible': [('asset_type','!=', 'vm')]}">
+            <field name="vm_restorepoints_instances_ids">
+              <tree default_order="stats_id desc" colors="blue:result_code>200;green:number_found!=0;red:number_found==0" >
+                <field name="stats_id"/>
+                <field name="number_found"/>
+                <field name="result_code"/>
+              </tree>
+            </field>
+          </page>
+
+
           <page string="Vcenter" attrs="{'invisible': [('asset_type','!=', 'vc')]}">
             <group string="vcenter info">
               <field name="vc_dns"/>
@@ -224,18 +263,7 @@
       </form>
     </field>
   </record>
-  <record model="ir.ui.view" id="assets_search_view">
-    <field name="name">assets.search</field>
-    <field name="model">lubon_qlan.assets</field>
-    <field name="arch" type="xml">
-      <search>
-        <field name="asset_name"  string="Search Name, Serial, IP" filter_domain="['|','|',('asset_name','ilike',self),('lot','ilike',self),('ip_display','ilike',self)]" />
-        <field name="site_id" filter_domain="['&amp;',('site_id','ilike',self),('show_in_site','=',1)]"/>
-        <field name="parent_id"/>
-        <field name="asset_type"/>
-      </search>
-    </field>
-  </record>
+
   <record model="ir.ui.view" id="lubon_qlan_memberships_tree">
     <field name="name">lubon_qlan.memberships_tree</field>
     <field name="model">lubon_qlan.memberships</field>
@@ -969,6 +997,8 @@
           parent="main_lubon_qlan_menu"/>
         <menuitem id="lubon_qlan_tenants_menu" name="Tenants"
             parent="main_lubon_qlan_menu"/>
+        <menuitem id="lubon_qlan_backup_menu" name="Backup"
+            parent="main_lubon_qlan_menu"/>            
         <menuitem id="sites_menu" name="Sites" parent="lubon_qlan_sites_menu"
               action="qlan_sites_action"/>
         <menuitem id="lubon_qlan_equipment_sites_menu" name="Equipment" parent="lubon_qlan_sites_menu"
@@ -979,8 +1009,13 @@
           action="qlan_tenants_action" groups="qlan_user"/>
         <menuitem id="contracts_menu" name="Contracts" parent="lubon_qlan_tenants_menu"
             action="qlan_contracts_action" groups="qlan_manager"/>
+        <menuitem id="lubon_qlan_restore_points_stats_menu" name="Stats" parent="lubon_qlan_backup_menu"
+          action="qlan_restore_points_stats_action"/>
+
+
+
         <menuitem id="lubon_qlan_configuration_menu" name="Configuration"
-          parent="main_lubon_qlan_menu" groups="base.group_no_one"/>
+          parent="main_lubon_qlan_menu" groups="base.group_no_one" sequence="999"/>
         <menuitem id="lubon_qlan_tables_menu" name="Tables" parent="lubon_qlan_configuration_menu"/>
         <menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tables_menu"
             action="qlan_adaccounts_action"/>
@@ -999,6 +1034,11 @@
           action="qlan_memberships_action"/>
         <menuitem id="lubon_qlan_interface_type_menu" name="Interface Types" parent="lubon_qlan_tables_menu"
           action="qlan_interface_type_action"/>
+        <menuitem id="lubon_qlan_restore_points_stats_menu" name="Stats" parent="lubon_qlan_backup_menu"
+          action="qlan_restore_points_stats_action"/>
+
+
+
            </data>
          </openerp>
 

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+		<record model="ir.ui.view" id="lubon_qlan_restore_points_stats_form">
+			<field name="name">lubon_qlan.restore_points_stats_form</field>
+			<field name="model">lubon_qlan.restore_points_stats</field>
+			<field name="arch" type="xml">
+				<form string="Stats">
+					<header>
+						<button type="object" string="Generate" name="generate_restorepoints_instances"/>
+						<button type="object" string="Check all" name="check_all_restorepoints"/>
+					</header>
+					        <div class="oe_right oe_button_box" name="buttons">
+
+           <button string="OK" type="action" class="oe_stat_button" name="%(qlan_interfaces_action)d" icon="fa-thumbs-up" context="{'search_default_asset_id': active_id, 'default_asset_id': active_id, 'default_site_id' : site_id }">
+           </button>
+         </div>
+					<group>
+						<field name="date"/>
+						<field name="number_succeeded"/>
+						<field name="rate_succeeded"/>
+						<field name="number_requests_failed"/>
+					</group>
+					<notebook>
+						<page string="Expected restore points">
+							<field name="restorepoints_instances_ids">
+								<tree>
+									<field name="asset_id"/>
+									<field name="number_found"/>
+									<field name="result_code"/>
+									<button name="find_restorepoints" type="object" string="check"/>
+								</tree>
+							</field>
+						</page>
+					</notebook>
+				</form>
+			</field>
+		</record>
+	</data>
+		<data>
+		<record model="ir.ui.view" id="lubon_qlan_restore_points_stats_tree">
+			<field name="name">lubon_qlan.restore_points_stats_tree</field>
+			<field name="model">lubon_qlan.restore_points_stats</field>
+			<field name="arch" type="xml">
+				<tree string="Stats">
+						<field name="date"/>
+						<field name="number_succeeded"/>
+						<field name="number_target"/>
+						<field name="rate_succeeded"/>
+						<field name="number_requests_failed"/>
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="lubon_qlan_restorepoints_instances_form">
+			<field name="name">lubon_qlan.restorepoints_instances</field>
+			<field name="model">lubon_qlan.restorepoints_instances</field>
+			<field name="arch" type="xml">
+				<form string="Stats">
+					<group>
+						<field name="stats_id"/>
+						<field name="asset_id"/>
+						<field name="number_found"/>
+						<field name="result_code"/>
+						<field name="result_href"/>
+						<field name="result_response"/>
+					</group>
+					<notebook>
+						<page string="Restore points">
+							<field name="restorepoints_ids">
+								<tree>
+									<field name="uid"/>
+									<field name="creationtimeutc"/>
+									<field name="algorithm"/>
+									<field name="BackupServerReference"/>
+								</tree>
+							</field>
+						</page>
+					</notebook>
+				</form>
+			</field>
+		</record>
+
+
+</data>
+
+</openerp>
