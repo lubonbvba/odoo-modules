@@ -198,7 +198,7 @@ class lubon_qlan_assets(models.Model):
 
 #		pdb.set_trace()
 
-		if len(newest) > 0:
+		if len(newest) > 0 and (newest.replace('T',' ') > self.vm_latest_restore_point) :
 			self.vm_latest_restore_point=newest.replace('T',' ')		
 
 				
