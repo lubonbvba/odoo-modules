@@ -1,5 +1,5 @@
 from openerp.osv import osv
-from openerp import models, fields, api, _
+from openerp import tools, models, fields, api, _
 import csv,os,string,pdb
 from path import path
 import openerp.addons.decimal_precision as dp
@@ -117,7 +117,7 @@ class lubon_qlan_restore_points_stats(models.Model):
 class lubon_qlan_restorepoints_instances(models.Model):
 	_name='lubon_qlan.restorepoints_instances'
 	_rec_name='stats_id'
-
+	_order='asset_id'
 	_sql_constraints = [
     
         ('stats_id_asset_id_unique',
@@ -148,3 +148,70 @@ class lubon_qlan_restorepoints_instances(models.Model):
 				})
 
 
+
+class lubon_qlan_restorepoints_instances_report(models.Model):
+	_name='lubon_qlan.restorepoints_instances.report'
+	_rec_name='date'
+	_auto = False
+	_order = 'date desc'
+
+	date=fields.Date(readonly=True)
+	stats_id=fields.One2many('lubon_qlan.restore_points_stats',readonly=True)
+	asset_id=fields.One2many('lubon_qlan.assets', readonly=True)
+	number_found=fields.Integer(readonly=True)
+	asset_name=fields.Char(readonly=True)
+
+	def sevendaysearlier():
+		pdb.set_trace()
+
+	def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
+		pdb.set_trace()
+		fiscalyear_obj = self.pool.get('account.fiscalyear')
+		period_obj = self.pool.get('account.period')
+		for arg in args:
+		    if arg[0] == 'period_id' and arg[2] == 'current_period':
+		        current_period = period_obj.find(cr, uid, context=context)[0]
+		        args.append(['period_id','in',[current_period]])
+		        break
+		    elif arg[0] == 'period_id' and arg[2] == 'current_year':
+		        current_year = fiscalyear_obj.find(cr, uid)
+		        ids = fiscalyear_obj.read(cr, uid, [current_year], ['period_ids'])[0]['period_ids']
+		        args.append(['period_id','in',ids])
+		for a in [['period_id','in','current_year'], ['period_id','in','current_period']]:
+		    if a in args:
+		        args.remove(a)
+		return super(account_entries_report, self).search(cr, uid, args=args, offset=offset, limit=limit, order=order,
+		    context=context, count=count)
+
+    # def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False,lazy=True):
+    #     if context is None:
+    #         context = {}
+    #     fiscalyear_obj = self.pool.get('account.fiscalyear')
+    #     period_obj = self.pool.get('account.period')
+    #     if context.get('period', False) == 'current_period':
+    #         current_period = period_obj.find(cr, uid, context=context)[0]
+    #         domain.append(['period_id','in',[current_period]])
+    #     elif context.get('year', False) == 'current_year':
+    #         current_year = fiscalyear_obj.find(cr, uid)
+    #         ids = fiscalyear_obj.read(cr, uid, [current_year], ['period_ids'])[0]['period_ids']
+    #         domain.append(['period_id','in',ids])
+    #     else:
+    #         domain = domain
+    #     return super(account_entries_report, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context, orderby,lazy)
+	def init(self, cr):
+		tools.drop_view_if_exists(cr, 'lubon_qlan_restorepoints_instances_report')
+		cr.execute("""
+			create or replace view lubon_qlan_restorepoints_instances_report as (
+			select
+			l.id as id,
+			s.date as date,
+			l.number_found as number_found,
+			s.id as stats_id,
+			a.id as asset_id,
+			a.asset_name as asset_name
+			from
+			lubon_qlan_restorepoints_instances l
+			left join lubon_qlan_assets a on (l.asset_id = a.id)
+			left join lubon_qlan_restore_points_stats s on (l.stats_id=s.id)
+			)
+			""")

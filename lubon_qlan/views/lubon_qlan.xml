@@ -44,9 +44,12 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>
-
-
-
+    <record model="ir.actions.act_window" id="qlan_restorepoints_instances_action">
+      <field name="name">Restore points instances</field>
+      <field name="res_model">lubon_qlan.restorepoints_instances</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
 
     <act_window id="act_add_interfaces_to_assets" name="Add interfaces to asset" res_model="add_interfaces_to_asset.wizard"
       view_mode="form"
@@ -170,6 +173,8 @@
 
            <button string="Interfaces" type="action" class="oe_stat_button" name="%(qlan_interfaces_action)d" icon="fa-table" context="{'search_default_asset_id': active_id, 'default_asset_id': active_id, 'default_site_id' : site_id }">
            </button>
+            <button string="Restore" type="action" class="oe_stat_button" name="%(qlan_restorepoints_instances_action)d" icon="fa-list" context="{'search_default_asset_id': active_id }">
+            </button>
          </div>
 
 
@@ -209,7 +214,7 @@
           <page string="Parts" attrs="{'invisible': [('is_container','=', False)]}">
             <field name="child_ids" context="{'default_parent_id' : active_id, 'default_site_id' : site_id }"/>
           </page>
-          <page string="VM info" attrs="{'invisible': [('asset_type','!=', 'vm')]}">
+          <page string="VM info" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
             <group>
             <field name="vm_path_name"/>
             <field name="vm_uuid_instance"/>
@@ -221,7 +226,7 @@
           </group>
           <button type="object" name="get_restorepoints" string="Get restore points"/>
         </page>
-          <page string="Restore points" attrs="{'invisible': [('asset_type','!=', 'vm')]}">
+          <page string="Restore points" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
             <field name="vm_restorepoints_ids">
               <tree default_order="creationtimeutc desc" >
                 <field name="uid"/>
@@ -231,7 +236,7 @@
               </tree>
             </field>
           </page>
-           <page string="Restore point instances" attrs="{'invisible': [('asset_type','!=', 'vm')]}">
+           <page string="Restore point instances" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
             <field name="vm_restorepoints_instances_ids">
               <tree default_order="stats_id desc" colors="blue:result_code>200;green:number_found!=0;red:number_found==0" >
                 <field name="stats_id"/>
@@ -1036,7 +1041,8 @@
           action="qlan_interface_type_action"/>
         <menuitem id="lubon_qlan_restore_points_stats_menu" name="Stats" parent="lubon_qlan_backup_menu"
           action="qlan_restore_points_stats_action"/>
-
+        <menuitem id="lubon_qlan_restorepoints_instances_menu" name="RP instances" parent="lubon_qlan_tables_menu"
+          action="qlan_restorepoints_instances_action"/>
 
 
            </data>

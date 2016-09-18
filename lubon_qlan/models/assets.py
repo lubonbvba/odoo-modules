@@ -19,7 +19,7 @@ class lubon_qlan_assets(models.Model):
 	_description = 'zzEquipment'
 	_rec_name="asset_name"
 	_inherit = ['mail.thread','ir.needaction_mixin']
-	
+	_order = 'asset_name'
 	parent_id=fields.Many2one('lubon_qlan.assets', string="Part of")
 
 	child_ids=fields.One2many('lubon_qlan.assets','parent_id')
