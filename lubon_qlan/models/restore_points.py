@@ -156,15 +156,18 @@ class lubon_qlan_restorepoints_instances_report(models.Model):
 	_order = 'date desc'
 
 	date=fields.Date(readonly=True)
+	max_date=fields.Date(readonly=True)
+
 	stats_id=fields.One2many('lubon_qlan.restore_points_stats',readonly=True)
 	asset_id=fields.One2many('lubon_qlan.assets', readonly=True)
 	number_found=fields.Integer(readonly=True)
+	result_code=fields.Integer(readonly=True)
 	asset_name=fields.Char(readonly=True)
 
 	def sevendaysearlier():
 		pdb.set_trace()
 
-	def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
+	def zzsearch(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
 		pdb.set_trace()
 		fiscalyear_obj = self.pool.get('account.fiscalyear')
 		period_obj = self.pool.get('account.period')
@@ -201,17 +204,35 @@ class lubon_qlan_restorepoints_instances_report(models.Model):
 	def init(self, cr):
 		tools.drop_view_if_exists(cr, 'lubon_qlan_restorepoints_instances_report')
 		cr.execute("""
+
+
+
 			create or replace view lubon_qlan_restorepoints_instances_report as (
-			select
-			l.id as id,
-			s.date as date,
-			l.number_found as number_found,
-			s.id as stats_id,
-			a.id as asset_id,
-			a.asset_name as asset_name
-			from
-			lubon_qlan_restorepoints_instances l
-			left join lubon_qlan_assets a on (l.asset_id = a.id)
-			left join lubon_qlan_restore_points_stats s on (l.stats_id=s.id)
+select l.id as id, s.date as date,l.number_found as number_found, l.result_code as result_code, s.id as stats_id,a.id  as asset_id,	a.asset_name as asset_name, x.max_date as max_date from lubon_qlan_restorepoints_instances l
+left join lubon_qlan_assets a on (l.asset_id = a.id)
+left join lubon_qlan_restore_points_stats s on (l.stats_id=s.id)
+left join (select aa.id, aa.asset_name, max(ss.date) as max_date from lubon_qlan_assets aa
+left join lubon_qlan_restorepoints_instances ii on ii.asset_id=aa.id
+left join lubon_qlan_restore_points_stats ss on ii.stats_id=ss.id
+where ii.number_found > 0
+group by aa.id,aa.asset_name) x on x.id=a.id
+
 			)
 			""")
+
+
+
+
+
+
+			# select
+			# l.id as id,
+			# s.date as date,
+			# l.number_found as number_found,
+			# s.id as stats_id,
+			# a.id as asset_id,
+			# a.asset_name as asset_name
+			# from
+			# lubon_qlan_restorepoints_instances l
+			# left join lubon_qlan_assets a on (l.asset_id = a.id)
+			# left join lubon_qlan_restore_points_stats s on (l.stats_id=s.id)
