@@ -50,7 +50,12 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>
-
+   <record model="ir.actions.act_window" id="qlan_isp_action">
+      <field name="name">ISP info</field>
+      <field name="res_model">lubon_qlan.isp</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
     <act_window id="act_add_interfaces_to_assets" name="Add interfaces to asset" res_model="add_interfaces_to_asset.wizard"
       view_mode="form"
       target="new"/>  
@@ -389,6 +394,43 @@
     </field>
   </record>
 
+
+<record model="ir.ui.view" id="lubon_qlan_sip_tree">
+    <field name="name">lubon_qlan.isp_tree</field>
+    <field name="model">lubon_qlan.isp</field>
+    <field name="arch" type="xml">
+                    <tree string="ISP" editable="bottom">
+                      <field name="name"/>
+                      <field name="ip_type"/>
+                      <field name="ip_address"/>
+                      <field name="ip_login"/>
+                      <field name="ip_password"/>
+                      <field name="ip_dns"/>
+                      <field name="ip_dns_reverse"/>
+                      <field name="account"/>
+                      <field name="account_login"/>
+                      <field name="account_password"/>
+                      <field name="ip_lookup_test"/>
+                      <field name="ip_date_changed"/>
+                      <field name="ip_resolved"/>
+                      <button name="check_ip" type="object" string="Chk"/>
+                    </tree>
+    </field>
+</record>
+
+<record model="ir.ui.view" id="lubon_qlan_sip_search">
+    <field name="name">lubon_qlan.isp_search</field>
+    <field name="model">lubon_qlan.isp</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="ip_dns"/>
+        <field name="ip_type"/>
+        <filter string="To be checked" name="to_be_checked" domain="[('ip_lookup_test','=',True)]"/>
+      </search>
+    </field>
+  </record>
+
+
   <record model="ir.ui.view" id="lubon_qlan_ip_tree">
     <field name="name">lubon_qlan.ip_tree</field>
     <field name="model">lubon_qlan.ip</field>
@@ -619,6 +661,10 @@
                       <field name="account"/>
                       <field name="account_login"/>
                       <field name="account_password"/>
+                      <field name="ip_lookup_test"/>
+                      <field name="ip_date_changed"/>
+                      <field name="ip_resolved"/>
+                      <button name="check_ip" type="object" string="Chk"/>
                     </tree>
                   </field>
                 </page>
@@ -1002,12 +1048,15 @@
           parent="main_lubon_qlan_menu"/>
         <menuitem id="lubon_qlan_tenants_menu" name="Tenants"
             parent="main_lubon_qlan_menu"/>
+        <menuitem id="lubon_qlan_checks_menu" name="Checks"
+            parent="main_lubon_qlan_menu"/>             
         <menuitem id="lubon_qlan_backup_menu" name="Backup"
-            parent="main_lubon_qlan_menu"/>            
+            parent="lubon_qlan_checks_menu"/>            
         <menuitem id="sites_menu" name="Sites" parent="lubon_qlan_sites_menu"
               action="qlan_sites_action"/>
         <menuitem id="lubon_qlan_equipment_sites_menu" name="Equipment" parent="lubon_qlan_sites_menu"
-                action="qlan_equipment_action"/>     
+                action="qlan_equipment_action"/>   
+
 
 
         <menuitem id="adtenants_menu" name="AD Tenants" parent="lubon_qlan_tenants_menu"
@@ -1016,7 +1065,8 @@
             action="qlan_contracts_action" groups="qlan_manager"/>
         <menuitem id="lubon_qlan_restore_points_stats_menu" name="Stats" parent="lubon_qlan_backup_menu"
           action="qlan_restore_points_stats_action"/>
-
+        <menuitem id="lubon_qlan_isp_check_menu" name="ISP info" parent="lubon_qlan_checks_menu"
+          action="qlan_isp_action"/>
 
 
         <menuitem id="lubon_qlan_configuration_menu" name="Configuration"

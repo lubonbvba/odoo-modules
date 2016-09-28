@@ -4,6 +4,7 @@ from openerp import models, fields, api,exceptions,_
 import csv,os,string,datetime,logging
 from path import path
 import pdb, base64
+import dns.resolver
 from os.path import expanduser
 
 
@@ -274,6 +275,39 @@ class lubon_qlan_isp(models.Model):
 	account_password=fields.Char()
 	site_id=fields.Many2one('lubon_qlan.sites')
 	tenant_id=fields.Many2one('lubon_qlan.tenants')
+	ip_resolved=fields.Char(help="Resolved ip address")
+	ip_date_changed=fields.Date(help="Date ip address changed")
+	ip_lookup_test=fields.Boolean(help="Check IP address regularly?")
+
+	@api.multi
+	def check_ip(self):
+		if self.ip_dns:
+			try:
+				logger.info("Check: %s" % self.ip_dns)
+				answer=dns.resolver.query(self.ip_dns)
+				for address in answer:
+					if address != self.ip_resolved:
+						self.ip_resolved=address
+						self.ip_date_changed=fields.Datetime.now()
+			except dns.resolver.NXDOMAIN:
+				self.ip_resolved= "No such domain %s" % self.ip_dns
+			except dns.resolver.Timeout:
+				self.ip_resolved="Timed out while resolving %s" % self.ip_dns
+			except dns.exception.DNSException:
+				self.ip_resolved= "Unhandled exception"
+		else:
+			self.ip_resolved="Error lookup"
+
+
+	@api.multi
+	def check_all_ip(self,dummy=None):
+
+		logger.info("Start check all ip")
+		address_list=self.search([('ip_lookup_test',"=",True)])
+		for address in address_list:
+			address.check_ip()
+		logger.info("End check all ip")	
+
 
 
 class lubon_qlan_credentials(models.Model):
