@@ -286,8 +286,9 @@ class lubon_qlan_isp(models.Model):
 				logger.info("Check: %s" % self.ip_dns)
 				answer=dns.resolver.query(self.ip_dns)
 				for address in answer:
-					if address != self.ip_resolved:
-						self.ip_resolved=address
+					#pdb.set_trace()
+					if str(address) != self.ip_resolved:
+						self.ip_resolved=str(address)
 						self.ip_date_changed=fields.Datetime.now()
 			except dns.resolver.NXDOMAIN:
 				self.ip_resolved= "No such domain %s" % self.ip_dns
