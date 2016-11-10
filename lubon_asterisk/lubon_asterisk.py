@@ -43,6 +43,7 @@ class PhoneCommon(orm.AbstractModel):
         dial_string+="&destclid="+ast_server.server_cid
         dial_string+="&sourceclid="+ast_number + "<Dial:>"
         dial_string+="&dest="+ast_number
+        dial_string+="&account="+user.internal_number+"-"+ast_server.server_tenant
         if ast_server.server_timeout:
             dial_string+="&timeout="+ast_server.server_timeout
         

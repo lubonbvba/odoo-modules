@@ -54,7 +54,7 @@ class lubon_qlan_adaccounts(models.Model):
 	_description = "AD Account"
 	_inherit = ['mail.thread','ir.needaction_mixin']
 	_sql_constraints = [('guid_unique','UNIQUE(objectguid)','objectguid has to be unique')]
-	_rec_name = 'logonname'
+	_rec_name = 'samaccountname'
 	_mail_post_access = 'read'
 	_track = {
         'product': {
