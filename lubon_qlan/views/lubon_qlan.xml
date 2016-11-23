@@ -55,6 +55,8 @@
       <field name="res_model">lubon_qlan.isp</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
+      <field name="context">{'order_ip_date_changed': 1,'search_default_to_be_checked':1, 'search_default_variable':1}</field>
+      
     </record>
     <act_window id="act_add_interfaces_to_assets" name="Add interfaces to asset" res_model="add_interfaces_to_asset.wizard"
       view_mode="form"
@@ -424,8 +426,9 @@
     <field name="arch" type="xml">
       <search>
         <field name="ip_dns"/>
-        <field name="ip_type"/>
+        <!-- field name="ip_type"/ -->
         <filter string="To be checked" name="to_be_checked" domain="[('ip_lookup_test','=',True)]"/>
+        <filter string="Variable" name="variable" domain="[('ip_type','=','variable')]"/>
       </search>
     </field>
   </record>
