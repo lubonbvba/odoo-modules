@@ -166,6 +166,7 @@ class lubon_qlan_restorepoints_instances_report(models.Model):
 	stats_id=fields.One2many('lubon_qlan.restore_points_stats',readonly=True)
 	asset_id=fields.One2many('lubon_qlan.assets', readonly=True)
 	number_restore=fields.Integer(readonly=True)
+	number_replica=fields.Integer(readonly=True)
 	result_code=fields.Integer(readonly=True)
 	asset_name=fields.Char(readonly=True)
 
@@ -213,7 +214,7 @@ class lubon_qlan_restorepoints_instances_report(models.Model):
 
 
 			create or replace view lubon_qlan_restorepoints_instances_report as (
-select l.id as id, s.date as date,l.number_restore as number_restore, l.result_code as result_code, s.id as stats_id,a.id  as asset_id,	a.asset_name as asset_name, x.max_date as max_date from lubon_qlan_restorepoints_instances l
+select l.id as id, s.date as date,l.number_restore as number_restore, l.number_replica as number_replica, l.result_code as result_code, s.id as stats_id,a.id  as asset_id,	a.asset_name as asset_name, x.max_date as max_date from lubon_qlan_restorepoints_instances l
 left join lubon_qlan_assets a on (l.asset_id = a.id)
 left join lubon_qlan_restore_points_stats s on (l.stats_id=s.id)
 left join (select aa.id, aa.asset_name, max(ss.date) as max_date from lubon_qlan_assets aa

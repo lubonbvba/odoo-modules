@@ -53,7 +53,8 @@
                 <field name="asset_name" type="row"/>
                 <field name="date" interval="day" type="col"/>
                 <field name="number_restore" type="measure"/>
-                <field name="result_code" type="measure"/>
+                <field name="number_replica" type="measure"/>
+                <!-- field name="result_code" type="measure"/ -->
              </graph>
          </field>
     </record>
@@ -65,6 +66,7 @@
                 <field name="asset_name"/>
                 <field name="date" />
                 <field name="number_restore"/>
+                <field name="number_replica"/>
                 <field name="max_date"/>
              </tree>
          </field>
