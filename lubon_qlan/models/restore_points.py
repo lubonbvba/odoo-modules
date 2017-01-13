@@ -18,6 +18,7 @@ class lubon_qlan_restorepoints(models.Model):
 	pointtype=fields.Char()
 	hierarchyobjref=fields.Char()
 	BackupServerReference=fields.Char()
+	veeamtype=fields.Selection([('VmRestorePoint','Restore point'),('VmReplicaPoint','Replica point')], default='VmRestorePoint')
 	restorepoints_instances_id=fields.Many2one('lubon_qlan.restorepoints_instances')
 
 	_sql_constraints = [
@@ -81,8 +82,9 @@ class lubon_qlan_restore_points_stats(models.Model):
 	def check_all_restorepoints(self):
 		for instance in self.restorepoints_instances_ids:
 			instance.find_restorepoints()
+#			instance.find_restorepoints('VmReplicaPoint')
 
-		self.number_succeeded=self.env['lubon_qlan.restorepoints_instances'].search_count([('stats_id','=',self.id),('number_found',">",0)])
+		self.number_succeeded=self.env['lubon_qlan.restorepoints_instances'].search_count([('stats_id','=',self.id),('number_restore',">",0)])
 
 		self.number_requests_failed=self.env['lubon_qlan.restorepoints_instances'].search_count([('stats_id','=',self.id),('result_code',"!=",200)])
 
@@ -130,14 +132,17 @@ class lubon_qlan_restorepoints_instances(models.Model):
 	asset_id = fields.Many2one('lubon_qlan.assets', ondelete='cascade', required=True)
 	date=fields.Date()
 	restorepoints_ids=fields.One2many('lubon_qlan.restorepoints','restorepoints_instances_id')
-	number_found=fields.Integer()
+	number_restore=fields.Integer(help="Number of restore points")
+	number_replica=fields.Integer(help="Number of replica points")
 	result_code=fields.Integer()
 	result_response=fields.Text()
 	result_href=fields.Char()
 	@api.multi
 	def find_restorepoints(self):
-		self.asset_id.get_restorepoints(self)
-		self.number_found=len(self.restorepoints_ids)
+		self.asset_id.get_restorepoints(self,'VmRestorePoint')
+		self.number_restore=len(self.restorepoints_ids.search([('veeamtype','=','VmRestorePoint'),('restorepoints_instances_id','=',self.id)]))
+		self.asset_id.get_restorepoints(self,'VmReplicaPoint')
+		self.number_replica=len(self.restorepoints_ids.search([('veeamtype','=','VmReplicaPoint'),('restorepoints_instances_id','=',self.id)]))
 
 	@api.multi		
 	def generate_restorepoints_instance(self, stats_id, asset_id):
@@ -160,7 +165,7 @@ class lubon_qlan_restorepoints_instances_report(models.Model):
 
 	stats_id=fields.One2many('lubon_qlan.restore_points_stats',readonly=True)
 	asset_id=fields.One2many('lubon_qlan.assets', readonly=True)
-	number_found=fields.Integer(readonly=True)
+	number_restore=fields.Integer(readonly=True)
 	result_code=fields.Integer(readonly=True)
 	asset_name=fields.Char(readonly=True)
 
@@ -208,13 +213,13 @@ class lubon_qlan_restorepoints_instances_report(models.Model):
 
 
 			create or replace view lubon_qlan_restorepoints_instances_report as (
-select l.id as id, s.date as date,l.number_found as number_found, l.result_code as result_code, s.id as stats_id,a.id  as asset_id,	a.asset_name as asset_name, x.max_date as max_date from lubon_qlan_restorepoints_instances l
+select l.id as id, s.date as date,l.number_restore as number_restore, l.result_code as result_code, s.id as stats_id,a.id  as asset_id,	a.asset_name as asset_name, x.max_date as max_date from lubon_qlan_restorepoints_instances l
 left join lubon_qlan_assets a on (l.asset_id = a.id)
 left join lubon_qlan_restore_points_stats s on (l.stats_id=s.id)
 left join (select aa.id, aa.asset_name, max(ss.date) as max_date from lubon_qlan_assets aa
 left join lubon_qlan_restorepoints_instances ii on ii.asset_id=aa.id
 left join lubon_qlan_restore_points_stats ss on ii.stats_id=ss.id
-where ii.number_found > 0
+where ii.number_restore > 0
 group by aa.id,aa.asset_name) x on x.id=a.id
 
 			)
@@ -228,7 +233,7 @@ group by aa.id,aa.asset_name) x on x.id=a.id
 			# select
 			# l.id as id,
 			# s.date as date,
-			# l.number_found as number_found,
+			# l.number_restore as number_restore,
 			# s.id as stats_id,
 			# a.id as asset_id,
 			# a.asset_name as asset_name

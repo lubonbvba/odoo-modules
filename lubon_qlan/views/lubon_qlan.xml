@@ -228,6 +228,7 @@
             <field name="vm_uuid_bios"/>
             <field name="vm_cpu"/>
             <field name="vm_memory"/>
+            <field name="vm_power_state"/>
             <field name="vm_latest_restore_point"/>
             <field name="vm_check_backup"/>
           </group>
@@ -245,9 +246,9 @@
           </page>
            <page string="Restore point instances" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
             <field name="vm_restorepoints_instances_ids">
-              <tree default_order="stats_id desc" colors="blue:result_code>200;green:number_found!=0;red:number_found==0" >
+              <tree default_order="stats_id desc" colors="blue:result_code>200;green:number_restore!=0;red:number_restore==0" >
                 <field name="stats_id"/>
-                <field name="number_found"/>
+                <field name="number_restore"/>
                 <field name="result_code"/>
               </tree>
             </field>
@@ -258,6 +259,7 @@
             <group string="vcenter info">
               <field name="vc_dns"/>
               <field name="vc_port"/>
+              <field name="vc_check"/>
               <field name="vc_password_id" domain="[('asset_id','=',active_id)]"/>
               <button name="vc_test_login" type="object" string="Test login"/>
               <button name="vc_get_vms" type="object" string="Get virtual machines"/>

@@ -11,8 +11,10 @@ from pyVmomi import vim
 
 from openerp import models, fields, api
 from openerp.exceptions import Warning
-import pdb
+import pdb, logging
 from veeam import get_restorepoints
+
+logger = logging.getLogger(__name__)
 
 class lubon_qlan_assets(models.Model):
 	_name="lubon_qlan.assets"
@@ -46,16 +48,18 @@ class lubon_qlan_assets(models.Model):
 	vm_uuid_instance=fields.Char(track_visibility='onchange')
 	vm_uuid_bios=fields.Char(track_visibility='onchange')
 	vm_path_name=fields.Char(track_visibility='onchange')
+	vm_power_state=fields.Char(track_visibility='onchange')
 	vm_check_backup=fields.Boolean(track_visibility='onchange', default=True)
 	vm_restorepoints_ids=fields.One2many('lubon_qlan.restorepoints',"asset_id")
 	vm_latest_restore_point=fields.Datetime()
 #	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances','asset_id')
 	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances',"asset_id")
+
 	#vcenter fields
 	vc_dns=fields.Char(string="vcenter dns")
 	vc_port=fields.Integer(string="vcenter tcp port", default=443)
 	vc_password_id=fields.Many2one('lubon_credentials.credentials')
-
+	vc_check=fields.Boolean(string="Include in schedule?" )
 
 
 	@api.multi
@@ -117,6 +121,15 @@ class lubon_qlan_assets(models.Model):
 	def vc_test_login(self):
 		session=self._vc_login()
 
+	@api.multi
+	def vc_inventory(self,dummy=None):
+		for vc in self.search([('vc_check','=',True)]):
+			logger.info("Run vc_inventory: %s" % vc.asset_name)
+			vc.vc_get_vms()
+
+
+
+
 	@api.one
 	def vc_get_vms(self):
 		#context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
@@ -137,7 +150,8 @@ class lubon_qlan_assets(models.Model):
 		
 		children = containerView.view
 		for child in children:
-			self.vc_check_vm(child)
+			if '_replica_' not in child.summary.config.name:
+				self.vc_check_vm(child)
 
 	@api.one
 	def vc_check_vm(self,child):
@@ -166,28 +180,34 @@ class lubon_qlan_assets(models.Model):
 		asset.vm_memory=virtual_machine.summary.config.memorySizeMB
 		asset.vm_cpu=virtual_machine.summary.config.numCpu
 		asset.vm_path_name=virtual_machine.summary.config.vmPathName
+		asset.vm_power_state=virtual_machine.runtime.powerState
 		#pdb.set_trace()
 
 	@api.multi
-	def get_restorepoints(self,instance_id=None):
+	def get_restorepoints(self,instance_id=None,querytype=None):
 		if instance_id:
 			target_date=instance_id.stats_id.date
-		#pdb.set_trace()
-		result = get_restorepoints(self.asset_name, target_date)
+
+		
+		result = get_restorepoints(self.asset_name, target_date, querytype)
+#		pdb.set_trace()
 		points=result['res']
 		newest = ""
 		for point in points:
 			rec=self.env['lubon_qlan.restorepoints'].search([('uid','like',point['uid'])])
 			if not rec:
-				rec= self.env['lubon_qlan.restorepoints'].create({
+				newrec={
 					'uid':point['uid'],
 					'asset_id': self.id,
 					'creationtimeutc': point['creationtimeutc'],
 					'BackupServerReference': point['BackupServerReference'],
 					'algorithm':point['algorithm'],
 					'pointtype':point['pointtype'],
-					'hierarchyobjref':point['hierarchyobjref'],
-					})
+					'veeamtype':querytype,
+#					'hierarchyobjref':point['hierarchyobjref'],
+					}
+				#pdb.set_trace()
+				rec=self.env['lubon_qlan.restorepoints'].create(newrec)
 			if point['creationtimeutc'] > newest:
 				newest=point['creationtimeutc']
 			if instance_id:
@@ -196,7 +216,6 @@ class lubon_qlan_assets(models.Model):
 		instance_id.result_code=result['response'].status_code	
 		instance_id.result_response=result['response'].content
 
-#		pdb.set_trace()
 
 		if len(newest) > 0 and (newest.replace('T',' ') > self.vm_latest_restore_point) :
 			self.vm_latest_restore_point=newest.replace('T',' ')		

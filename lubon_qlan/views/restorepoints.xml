@@ -32,7 +32,8 @@
 							<field name="restorepoints_instances_ids">
 								<tree>
 									<field name="asset_id"/>
-									<field name="number_found"/>
+									<field name="number_restore"/>
+									<field name="number_replica"/>
 									<field name="result_code"/>
 									<button name="find_restorepoints" type="object" string="check"/>
 								</tree>
@@ -65,7 +66,7 @@
 					<group>
 						<field name="stats_id"/>
 						<field name="asset_id"/>
-						<field name="number_found"/>
+						<field name="number_restore"/>
 						<field name="result_code"/>
 						<field name="result_href"/>
 						<field name="result_response"/>
@@ -74,8 +75,10 @@
 						<page string="Restore points">
 							<field name="restorepoints_ids">
 								<tree>
+									<field name="veeamtype"/>
 									<field name="uid"/>
 									<field name="creationtimeutc"/>
+									<field name="pointtype"/>
 									<field name="algorithm"/>
 									<field name="BackupServerReference"/>
 								</tree>
@@ -92,7 +95,8 @@
 				<tree string="Stats">
 					<field name="stats_id"/>
 					<field name="asset_id"/>
-					<field name="number_found"/>
+					<field name="number_restore"/>
+					<field name="number_replica"/>
 					<field name="result_code"/>
 				</tree>
 			</field>
@@ -104,15 +108,16 @@
 				<search string="Stats">
 					<field name="stats_id"/>
 					<field name="asset_id"/>
-					<field name="number_found"/>
+					<field name="number_restore"/>
+					<field name="number_replica"/>
 					<field name="result_code"/>
-					<filter name="ok" string="OK" domain="[('number_found', '!=', 0)]"/>
-					<filter name="bad" string="Bad" domain="[('number_found', '=', 0)]"/>
+					<filter name="ok" string="OK" domain="[('number_restore', '!=', 0)]"/>
+					<filter name="bad" string="Bad" domain="[('number_restore', '=', 0)]"/>
 					<filter name="reqfailed" string="Request failed" domain="[('result_code', '!=', 200)]"/>
 
 					<group string="Group By">
-						<filter name="by_number_found" string="Number found"
-							context="{'group_by': 'number_found'}"/>
+						<filter name="by_number_restore" string="Number found"
+							context="{'group_by': 'number_restore'}"/>
 							<filter name="by_result_code" string="Result code"
 								context="{'group_by': 'result_code'}"/>
 							</group>

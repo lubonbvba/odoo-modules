@@ -52,7 +52,7 @@
              <graph string="Entries Analysis" type="pivot">
                 <field name="asset_name" type="row"/>
                 <field name="date" interval="day" type="col"/>
-                <field name="number_found" type="measure"/>
+                <field name="number_restore" type="measure"/>
                 <field name="result_code" type="measure"/>
              </graph>
          </field>
@@ -64,7 +64,7 @@
              <tree string="Entries Analysis">
                 <field name="asset_name"/>
                 <field name="date" />
-                <field name="number_found"/>
+                <field name="number_restore"/>
                 <field name="max_date"/>
              </tree>
          </field>
@@ -78,7 +78,7 @@
                 <field name="asset_name"/>
                 <field name="date" />
                 <filter string="This Month" name="thismonth" domain="[('date','&gt;=',time.strftime('%%Y-%%m-01'))]" help="This month"/>
-                <filter string="Number = 0" name="numberfound0" domain="[('number_found','=',0)]" help="Not found"/>
+                <filter string="Number = 0" name="numberfound0" domain="[('number_restore','=',0)]" help="Not found"/>
                 <filter string="Last 7 days" name="last7" domain="[('date','&gt;=',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d')))]" help="Last 7 days"/>
                 <filter string="Failed yesterday" name="failedyesterday" domain="['|',('max_date','=',False) , ('max_date','&lt;',((context_today()+datetime.timedelta(days=-1)).strftime('%Y-%m-%d'))) ,('date','&gt;=',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d'))) ]" help="VM's failed yesterday, last success date less than yesterday or null"/>
                 <filter string="Failed 7 days" name="failed7" domain="['|',('max_date','=',False) , ('max_date','&lt;=',((context_today()+datetime.timedelta(days=-6)).strftime('%Y-%m-%d'))) ,('date','&gt;=',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d'))) ]" help="VM's failed 7 days, last success date less than yesterday or null"/>
