@@ -54,6 +54,8 @@ class lubon_qlan_assets(models.Model):
 	vm_latest_restore_point=fields.Datetime()
 #	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances','asset_id')
 	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances',"asset_id")
+	vm_snapshots_ids=fields.One2many("lubon_qlan.snapshots","asset_id")
+	vm_snapshots_count=fields.Integer()
 
 	#vcenter fields
 	vc_dns=fields.Char(string="vcenter dns")
@@ -181,7 +183,19 @@ class lubon_qlan_assets(models.Model):
 		asset.vm_cpu=virtual_machine.summary.config.numCpu
 		asset.vm_path_name=virtual_machine.summary.config.vmPathName
 		asset.vm_power_state=virtual_machine.runtime.powerState
-		#pdb.set_trace()
+		for snapshot in asset.vm_snapshots_ids:
+			snapshot.unlink()
+		asset.vm_snapshots_count=0	
+		if virtual_machine.snapshot:
+			for snapshot in virtual_machine.snapshot.rootSnapshotList:
+				self.env["lubon_qlan.snapshots"].create({
+					'asset_id': asset.id,
+					'name': snapshot.name,
+					'createTime': snapshot.createTime,
+					})
+				logger.info("Name: %s " %  snapshot.name)
+				asset.vm_snapshots_count+=1
+			#pdb.set_trace()
 
 	@api.multi
 	def get_restorepoints(self,instance_id=None,querytype=None):

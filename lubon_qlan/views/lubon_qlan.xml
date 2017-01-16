@@ -138,6 +138,7 @@
         <field name="site_id" filter_domain="['&amp;',('site_id','ilike',self),('show_in_site','=',1)]"/>
         <field name="parent_id"/>
         <field name="asset_type"/>
+        <filter name="VM with snapshot" domain="[('asset_type','=','vm'),('vm_snapshots_count','!=',0)]" />
         <filter name="Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',True)]" />
         <filter name="Excluded from Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',False)]" />
       </search>
@@ -229,10 +230,18 @@
             <field name="vm_cpu"/>
             <field name="vm_memory"/>
             <field name="vm_power_state"/>
+            <field name="vm_snapshots_count" readonly="True"/>
             <field name="vm_latest_restore_point"/>
             <field name="vm_check_backup"/>
           </group>
-          <button type="object" name="get_restorepoints" string="Get restore points"/>
+        </page>
+          <page string="Snapshots" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
+            <field name="vm_snapshots_ids">
+              <tree>
+              <field name="name"/>
+              <field name="createTime"/>
+            </tree>
+            </field>
         </page>
           <page string="Restore points" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
             <field name="vm_restorepoints_ids">
