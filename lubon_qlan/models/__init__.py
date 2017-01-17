@@ -3,4 +3,4 @@ import assets
 import invoicing
 import lubon_qlan
 import restore_points
-import snapshots
+import vmobjects

@@ -15,6 +15,7 @@ import pdb, logging
 from veeam import get_restorepoints
 
 logger = logging.getLogger(__name__)
+containerView = ""
 
 class lubon_qlan_assets(models.Model):
 	_name="lubon_qlan.assets"
@@ -55,6 +56,7 @@ class lubon_qlan_assets(models.Model):
 #	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances','asset_id')
 	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances',"asset_id")
 	vm_snapshots_ids=fields.One2many("lubon_qlan.snapshots","asset_id")
+
 	vm_snapshots_count=fields.Integer()
 
 	#vcenter fields
@@ -62,7 +64,8 @@ class lubon_qlan_assets(models.Model):
 	vc_port=fields.Integer(string="vcenter tcp port", default=443)
 	vc_password_id=fields.Many2one('lubon_credentials.credentials')
 	vc_check=fields.Boolean(string="Include in schedule?" )
-
+	vc_portgroups_ids=fields.One2many("lubon_qlan.portgroups","asset_id")
+	vc_datastores_ids=fields.One2many("lubon_qlan.datastores","asset_id")
 
 	@api.multi
 	def new_asset(self,site_id,quant_id):
@@ -127,15 +130,12 @@ class lubon_qlan_assets(models.Model):
 	def vc_inventory(self,dummy=None):
 		for vc in self.search([('vc_check','=',True)]):
 			logger.info("Run vc_inventory: %s" % vc.asset_name)
-			vc.vc_get_vms()
-
-
-
-
+			vc.vc_get_all()
 	@api.one
-	def vc_get_vms(self):
+	def _vc_get_containerview(self,viewType):
 		#context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
 #		context.verify_mode = ssl.CERT_NONE
+		global containerView
 		service_instance = connect.SmartConnect(host=self.vc_dns,
 				user=self.vc_password_id.user,
 				pwd=self.vc_password_id.decrypt()[0],
@@ -145,15 +145,60 @@ class lubon_qlan_assets(models.Model):
 		content = service_instance.RetrieveContent()
 
 		container = content.rootFolder  # starting point to look into
-		viewType = [vim.VirtualMachine]  # object types to look for
+#		viewType = [vim.VirtualMachine]  # object types to look for
+		viewType = viewType  # object types to look for
 		recursive = True  # whether we should look into it recursively
 		containerView = content.viewManager.CreateContainerView(
 			container, viewType, recursive)
+
+	@api.one
+	def vc_get_all(self):
 		
-		children = containerView.view
-		for child in children:
+		self.vc_get_networks()
+		self.vc_get_datastores()
+		self.vc_get_vms()
+
+
+
+	@api.one
+	def vc_get_vms(self):
+		self._vc_get_containerview([vim.VirtualMachine])
+		for child in containerView.view:
 			if '_replica_' not in child.summary.config.name:
 				self.vc_check_vm(child)
+
+	@api.one
+	def vc_get_networks(self):
+		self._vc_get_containerview([vim.DistributedVirtualPortgroup])
+		for child in containerView.view:
+			#logger.info("Portgroup: %s " %  child.config.name)
+			logger.info("Portgroup: %s " %  child.key)
+			portgroup=self.vc_portgroups_ids.search([('uuid','=',child.key),('asset_id','=',self.id)])
+			if not portgroup:
+				self.vc_portgroups_ids.create(
+					{'uuid': child.key,
+					'name':child.config.name,
+					'asset_id': self.id,
+					})
+			#pdb.set_trace()
+	@api.one
+	def vc_get_datastores(self):
+		self._vc_get_containerview([vim.Datastore])
+		for child in containerView.view:
+			#logger.info("Portgroup: %s " %  child.config.name)
+			logger.info("Datastore: %s " %  child.info.name)
+			datastore=self.vc_datastores_ids.search([('url','=',child.info.url),('asset_id','=',self.id)])
+			if not datastore:
+				datastore=self.vc_datastores_ids.create(
+					{'url': child.info.url,
+					'name':child.info.name,
+					'asset_id': self.id,
+					})
+			datastore.free=child.info.freeSpace/(1024*1024*1024)
+			datastore.capacity=child.summary.capacity/(1024*1024*1024)
+			datastore.rate_free=int(10000*datastore.free/datastore.capacity)/100
+			#pdb.set_trace()
+
 
 	@api.one
 	def vc_check_vm(self,child):
@@ -195,6 +240,7 @@ class lubon_qlan_assets(models.Model):
 					})
 				logger.info("Name: %s " %  snapshot.name)
 				asset.vm_snapshots_count+=1
+		#for network in virtual_machine.network:
 			#pdb.set_trace()
 
 	@api.multi
