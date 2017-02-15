@@ -56,8 +56,10 @@ class lubon_qlan_assets(models.Model):
 #	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances','asset_id')
 	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances',"asset_id")
 	vm_snapshots_ids=fields.One2many("lubon_qlan.snapshots","asset_id")
+	vm_drives_ids=fields.One2many("lubon_qlan.drives","asset_id")
 
 	vm_snapshots_count=fields.Integer()
+	vm_date_last=fields.Datetime(help="Date last inventoried")
 
 	#vcenter fields
 	vc_dns=fields.Char(string="vcenter dns")
@@ -228,6 +230,7 @@ class lubon_qlan_assets(models.Model):
 		asset.vm_cpu=virtual_machine.summary.config.numCpu
 		asset.vm_path_name=virtual_machine.summary.config.vmPathName
 		asset.vm_power_state=virtual_machine.runtime.powerState
+		asset.vm_date_last=fields.Datetime.now()
 		for snapshot in asset.vm_snapshots_ids:
 			snapshot.unlink()
 		asset.vm_snapshots_count=0	
@@ -240,9 +243,14 @@ class lubon_qlan_assets(models.Model):
 					})
 				logger.info("Name: %s " %  snapshot.name)
 				asset.vm_snapshots_count+=1
+		#if virtual_machine.tag:		
+		#	pdb.set_trace()
 		#for network in virtual_machine.network:
 			#pdb.set_trace()
-
+	@api.multi
+	def get_vm_drives(self):
+		self.env['lubon_qlan.drives'].read_drives()
+				
 	@api.multi
 	def get_restorepoints(self,instance_id=None,querytype=None):
 		if instance_id:

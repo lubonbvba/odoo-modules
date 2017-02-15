@@ -183,6 +183,8 @@
            </button>
             <button string="Restore" type="action" class="oe_stat_button" name="%(qlan_restorepoints_instances_action)d" icon="fa-list" context="{'search_default_asset_id': active_id }">
             </button>
+            <button string="Parts" type="action" class="oe_stat_button" name="%(qlan_equipment_action)d" icon="fa-cogs" context="{'search_default_parent_id': active_id }">
+            </button>            
          </div>
 
 
@@ -233,6 +235,7 @@
             <field name="vm_snapshots_count" readonly="True"/>
             <field name="vm_latest_restore_point"/>
             <field name="vm_check_backup"/>
+            <field name="vm_date_last"/>
           </group>
         </page>
           <page string="Snapshots" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
@@ -263,7 +266,16 @@
             </field>
           </page>
 
-
+          <page string="Drives" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
+            <button type="object" name="get_vm_drives" string="Get drives"/>
+            <field name="vm_drives_ids">
+              <tree>
+              <field name="name"/>
+              <field name="number_snapshots"/>
+              <field name="oldest_snapshot"/>
+            </tree>
+            </field>
+        </page>
           <page string="Vcenter" attrs="{'invisible': [('asset_type','!=', 'vc')]}">
             <group string="vcenter info">
               <field name="vc_dns"/>

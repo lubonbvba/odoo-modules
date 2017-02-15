@@ -47,3 +47,5 @@ class lubon_qlan_datastores(models.Model):
 	capacity=fields.Float()
 	rate_free=fields.Float()
 
+
+
