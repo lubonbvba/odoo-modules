@@ -141,6 +141,10 @@
         <filter name="VM with snapshot" domain="[('asset_type','=','vm'),('vm_snapshots_count','!=',0)]" />
         <filter name="Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',True)]" />
         <filter name="Excluded from Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',False)]" />
+         <filter string="Missing VM" name="last7" domain="[('asset_type','=','vm'),
+          '|', ('vm_date_last','=',False),
+          ('vm_date_last','&lt;',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d')))]" 
+          help="VM Not seen for 7 days"/>
       </search>
     </field>
   </record>

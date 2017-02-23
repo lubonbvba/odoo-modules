@@ -219,11 +219,9 @@ class lubon_qlan_vlan(models.Model):
 
 	@api.multi
  	def _migrate(self):
- 		#pdb.set_trace()
- 		records=self.search([('vlan_tag_str',"=",False)])._comp_vlan_tag_str()
- 		#for r in records:
- 		#	r._comp_vlan_tag_str()
- 		#pdb.set_trace()
+ 		if 'vlan_tag_str' in self.fields_get():
+ 			records=self.search([('vlan_tag_str',"=",False)])._comp_vlan_tag_str()
+
 
 	@api.one
 	@api.onchange('ipv4_net','ipv4_mask')
@@ -559,11 +557,8 @@ class lubon_qlan_interfaces(models.Model):
 
 	@api.multi
  	def _migrate(self):
-# 		pdb.set_trace()
- 		records=self.search([("name_srch","=",False)]).compute_display_name()
- 		#for r in records:
- 		#	r._comp_vlan_tag_str()
- 		#pdb.set_trace()
+ 		if 'name_srch' in self.fields_get():
+	 		records=self.search([("name_srch","=",False)]).compute_display_name()
 
 
 	@api.one
@@ -589,7 +584,7 @@ class lubon_qlan_interfaces(models.Model):
 			if vlan_string:
 				vlan_string+= ","
 			vlan_string+= str(m.vlan_id.vlan_tag) 
-			if m.member_type == 'u':
+			if m.member_type and m.member_type == 'u':
 				vlan_string+='(u)' 
 		#pdb.set_trace()	
 		self.vlan_string=vlan_string
@@ -598,7 +593,6 @@ class lubon_qlan_interfaces(models.Model):
 
 	@api.multi
 	def name_get(self):
-		#pdb.set_trace()
 		res=[]
 		for line in self:
 			text=''
