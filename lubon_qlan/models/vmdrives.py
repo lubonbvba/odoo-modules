@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 class lubon_qlan_drives(models.Model):
 	_name = 'lubon_qlan.drives'
 	_description = 'Disk drives'
+	_order = 'name'
 	asset_id=fields.Many2one('lubon_qlan.assets')
 	name=fields.Char(string="Drive name")
 	number_snapshots=fields.Integer(string="Number of snapshots")

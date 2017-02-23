@@ -290,9 +290,11 @@
           <page string="Portgroups" attrs="{'invisible': [('asset_type','!=', 'vc')]}">
             <button name="vc_get_networks" type="object" string="Get networks"/>
             <field name="vc_portgroups_ids">
-              <tree>
+              <tree editable="top">
               <field name="name"/>
               <field name="uuid"/>
+              <field name="site_id" zzinvisible="True"/>
+              <field name="vlan_id" domain="[('site_id','=',site_id)]" />
             </tree>
             </field>
         </page>
@@ -339,7 +341,7 @@
     <field name="name">lubon_qlan.memberships_form</field>
     <field name="model">lubon_qlan.memberships</field>
     <field name="arch" type="xml">
-      <form string="Vlan Membership">
+      <form string="Vlan Membership" >
         <group>
           <field name="asset_id"/>
           <field name="interface_id"/>
@@ -504,6 +506,7 @@
         <field name="site_id"/>
         <field name="name"/>
         <field name="vlan_tag"/>
+        <field name="vlan_tag_str" invisible="True"/>
         <field name="ipv4"/>
         <field name="ipv4_net"/>
         <field name="ipv4_mask"/>
@@ -523,6 +526,7 @@
         <group string="General info">
           <field name="name"/>
           <field name="vlan_tag"/>
+          <field name="vlan_tag_str" invisible="True"/>
         </group>
         <group>
           <group string="IPv4">
@@ -556,6 +560,12 @@
     <field name="arch" type="xml">
       <search>
         <field name="site_id"/>
+        <field name="vlan_id"/>
+          <group string="Group By">
+            <filter name="by_vlan" string="Vlan"
+                context="{'group_by': 'vlan_id'}"/>
+          </group>
+
       </search>
     </field>
   </record>

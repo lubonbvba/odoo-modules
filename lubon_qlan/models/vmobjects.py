@@ -28,6 +28,13 @@ class lubon_qlan_portgroups(models.Model):
 	asset_id=fields.Many2one('lubon_qlan.assets')
 	name=fields.Char(string="Portgroup description")
 	uuid=fields.Char(string="UUID")
+	vlan_id=fields.Many2one('lubon_qlan.vlan')
+	@api.one
+	def _compute_site(self):
+		self.site_id=self.asset_id.site_id.id
+
+
+	site_id=fields.Many2one('lubon_qlan.sites', compute='_compute_site')
 
 class lubon_qlan_datastores(models.Model):
 	_name = 'lubon_qlan.datastores'

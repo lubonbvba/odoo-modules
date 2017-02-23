@@ -8,7 +8,7 @@ import pdb,logging
 from datetime import datetime,timedelta
 
 logger = logging.getLogger(__name__)
-api_url = 'http://q02mon002.q.lan:9399/api'
+api_url = 'http://q02mon003.q.lan:9399/api'
 username = "q\\admlbonjean"
 
 session = False
@@ -134,7 +134,7 @@ def get_restorepoints(vmname,date=None,querytype=None):
 #                else:
 #                    print t
             else:
-                print "Len >0"
+                print "Len >0", len(t) 
                 for u in t:
                     if 'Type' in u.attrib.keys() and u.attrib['Type']=='BackupServerReference':
                         restorepoint['BackupServerReference']=u.attrib['Name']
@@ -144,6 +144,6 @@ def get_restorepoints(vmname,date=None,querytype=None):
 
 
 
-#points = get_restorepoints("Q01LIC001","2016-12-16")
+#points = get_restorepoints("C0008ALF001","2017-02-22",'VmRestorePoint')
 #print len (points)
 #pdb.set_trace()

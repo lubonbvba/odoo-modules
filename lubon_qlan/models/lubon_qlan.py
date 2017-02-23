@@ -6,6 +6,7 @@ from path import path
 import pdb, base64
 import dns.resolver
 from os.path import expanduser
+import openerp
 
 
 logger = logging.getLogger(__name__)
@@ -200,6 +201,7 @@ class lubon_qlan_vlan(models.Model):
 	name=fields.Char(required=True)
 	sequence=fields.Integer()
 	vlan_tag=fields.Integer(required=True)
+	vlan_tag_str=fields.Char(help="Vlan tag string converted for search reasons")
 	ipv4=fields.Char(string="IPv4 Net name")
 	ipv4_net=fields.Char(string="IPv4 Net")
 	ipv4_mask=fields.Selection([("32","/32"),("30","/30"),("29","/29"),("28","/28"),("27","/27"),("26","/26"),("25","/25"),("24","/24"),("16","/16"),("12","/12"),("8","/8")])
@@ -212,11 +214,32 @@ class lubon_qlan_vlan(models.Model):
 	tenant_id=fields.Many2one('lubon_qlan.tenants')
 	ip_ids=fields.One2many('lubon_qlan.ip','site_id')
 
+	def init(self,cr):
+		self._migrate(cr, openerp.SUPERUSER_ID,[],{})
+
+	@api.multi
+ 	def _migrate(self):
+ 		#pdb.set_trace()
+ 		records=self.search([('vlan_tag_str',"=",False)])._comp_vlan_tag_str()
+ 		#for r in records:
+ 		#	r._comp_vlan_tag_str()
+ 		#pdb.set_trace()
+
 	@api.one
 	@api.onchange('ipv4_net','ipv4_mask')
 	def calculate_ipv4(self):
 		if self.ipv4_net and self.ipv4_mask:
 			self.ipv4=self.ipv4_net + '/' + self.ipv4_mask
+	
+	@api.one
+	@api.onchange('vlan_tag')
+	def _comp_vlan_tag_str(self):
+
+		if self.vlan_tag:
+			self.vlan_tag_str=str(self.vlan_tag)
+		else:
+			self.vlan_tag_str=False
+		#pdb.set_trace()	
 	@api.multi
 	def name_get(self):
 		res=[]
@@ -227,7 +250,17 @@ class lubon_qlan_vlan(models.Model):
 			if line.vlan_tag:
 				text+='(' + str(line.vlan_tag) + ')'
 			res.append((line.id,text ))
-		return res 	
+		return res
+
+	@api.model
+	def name_search(self, name, args=None, operator='ilike', limit=100):
+		args = args or []
+		recs = self.browse()
+		logger.info("Name search: %s", name)
+		recs = self.search([('vlan_tag_str', 'ilike', name)] + args, limit=limit)
+		if not recs:
+		    recs = self.search([('name', operator, name)] + args, limit=limit)
+		return recs.name_get()
 
 class lubon_qlan_ip(models.Model):
 	_name='lubon_qlan.ip'
@@ -513,19 +546,34 @@ class lubon_qlan_interfaces(models.Model):
 	name=fields.Char(required=True, help="eth=Ethernet, gi=Gigabit, Fi=Fiber, pwr=power")
 #	display_name=fields.Char()
 	sequence=fields.Integer()
-	asset_id=fields.Many2one('lubon_qlan.assets')
+	asset_id=fields.Many2one('lubon_qlan.assets', required=True)
 	connected_to=fields.Many2one('lubon_qlan.interfaces',domain="[('site_id','=',parent.site_id)]")
 	site_id=fields.Many2one('lubon_qlan.sites',required=True) 
 	memberships_ids=fields.One2many('lubon_qlan.memberships','interface_id')
 	mac=fields.Char()
 	interface_type_id=fields.Many2one("lubon_qlan.interface_type", string="Type")
-	
+	name_srch=fields.Char(help="Full name for search")
+
+	def init(self,cr):
+		self._migrate(cr, openerp.SUPERUSER_ID,[],{})
+
+	@api.multi
+ 	def _migrate(self):
+# 		pdb.set_trace()
+ 		records=self.search([("name_srch","=",False)]).compute_display_name()
+ 		#for r in records:
+ 		#	r._comp_vlan_tag_str()
+ 		#pdb.set_trace()
+
+
 	@api.one
 	@api.onchange('name')
 	def compute_display_name(self):
 		self.display_name=self.asset_id.asset_name 
-		if self.name:
+		if self.name and self.display_name:
 			self.display_name += "/" + self.name 
+		self.name_srch=self.display_name
+
 	@api.one
 	@api.onchange('asset_id')
 	def compute_site_id(self):
@@ -560,7 +608,18 @@ class lubon_qlan_interfaces(models.Model):
 				text+=line.name
 			res.append((line.id,text ))
 		return res 		
-	
+
+	@api.model
+	def name_search(self, name, args=None, operator='ilike', limit=100):
+		args = args or []
+		recs = self.browse()
+		logger.info("Name search: %s", name)
+
+		recs = self.search([('name_srch', 'ilike', name)] + args, limit=limit)
+		if not recs:
+		    recs = self.search([('name', operator, name)] + args, limit=limit)
+		return recs.name_get()
+
 	@api.one
 	@api.onchange('connected_to')
 	def set_connected_to(self):
