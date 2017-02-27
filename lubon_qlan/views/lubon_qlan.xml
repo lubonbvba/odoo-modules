@@ -50,6 +50,12 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>
+    <record model="ir.actions.act_window" id="qlan_events_action">
+      <field name="name">Events</field>
+      <field name="res_model">lubon_qlan.events</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
    <record model="ir.actions.act_window" id="qlan_isp_action">
       <field name="name">ISP info</field>
       <field name="res_model">lubon_qlan.isp</field>
@@ -311,6 +317,30 @@
               <field name="free"/>
               <field name="capacity"/>
               <field name="rate_free"/>
+            </tree>
+            </field>
+        </page>
+        <page string="Asset Events">
+            <field name="assigned_events_ids">
+              <tree>
+                <field name="createtime"/>
+                <field name="event_type"/>
+                <field name="event_source_type"/>
+                <field name="event_full"/>
+            </tree>
+            </field>
+        </page> 
+        <page string="Events" attrs="{'invisible': [('asset_type','!=', 'vc')]}">
+            <button name="vc_get_events" type="object" string="Get events"/>
+            <field name="vc_events_ids">
+              <tree>
+                <field name="createtime"/>
+                <field name="event_type"/>
+                <field name="event_source_type"/>
+                <field name="event_source_type"/>
+                <field name="model"/>
+                <field name="related_id"/>
+                <field name="event_full"/>
             </tree>
             </field>
         </page>
@@ -904,7 +934,7 @@
                   <filter name="account_to_complete" string="To complete"
                     domain="['|', ('product', 'not ilike', '-'),('tenant_id', '=', False)]"/>                    
                     <filter name="obsolete" string="Obsolete"
-                    domain="[('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') )]"/>
+                    domain="['&amp;',('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') ),('contract_line_id','!=',False)]"/>
                     <group string="Group By">
                       <filter name="by_tenant" string="Tenant"
                         context="{'group_by': 'tenant_id'}"/>
@@ -1155,6 +1185,8 @@
           action="qlan_restore_points_stats_action"/>
         <menuitem id="lubon_qlan_restorepoints_instances_menu" name="RP instances" parent="lubon_qlan_tables_menu"
           action="qlan_restorepoints_instances_action"/>
+        <menuitem id="lubon_qlan_events_menu" name="Events" parent="lubon_qlan_tables_menu"
+          action="qlan_events_action"/>
 
 
            </data>

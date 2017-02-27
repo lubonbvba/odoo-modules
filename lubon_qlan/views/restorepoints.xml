@@ -34,6 +34,7 @@
 									<field name="asset_id"/>
 									<field name="number_restore"/>
 									<field name="number_replica"/>
+									<field name="number_vsphere_replica"/>
 									<field name="result_code"/>
 									<button name="find_restorepoints" type="object" string="check"/>
 								</tree>
@@ -67,6 +68,8 @@
 						<field name="stats_id"/>
 						<field name="asset_id"/>
 						<field name="number_restore"/>
+						<field name="number_replica"/>
+						<field name="number_vsphere_replica"/>
 						<field name="result_code"/>
 						<field name="result_href"/>
 						<field name="result_response"/>
@@ -97,6 +100,7 @@
 					<field name="asset_id"/>
 					<field name="number_restore"/>
 					<field name="number_replica"/>
+					<field name="number_vsphere_replica"/>
 					<field name="result_code"/>
 				</tree>
 			</field>
@@ -110,6 +114,7 @@
 					<field name="asset_id"/>
 					<field name="number_restore"/>
 					<field name="number_replica"/>
+					<field name="number_vsphere_replica"/>
 					<field name="result_code"/>
 					<filter name="ok" string="OK" domain="[('number_restore', '!=', 0)]"/>
 					<filter name="bad" string="Bad" domain="[('number_restore', '=', 0)]"/>

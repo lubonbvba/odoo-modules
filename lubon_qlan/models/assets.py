@@ -13,6 +13,7 @@ from openerp import models, fields, api
 from openerp.exceptions import Warning
 import pdb, logging
 from veeam import get_restorepoints
+import datetime
 
 logger = logging.getLogger(__name__)
 containerView = ""
@@ -44,6 +45,11 @@ class lubon_qlan_assets(models.Model):
 	ips=fields.One2many('lubon_qlan.ip','asset_id')
 	interfaces_ids=fields.One2many('lubon_qlan.interfaces','asset_id')
 	credentials_ids=fields.One2many('lubon_credentials.credentials','asset_id')
+
+	assigned_events_ids=fields.One2many('lubon_qlan.events', 'related_id',	domain=lambda self: [('model', '=', self._name)],auto_join=True,string='Assignedevents' ,help="Events assigned to this asset")
+	asset_event_last_check=fields.Datetime(help="Time of the latest event")
+
+
 	vm_memory=fields.Char(track_visibility='onchange')
 	vm_cpu=fields.Integer(track_visibility='onchange')
 	vm_uuid_instance=fields.Char(track_visibility='onchange')
@@ -68,7 +74,7 @@ class lubon_qlan_assets(models.Model):
 	vc_check=fields.Boolean(string="Include in schedule?" )
 	vc_portgroups_ids=fields.One2many("lubon_qlan.portgroups","asset_id")
 	vc_datastores_ids=fields.One2many("lubon_qlan.datastores","asset_id")
-
+	vc_events_ids=fields.One2many("lubon_qlan.events","asset_id")
 	@api.multi
 	def new_asset(self,site_id,quant_id):
 		asset = self.create({
@@ -138,6 +144,7 @@ class lubon_qlan_assets(models.Model):
 		#context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
 #		context.verify_mode = ssl.CERT_NONE
 		global containerView
+		global content
 		service_instance = connect.SmartConnect(host=self.vc_dns,
 				user=self.vc_password_id.user,
 				pwd=self.vc_password_id.decrypt()[0],
@@ -200,6 +207,36 @@ class lubon_qlan_assets(models.Model):
 			datastore.capacity=child.summary.capacity/(1024*1024*1024)
 			datastore.rate_free=int(10000*datastore.free/datastore.capacity)/100
 			#pdb.set_trace()
+	@api.multi
+	def vc_get_events(self,context,eventTypeId='hbr.primary.DeltaCompletedEvent'):
+		self._vc_get_containerview([vim.HostSystem])
+		eMgrRef = content.eventManager
+		filter_spec = vim.event.EventFilterSpec()
+		filter_spec.eventTypeId = eventTypeId
+		oldevents=self.env['lubon_qlan.events'].search([('asset_id','=',self.id),('event_type','=',eventTypeId)])
+		oldevents.sorted(key=lambda r: r.createtime,reverse=True)
+		if oldevents:
+			newest=fields.Datetime.from_string(oldevents[0].createtime) 
+			time_filter=vim.event.EventFilterSpec.ByTime(beginTime=newest + datetime.timedelta(seconds=1))
+			filter_spec.time=time_filter                
+
+		event_res = eMgrRef.QueryEvents(filter_spec)
+		for e in event_res:
+			#pdb.set_trace()
+			if not self.env['lubon_qlan.events'].search([('asset_id','=',self.id),('external_id',"=",e.key)]):
+				vm=self.env['lubon_qlan.assets'].search([('asset_name','=',e.vm.name),('parent_id','=',self.id)])
+				evt=self.env['lubon_qlan.events'].create({
+					'asset_id': self.id,
+					'external_id': e.key,
+					'event_type': e.eventTypeId,
+					'event_source_type':'vc',
+					'event_full': e.fullFormattedMessage,
+					'createtime': fields.Datetime.to_string(e.createdTime), 
+					'model': 'lubon_qlan.assets',
+					'related_id': vm.id,
+					})
+
+		#pdb.set_trace()
 
 
 	@api.one
@@ -283,7 +320,20 @@ class lubon_qlan_assets(models.Model):
 		instance_id.result_href=result['href']	
 		instance_id.result_code=result['response'].status_code	
 		instance_id.result_response=result['response'].content
-
+		#pdb.set_trace()
+		datetime_begin=fields.Datetime.from_string(instance_id.stats_id.date)
+		datetime_end=fields.Datetime.from_string(instance_id.stats_id.date)+datetime.timedelta(hours=+24)
+		datetime_begin=fields.Datetime.to_string(datetime_begin)
+		datetime_end=fields.Datetime.to_string(datetime_end)
+		#pdb.set_trace()
+		instance_id.number_vsphere_replica=self.env['lubon_qlan.events'].search_count([
+			('related_id','=',self.id),
+			('model','=','lubon_qlan.assets'),
+			('createtime','>=',datetime_begin),
+			('createtime','<',datetime_end),
+			('event_type','=','hbr.primary.DeltaCompletedEvent'),
+			])
+		#pdb.set_trace()
 
 		if len(newest) > 0 and (newest.replace('T',' ') > self.vm_latest_restore_point) :
 			self.vm_latest_restore_point=newest.replace('T',' ')		
