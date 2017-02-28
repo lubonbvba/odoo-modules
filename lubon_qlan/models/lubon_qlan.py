@@ -32,7 +32,7 @@ class lubon_qlan_tenants(models.Model):
 	vlan_ids=fields.One2many('lubon_qlan.vlan','tenant_id')
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
 
-	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id')
+	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
 	assets_ids=fields.One2many('lubon_qlan.assets', 'tenant_id')
 
 	credential_ids=fields.One2many('lubon_credentials.credentials','tenant_id')
@@ -103,6 +103,14 @@ class lubon_qlan_adaccounts(models.Model):
 	@api.one
 	def _getpersonname(self):
 		self.name=self.person_id.name
+	
+	@api.onchange('account_created')
+	@api.one
+	def check_product(self):
+		if not self.account_created:
+			self.contract_line_id=False
+
+
 
 class lubon_qlan_adaccounts_import(models.TransientModel):
 	_name='lubon_qlan.adaccounts_import'

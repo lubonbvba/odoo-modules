@@ -867,6 +867,8 @@
                         <field name="logonname"/>
                         <field name="product"/>
                         <field name="contract_id"/>
+                        <field name="ad_enabled"/>
+                        <field name="account_created"/>
                         <!-- field name="main_partner" invisible="False"/ -->
                         <field name="validcustomers_ids" invisible="True" />
                         <field name="person_id" domain="[('type','=','contact'),('parent_id.id','in', validcustomers_ids[0][2])]"/>
@@ -931,8 +933,10 @@
                     domain="[('tenant_id', '=', False)]"/>
                   <filter name="notenant" string="No Product"
                     domain="[('product', 'not ilike', '-')]"/>
-                  <filter name="account_to_complete" string="To complete"
-                    domain="['|', ('product', 'not ilike', '-'),('tenant_id', '=', False)]"/>                    
+                  <filter name="account_to_complete" string="To complete win"
+                    domain="['|', ('product', 'not ilike', '-'),('tenant_id', '=', False)]"/>            
+                    <filter name="contract check" string="Contract not ok"
+                    domain="[('product', '!=', 'LUB-USR-000'),('account_created', '=', True),('contract_line_id', '=', False)]"/>                   
                     <filter name="obsolete" string="Obsolete"
                     domain="['&amp;',('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') ),('contract_line_id','!=',False)]"/>
                     <group string="Group By">
@@ -952,7 +956,7 @@
               <field name="name">adaccounts.tree</field>
               <field name="model">lubon_qlan.adaccounts</field>
               <field name="arch" type="xml">
-                <tree string="Ad accounts Tree">
+                <tree string="Ad accounts Tree" editable="top">
                   <field name="tenant_id"/>
                   <field name="samaccountname"/>
                   <field name="logonname"/>
@@ -961,6 +965,8 @@
                   <field name="date_last"/>
                   <field name="product"/>
                   <field name="ad_enabled"/>
+                  <field name="account_created"/>
+                  <field name="validcontract_ids" invisible="True"/>
                   <field name="contract_line_id"/>
                 </tree>
               </field>

@@ -108,6 +108,7 @@ class account_analytic_account(models.Model):
 
 		res.update({'account_analytic_id': line.invoice_analytic_account_id.id})
 		res.update({'discount': line.line_discount_rate})
+		res.update({'sequence': line.sequence})
 		#pdb.set_trace()
 		if line.add_to_prepaid:
 			line.analytic_account_id.quantity_max += line.quantity
