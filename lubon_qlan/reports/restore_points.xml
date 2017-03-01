@@ -2,6 +2,8 @@
 <openerp>
 <data>
 
+
+
     <record id="view_restorepoints_instances_report_graph" model="ir.ui.view">
          <field name="name">lubon_qlan.restorepoints_instances.report.graph</field>
          <field name="model">lubon_qlan.restorepoints_instances.report</field>

@@ -45,21 +45,44 @@
 				</form>
 			</field>
 		</record>
-	</data>
-	<data>
+		<record model="ir.ui.view" id="lubon_qlan_restore_points_stats_search">
+			<field name="name">lubon_qlan.restore_points_stats_search</field>
+			<field name="model">lubon_qlan.restore_points_stats</field>
+			<field name="arch" type="xml">
+				<search string="Stats">		
+					<filter string="All Last 7 days" name="last7" domain="[('date','&gt;=',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d')))]"  help="Last 7 days" context="{'field': ['date'],'measures': ['rate_succeeded']}"/>
+				</search>
+			</field>
+		</record>
+
 		<record model="ir.ui.view" id="lubon_qlan_restore_points_stats_tree">
 			<field name="name">lubon_qlan.restore_points_stats_tree</field>
 			<field name="model">lubon_qlan.restore_points_stats</field>
 			<field name="arch" type="xml">
 				<tree string="Stats">
 					<field name="date"/>
+					<field name="rate_succeeded"/>
 					<field name="number_succeeded"/>
 					<field name="number_target"/>
-					<field name="rate_succeeded"/>
+					
 					<field name="number_requests_failed"/>
 				</tree>
 			</field>
 		</record>
+    <record id="lubon_qlan_restore_points_stats_graph" model="ir.ui.view">
+         <field name="name">lubon_qlan.restore_points_stats_graph</field>
+         <field name="model">lubon_qlan.restore_points_stats</field>
+         <field name="arch" type="xml">
+             <graph string="Backup stats">
+                <field name="date" interval="day" type="row"/>
+                <field name="rate_succeeded" type="measure"/>
+                <!--field name="number_target" type="measure"/>
+                <field name="number_succeeded" type="measure"/-->
+             </graph>
+         </field>
+    </record>
+
+
 		<record model="ir.ui.view" id="lubon_qlan_restorepoints_instances_form">
 			<field name="name">lubon_qlan.restorepoints_instances_form</field>
 			<field name="model">lubon_qlan.restorepoints_instances</field>

@@ -42,7 +42,10 @@
       <field name="name">Restore points stats</field>
       <field name="res_model">lubon_qlan.restore_points_stats</field>
       <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">graph,tree,form,</field>
+      <field name="domain">[('date','&gt;=',((context_today()+datetime.timedelta(days=-30)).strftime('%Y-%m-%d')))]</field>
+      <!--field name="view_id" ref="lubon_qlan_restore_points_stats_graph"/-->
+
     </record>
     <record model="ir.actions.act_window" id="qlan_restorepoints_instances_action">
       <field name="name">Restore points instances</field>
