@@ -1,50 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
-<!--     <record id="view_account_entries_report_tree" model="ir.ui.view">
-        <field name="name">account.entries.report.tree</field>
-        <field name="model">account.entries.report</field>
-        <field name="arch" type="xml">
-            <tree colors="blue:move_state == 'draft';black:move_state == 'posted'" create="false" string="Entries Analysis">
-                <field name="date" invisible="1"/>
-                <field name="date_created" invisible="1"/>
-                <field name="date_maturity" invisible="1"/>
-                <field name="ref" invisible="1"/>
-                <field name="nbr" sum="# of Entries "/>
-                <field name="quantity" sum="# of Products Qty " invisible="not context.get('quantity_visible', False)"/>
-                <field name="amount_currency" invisible="not context.get('amount_currency_visible', False)"/>
-                <field name="currency_id" invisible="not context.get('currency_id_visible', False)"/>
-                <field name="debit"/>
-                <field name="credit"/>
-                <field name="balance"/>
-                <field name="move_state" invisible="1"/>
-                <field name="partner_id" invisible="1"/>
-                <field name="product_id" invisible="1"/>
-                <field name="product_uom_id" invisible="1"/>
-                <field name="company_id" invisible="1" groups="base.group_multi_company"/>
-                <field name="journal_id" invisible="1"/>
-                <field name="account_id" invisible="1"/>
-                <field name="fiscalyear_id" invisible="1"/>
-                <field name="period_id" invisible="1"/>
-                <field name="user_type" invisible="1"/>
-                <field name="type" invisible="1"/>
-           </tree>
-        </field>
-    </record> -->
-<!--     <record id="view_company_analysis_tree" model="ir.ui.view">
-         <field name="name">account.company.analysis.tree</field>
-         <field name="model">account.entries.report</field>
-         <field name="arch" type="xml">
-             <tree string="Company Analysis" >
-                <field name="user_type"/>
-                <field name="debit" />
-                <field name="credit" />
-                <field name="balance" />
-             </tree>
-         </field>
-    </record>
 
-  -->   
     <record id="view_restorepoints_instances_report_graph" model="ir.ui.view">
          <field name="name">lubon_qlan.restorepoints_instances.report.graph</field>
          <field name="model">lubon_qlan.restorepoints_instances.report</field>
@@ -55,6 +12,7 @@
                 <field name="number_restore" type="measure"/>
                 <field name="number_replica" type="measure"/>
                 <field name="number_vsphere_replica" type="measure"/>
+                <field name="backup_ok" type="measure"/>
                 <!-- field name="result_code" type="measure"/ -->
              </graph>
          </field>
@@ -69,6 +27,7 @@
                 <field name="number_restore"/>
                 <field name="number_replica"/>
                 <field name="number_vsphere_replica"/>
+                <field name="backup_ok"/>
                 <field name="max_date"/>
              </tree>
          </field>
@@ -81,14 +40,10 @@
             <search string="Backup Analysis">
                 <field name="asset_name"/>
                 <field name="date" />
-                <filter string="This Month" name="thismonth" domain="[('date','&gt;=',time.strftime('%%Y-%%m-01'))]" help="This month"/>
-                <filter string="Number = 0" name="numberfound0" domain="[('number_restore','=',0)]" help="Not found"/>
-                <filter string="Last 7 days" name="last7" domain="[('date','&gt;=',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d')))]" help="Last 7 days"/>
-                <filter string="Failed yesterday" name="failedyesterday" domain="['|',('max_date','=',False) , ('max_date','&lt;',((context_today()+datetime.timedelta(days=-1)).strftime('%Y-%m-%d'))) ,('date','&gt;=',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d'))) ]" help="VM's failed yesterday, last success date less than yesterday or null"/>
-                <filter string="Failed 7 days" name="failed7" domain="['|',('max_date','=',False) , ('max_date','&lt;=',((context_today()+datetime.timedelta(days=-6)).strftime('%Y-%m-%d'))) ,('date','&gt;=',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d'))) ]" help="VM's failed 7 days, last success date less than yesterday or null"/>
-
-
-
+                <filter string="All Last 7 days" name="last7" domain="[('date','&gt;=',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d')))]" context="{'col_group_by': ['date:day'], 'group_by':['asset_name'], 'measures': ['backup_ok']}" help="Last 7 days"/>
+                <filter string="Failed yesterday" name="failedyesterday" domain="['|',('max_date','=',False) , ('max_date','&lt;',((context_today()+datetime.timedelta(days=-1)).strftime('%Y-%m-%d'))) ,('date','&gt;=',((context_today()+datetime.timedelta(days=-1)).strftime('%Y-%m-%d'))) ]" help="VM's failed yesterday, last success date less than yesterday or null" context="{'col_group_by': ['date:day'], 'group_by':['asset_name'], 'measures': ['backup_ok']}"/>
+                <filter string="Failed 7 days" name="failed7" domain="['|',('max_date','=',False) , ('max_date','&lt;=',((context_today()+datetime.timedelta(days=-6)).strftime('%Y-%m-%d'))) ,('date','&gt;=',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d'))) ]" context="{'col_group_by': ['date:day'], 'group_by':['asset_name'], 'measures': ['backup_ok']}" help="VM's failed 7 days, last success date less than yesterday or null"/>
+                 <filter string="With detail" context="{'measures': ['number_restore','number_replica','number_vsphere_replica']}" help="Include full details"/>
 
 
                 <!--group expand="1" string="Group By">
@@ -131,40 +86,14 @@
         <field name="view_mode">graph,tree</field>
         <field name="search_view_id" ref="view_restorepoints_instances_report_search"/>
         <field name="view_id" ref="view_restorepoints_instances_report_graph"/>
-        <field name="context">{'group_by':[], 'zzsearch_default_usertype':1, 'search_default_failedyesterday':1, 'zzgroup_by_no_leaf':1}</field>
-        <field name="help">This view lets you dig into the backup history</field>
-    </record>
-    <record id="action_restorepoints_instances_report_failed7" model="ir.actions.act_window">
-        <field name="name">Backup failed 7 days</field>
-        <field name="res_model">lubon_qlan.restorepoints_instances.report</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">graph,tree</field>
-        <field name="search_view_id" ref="view_restorepoints_instances_report_search"/>
-        <field name="view_id" ref="view_restorepoints_instances_report_graph"/>
-        <field name="context">{'group_by':[], 'zzsearch_default_usertype':1, 'search_default_failed7':1, 'zzgroup_by_no_leaf':1}</field>
+        <field name="context">{'group_by':['asset_name'], 'search_default_failedyesterday':1, 'measures': ['backup_ok']}</field>
         <field name="help">This view lets you dig into the backup history</field>
     </record>
 
-    <record id="action_restorepoints_instances_report_last7" model="ir.actions.act_window">
-        <field name="name">Backup Last 7</field>
-        <field name="res_model">lubon_qlan.restorepoints_instances.report</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">graph,tree</field>
-        <field name="search_view_id" ref="view_restorepoints_instances_report_search"/>
-        <field name="view_id" ref="view_restorepoints_instances_report_graph"/>
-        <field name="context">{'group_by':[], 'zzsearch_default_usertype':1, 'search_default_last7':1, 'zzgroup_by_no_leaf':1}</field>
-        <field name="help">This view lets you dig into the backup history</field>
-    </record>
 
     <menuitem action="action_restorepoints_instances_report_failed_yesterday" id="menu_action_restorepoints_instances_failed_yesterday"
         parent="lubon_qlan_backup_menu"
         sequence="2"/>
-    <menuitem action="action_restorepoints_instances_report_failed7" id="menu_action_restorepoints_instances_failed7"
-        parent="lubon_qlan_backup_menu"
-        sequence="3"/>
-
-    <menuitem action="action_restorepoints_instances_report_last7" id="menu_action_restorepoints_instances_last7"
-        parent="lubon_qlan_backup_menu"
-        sequence="4"/>        
+      
 </data>
 </openerp>

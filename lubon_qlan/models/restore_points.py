@@ -84,7 +84,8 @@ class lubon_qlan_restore_points_stats(models.Model):
 			instance.find_restorepoints()
 #			instance.find_restorepoints('VmReplicaPoint')
 
-		self.number_succeeded=self.env['lubon_qlan.restorepoints_instances'].search_count([('stats_id','=',self.id),('number_restore',">",0)])
+#		self.number_succeeded=self.env['lubon_qlan.restorepoints_instances'].search_count([('stats_id','=',self.id),('number_restore',">",0)])
+		self.number_succeeded=self.env['lubon_qlan.restorepoints_instances'].search_count([('stats_id','=',self.id),('stat_general',">",0)])
 
 		self.number_requests_failed=self.env['lubon_qlan.restorepoints_instances'].search_count([('stats_id','=',self.id),('result_code',"!=",200)])
 
@@ -135,16 +136,36 @@ class lubon_qlan_restorepoints_instances(models.Model):
 	number_restore=fields.Integer(help="Number of restore points")
 	number_replica=fields.Integer(help="Number of replica points")
 	number_vsphere_replica=fields.Integer(help="Number of vsphere replicas")
+	stat_general=fields.Integer(help="General backup status")
+	stat_restore_points=fields.Integer(help="Restorepoints status")
+	stat_vsphere_replicas=fields.Integer("Vsphere replica status")
+	stat_veeam_replicas=fields.Integer("Veeam replica status")
+
 	result_code=fields.Integer()
 	result_response=fields.Text()
 	result_href=fields.Char()
+
 	@api.multi
 	def find_restorepoints(self):
 		self.asset_id.get_restorepoints(self,'VmRestorePoint')
 		self.number_restore=len(self.restorepoints_ids.search([('veeamtype','=','VmRestorePoint'),('restorepoints_instances_id','=',self.id)]))
 		self.asset_id.get_restorepoints(self,'VmReplicaPoint')
-		self.number_replica=len(self.restorepoints_ids.search([('veeamtype','=','VmReplicaPoint'),('restorepoints_instances_id','=',self.id)]))
+		self.number_replica=0 or len(self.restorepoints_ids.search([('veeamtype','=','VmReplicaPoint'),('restorepoints_instances_id','=',self.id)]))
+		if self.number_restore >= self.asset_id.vm_backup_req_restorepoints:
+			self.stat_restore_points=1
+		else:
+			self.stat_restore_points=0
+		if self.number_replica >= self.asset_id.vm_backup_req_veeam_replicas:
+			self.stat_veeam_replicas=1
+		else:
+			self.stat_veeam_replicas=0
+		if self.number_vsphere_replica >= self.asset_id.vm_backup_req_vsphere_replicas:
+			self.stat_vsphere_replicas=1
+		else:
+			self.stat_vsphere_replicas=0
 
+		self.stat_general=self.stat_restore_points * self.stat_veeam_replicas * self.stat_vsphere_replicas 	
+		#pdb.set_trace()
 	@api.multi		
 	def generate_restorepoints_instance(self, stats_id, asset_id):
 		if not self.search( [ ('stats_id','=',stats_id.id) , ('asset_id','=', asset_id.id) ]):
@@ -169,6 +190,7 @@ class lubon_qlan_restorepoints_instances_report(models.Model):
 	number_restore=fields.Integer(readonly=True)
 	number_replica=fields.Integer(readonly=True)
 	number_vsphere_replica=fields.Integer(readonly=True)
+	backup_ok=fields.Integer(readonly=True)
 	result_code=fields.Integer(readonly=True)
 	asset_name=fields.Char(readonly=True)
 
@@ -216,15 +238,15 @@ class lubon_qlan_restorepoints_instances_report(models.Model):
 
 
 			create or replace view lubon_qlan_restorepoints_instances_report as (
-select l.id as id, s.date as date,l.number_restore as number_restore, l.number_replica as number_replica,l.number_vsphere_replica as number_vsphere_replica, l.result_code as result_code, s.id as stats_id,a.id  as asset_id,	a.asset_name as asset_name, x.max_date as max_date from lubon_qlan_restorepoints_instances l
+select l.id as id, s.date as date,l.number_restore as number_restore, l.number_replica as number_replica,l.number_vsphere_replica as number_vsphere_replica, l.stat_general as backup_ok, l.result_code as result_code, s.id as stats_id,a.id  as asset_id,	a.asset_name as asset_name, x.max_date as max_date from lubon_qlan_restorepoints_instances l
 left join lubon_qlan_assets a on (l.asset_id = a.id)
 left join lubon_qlan_restore_points_stats s on (l.stats_id=s.id)
 left join (select aa.id, aa.asset_name, max(ss.date) as max_date from lubon_qlan_assets aa
 left join lubon_qlan_restorepoints_instances ii on ii.asset_id=aa.id
 left join lubon_qlan_restore_points_stats ss on ii.stats_id=ss.id
-where ii.number_restore > 0
+where ii.stat_general > 0
 group by aa.id,aa.asset_name) x on x.id=a.id
-
+where a.vm_check_backup = 't'
 			)
 			""")
 

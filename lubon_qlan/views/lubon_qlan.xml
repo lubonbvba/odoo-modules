@@ -236,6 +236,7 @@
           </page>
           <page string="VM info" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
             <group>
+            <group string="VM Details">
             <field name="vm_path_name"/>
             <field name="vm_uuid_instance"/>
             <field name="vm_uuid_bios"/>
@@ -243,10 +244,16 @@
             <field name="vm_memory"/>
             <field name="vm_power_state"/>
             <field name="vm_snapshots_count" readonly="True"/>
-            <field name="vm_latest_restore_point"/>
-            <field name="vm_check_backup"/>
             <field name="vm_date_last"/>
           </group>
+          <group string="Backup info">
+            <field name="vm_check_backup"/>
+            <field name="vm_latest_restore_point"/>
+            <field name="vm_backup_req_restorepoints"/>
+            <field name="vm_backup_req_veeam_replicas"/>
+            <field name="vm_backup_req_vsphere_replicas"/>
+          </group>
+        </group>
         </page>
           <page string="Snapshots" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
             <field name="vm_snapshots_ids">
@@ -356,7 +363,22 @@
       </form>
     </field>
   </record>
-
+  <record model="ir.ui.view" id="lubon_qlan_events_tree">
+    <field name="name">lubon_qlan.events_tree</field>
+    <field name="model">lubon_qlan.events</field>
+    <field name="arch" type="xml">
+      <tree string="Events">
+                <field name="asset_id"/>
+                <field name="createtime"/>
+                <field name="event_type"/>
+                <field name="event_source_type"/>
+                <field name="event_source_type"/>
+                <field name="model"/>
+                <field name="related_id"/>
+                <field name="event_full"/>
+      </tree>
+    </field>
+  </record>
   <record model="ir.ui.view" id="lubon_qlan_memberships_tree">
     <field name="name">lubon_qlan.memberships_tree</field>
     <field name="model">lubon_qlan.memberships</field>

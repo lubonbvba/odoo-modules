@@ -59,14 +59,16 @@ class lubon_qlan_assets(models.Model):
 	vm_check_backup=fields.Boolean(track_visibility='onchange', default=True)
 	vm_restorepoints_ids=fields.One2many('lubon_qlan.restorepoints',"asset_id")
 	vm_latest_restore_point=fields.Datetime()
-#	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances','asset_id')
+
 	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances',"asset_id")
 	vm_snapshots_ids=fields.One2many("lubon_qlan.snapshots","asset_id")
 	vm_drives_ids=fields.One2many("lubon_qlan.drives","asset_id")
 
 	vm_snapshots_count=fields.Integer()
 	vm_date_last=fields.Datetime(help="Date last inventoried")
-
+	vm_backup_req_restorepoints=fields.Integer(help="Min restorepoints required", string="Min req restore points" )
+	vm_backup_req_veeam_replicas=fields.Integer(help="Min veeam replicas required", string="Min req veeam replicas")
+	vm_backup_req_vsphere_replicas=fields.Integer(help="Min vsphere replicas required", string="Min req vsphere replicas")
 	#vcenter fields
 	vc_dns=fields.Char(string="vcenter dns")
 	vc_port=fields.Integer(string="vcenter tcp port", default=443)
@@ -162,15 +164,16 @@ class lubon_qlan_assets(models.Model):
 
 	@api.one
 	def vc_get_all(self):
-		
+		logger.info("Start vc_get_all %s" % self.asset_name)
 		self.vc_get_networks()
 		self.vc_get_datastores()
 		self.vc_get_vms()
-
+		self.vc_get_events()
 
 
 	@api.one
 	def vc_get_vms(self):
+		logger.info("Start vc_get_vms %s" % self.asset_name)
 		self._vc_get_containerview([vim.VirtualMachine])
 		for child in containerView.view:
 			if '_replica_' not in child.summary.config.name:
@@ -178,6 +181,7 @@ class lubon_qlan_assets(models.Model):
 
 	@api.one
 	def vc_get_networks(self):
+		logger.info("Start vc_get_networks %s" % self.asset_name)
 		self._vc_get_containerview([vim.DistributedVirtualPortgroup])
 		for child in containerView.view:
 			#logger.info("Portgroup: %s " %  child.config.name)
@@ -192,6 +196,8 @@ class lubon_qlan_assets(models.Model):
 			#pdb.set_trace()
 	@api.one
 	def vc_get_datastores(self):
+		logger.info("Start vc_get_datastores %s" % self.asset_name)
+
 		self._vc_get_containerview([vim.Datastore])
 		for child in containerView.view:
 			#logger.info("Portgroup: %s " %  child.config.name)
@@ -208,7 +214,8 @@ class lubon_qlan_assets(models.Model):
 			datastore.rate_free=int(10000*datastore.free/datastore.capacity)/100
 			#pdb.set_trace()
 	@api.multi
-	def vc_get_events(self,context,eventTypeId='hbr.primary.DeltaCompletedEvent'):
+	def vc_get_events(self,context=None,eventTypeId='hbr.primary.DeltaCompletedEvent'):
+		logger.info("Start vc_get_events %s" % self.asset_name)
 		self._vc_get_containerview([vim.HostSystem])
 		eMgrRef = content.eventManager
 		filter_spec = vim.event.EventFilterSpec()

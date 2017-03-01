@@ -35,6 +35,7 @@
 									<field name="number_restore"/>
 									<field name="number_replica"/>
 									<field name="number_vsphere_replica"/>
+									<field name="stat_general"/>
 									<field name="result_code"/>
 									<button name="find_restorepoints" type="object" string="check"/>
 								</tree>
@@ -73,6 +74,10 @@
 						<field name="result_code"/>
 						<field name="result_href"/>
 						<field name="result_response"/>
+						<field name="stat_general"/>
+						<field name="stat_restore_points"/>
+						<field name="stat_veeam_replicas"/>
+						<field name="stat_vsphere_replicas"/>
 					</group>
 					<notebook>
 						<page string="Restore points">
@@ -101,6 +106,7 @@
 					<field name="number_restore"/>
 					<field name="number_replica"/>
 					<field name="number_vsphere_replica"/>
+					<field name="stat_general"/>
 					<field name="result_code"/>
 				</tree>
 			</field>
@@ -116,8 +122,8 @@
 					<field name="number_replica"/>
 					<field name="number_vsphere_replica"/>
 					<field name="result_code"/>
-					<filter name="ok" string="OK" domain="[('number_restore', '!=', 0)]"/>
-					<filter name="bad" string="Bad" domain="[('number_restore', '=', 0)]"/>
+					<filter name="ok" string="OK" domain="[('stat_general', '=', 1)]"/>
+					<filter name="bad" string="Bad" domain="[('stat_general', '=', 0)]"/>
 					<filter name="reqfailed" string="Request failed" domain="[('result_code', '!=', 200)]"/>
 
 					<group string="Group By">
