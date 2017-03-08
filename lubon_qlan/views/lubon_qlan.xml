@@ -623,11 +623,14 @@
     <field name="model">lubon_qlan.ip</field>
     <field name="arch" type="xml">
       <search>
+        <field name="name"/>
+        <field name="ip"/>
         <field name="site_id"/>
         <field name="vlan_id"/>
           <group string="Group By">
-            <filter name="by_vlan" string="Vlan"
-                context="{'group_by': 'vlan_id'}"/>
+            <filter name="by_vlan" string="Vlan" context="{'group_by': 'vlan_id'}"/>
+            <filter name="by_site" string="Site" context="{'group_by': 'site_id'}"/>
+            <filter name="by_asset" string="Device" context="{'group_by': 'asset_id'}"/>
           </group>
 
       </search>
