@@ -147,13 +147,18 @@
         <field name="site_id" filter_domain="['&amp;',('site_id','ilike',self),('show_in_site','=',1)]"/>
         <field name="parent_id"/>
         <field name="asset_type"/>
+        <field name="tenant_id"/>
         <filter name="VM with snapshot" domain="[('asset_type','=','vm'),('vm_snapshots_count','!=',0)]" />
         <filter name="Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',True)]" />
         <filter name="Excluded from Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',False)]" />
-         <filter string="Missing VM" name="last7" domain="[('asset_type','=','vm'),
+         <filter string="Missing VM" name="last7" domain="[('asset_type','=','vm'),('parent_id','!=',False),
           '|', ('vm_date_last','=',False),
           ('vm_date_last','&lt;',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d')))]" 
           help="VM Not seen for 7 days"/>
+          <group string="Group By">
+            <filter name="by_tenant" string="Tenant" context="{'group_by': 'tenant_id'}"/>
+            <filter name="by_parent" string="Parent" context="{'group_by': 'parent_id'}"/>
+          </group>
       </search>
     </field>
   </record>
