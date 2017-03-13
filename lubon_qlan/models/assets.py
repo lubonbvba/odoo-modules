@@ -51,9 +51,10 @@ class lubon_qlan_assets(models.Model):
 
 
 	vm_memory=fields.Char(track_visibility='onchange')
-	vm_cpu=fields.Integer(track_visibility='onchange')
+	vm_cpu=fields.Integer(track_visibility='onchange', string="Virtual CPU", help="Number of virtual cpus. (Socket * number of cores per socket")
 	vm_guestos=fields.Char(track_visibility='onchange')
-	vm_cores_per_socket=fields.Integer(track_visibility='onchange')
+	vm_cores_per_socket=fields.Integer(track_visibility='onchange', string="Cores/Socket", help='Number of cores per socket' )
+	vm_sockets=fields.Integer(track_visibility='onchange', string="Sockets", help='Number of sockets' )
 	vm_uuid_instance=fields.Char(track_visibility='onchange')
 	vm_uuid_bios=fields.Char(track_visibility='onchange')
 	vm_path_name=fields.Char(track_visibility='onchange')
@@ -277,6 +278,7 @@ class lubon_qlan_assets(models.Model):
 		asset.vm_guestos=virtual_machine.summary.config.guestFullName
 		#pdb.set_trace()
 		asset.vm_cores_per_socket=virtual_machine.config.hardware.numCoresPerSocket
+		asset.vm_sockets=asset.vm_cpu/asset.vm_cores_per_socket
 		asset.vm_path_name=virtual_machine.summary.config.vmPathName
 		asset.vm_power_state=virtual_machine.runtime.powerState
 		asset.vm_date_last=fields.Datetime.now()

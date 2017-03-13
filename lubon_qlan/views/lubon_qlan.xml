@@ -251,6 +251,7 @@
             <field name="vm_uuid_bios"/>
             <field name="vm_cpu"/>
             <field name="vm_cores_per_socket"/>
+            <field name="vm_sockets"/>
             <field name="vm_memory"/>
             <field name="vm_power_state"/>
             <field name="vm_snapshots_count" readonly="True"/>
