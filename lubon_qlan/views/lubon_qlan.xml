@@ -245,10 +245,12 @@
           <page string="VM info" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
             <group>
             <group string="VM Details">
+            <field name="vm_guestos"/>
             <field name="vm_path_name"/>
             <field name="vm_uuid_instance"/>
             <field name="vm_uuid_bios"/>
             <field name="vm_cpu"/>
+            <field name="vm_cores_per_socket"/>
             <field name="vm_memory"/>
             <field name="vm_power_state"/>
             <field name="vm_snapshots_count" readonly="True"/>

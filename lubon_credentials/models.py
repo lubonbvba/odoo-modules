@@ -66,6 +66,8 @@ class lubon_qlan_credentials(models.Model):
     encrypted=fields.Char(string="Encrypted")
     is_saved=fields.Boolean(string="Saved")
     partner_id = fields.Many2one('res.partner',  ondelete='set null', string="Partner", index=True)
+    model=fields.Char()
+    related_id=fields.Integer()
  #   credentials_type=fields.Selection([('tenant_admin','Tenant admin'),('wifi','Wifi'),('site_admin','Site admin'),('telephony','Telephony'),('general','General')], default='general')
     @api.one
     def show_password(self):
