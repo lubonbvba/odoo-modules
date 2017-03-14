@@ -6,3 +6,4 @@ import restore_points
 import vmobjects
 import vmdrives
 import events
+import licenses

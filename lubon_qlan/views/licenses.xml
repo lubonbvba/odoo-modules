@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+  <data> 
+   <record model="ir.ui.view" id="lubon_qlan_licenses_tree">
+    <field name="name">lubon_qlan.licenses_tree</field>
+    <field name="model">lubon_qlan.licenses</field>
+    <!-- field name="inherit_id" ref="base.view_partner_form"/-->
+    <field name="arch" type="xml">
+      <tree editable="top" >
+       <field name="name"/>
+       <field name="responsible_person"/>
+     </tree>
+   </field>
+ </record>
+ <record model="ir.ui.view" id="lubon_qlan_licenses_form">
+  <field name="name">lubon_qlan.licenses_form</field>
+  <field name="model">lubon_qlan.licenses</field>
+  <field name="arch" type="xml">
+   <form string="Asset Details">
+    <sheet>
+      <group>
+       <field name="name"/>
+       <field name="responsible_person"/>
+     </group>
+     <notebook>
+      <page string="Members">
+        <field name="members" >
+        <tree>
+         <field name="asset_name"/>
+         <field name="vm_guestos"/>
+        </tree>
+      </field>
+      </page>
+    </notebook>
+  </sheet>
+</form>
+</field>
+</record>
+<record model="ir.actions.act_window" id="qlan_licenses_action">
+  <field name="name">Licenses</field>
+  <field name="res_model">lubon_qlan.licenses</field>
+  <field name="view_type">form</field>
+  <field name="view_mode">tree,form</field>
+</record>
+
+<menuitem id="lubon_licenses_menu" name="Licenses" parent="lubon_qlan_configuration_menu" 
+  action="qlan_licenses_action"/>
+</data>
+</openerp>

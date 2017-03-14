@@ -49,6 +49,7 @@ class lubon_qlan_assets(models.Model):
 	assigned_events_ids=fields.One2many('lubon_qlan.events', 'related_id',	domain=lambda self: [('model', '=', self._name)],auto_join=True,string='Assignedevents' ,help="Events assigned to this asset")
 	asset_event_last_check=fields.Datetime(help="Time of the latest event")
 
+	licenses_id=fields.Many2one('lubon_qlan.licenses')
 
 	vm_memory=fields.Char(track_visibility='onchange')
 	vm_cpu=fields.Integer(track_visibility='onchange', string="Virtual CPU", help="Number of virtual cpus. (Socket * number of cores per socket")

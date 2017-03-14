@@ -1,4 +1,3 @@
-from openerp.osv import osv
 from openerp import tools, models, fields, api, _
 import csv,os,string,pdb
 from path import path
