@@ -1023,6 +1023,7 @@
                   <field name="ad_enabled"/>
                   <field name="account_created"/>
                   <field name="contract_line_id" />
+                  <field name="exc_mb_size" />
                 </group>
                 <group>
                   <field name="tenant_id"/>
