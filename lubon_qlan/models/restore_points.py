@@ -1,7 +1,7 @@
 from openerp.osv import osv
 from openerp import tools, models, fields, api, _
 import csv,os,string,pdb
-from path import path
+#from path import path
 import openerp.addons.decimal_precision as dp
 import openerp
 from datetime import datetime,timedelta

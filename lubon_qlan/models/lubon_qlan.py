@@ -2,7 +2,7 @@
 
 from openerp import models, fields, api,exceptions,_
 import csv,os,string,datetime,logging
-from path import path
+#from path import path
 import pdb, base64
 import dns.resolver
 from os.path import expanduser
