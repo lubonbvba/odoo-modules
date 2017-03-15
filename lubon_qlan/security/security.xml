@@ -5,17 +5,17 @@
     		<field name="description">Qlan mgmt</field>
     		<!--field name="sequence">5</field -->
 		</record>
-        <record id="qlan_manager" model="res.groups">
-            <field name="name">Manager</field>
-            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="category_id" ref="module_category_lubon_qlan"/>
-            <!-- field name="category_id" ref="base.module_category_lubon_customer"</field -->
-        </record>
-                <record id="qlan_user" model="res.groups">
+        <record id="qlan_user" model="res.groups">
             <field name="name">User</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
             <field name="category_id" ref="module_category_lubon_qlan"/>
         </record>
+        <record id="qlan_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="implied_ids" eval="[(4, ref('lubon_qlan.qlan_user'))]"/>
+            <field name="category_id" ref="module_category_lubon_qlan"/>
+            <!-- field name="category_id" ref="base.module_category_lubon_customer"</field -->
+        </record>        
     </data>
 </openerp>
 

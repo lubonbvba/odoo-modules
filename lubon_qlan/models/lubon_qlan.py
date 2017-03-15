@@ -2,7 +2,7 @@
 
 from openerp import models, fields, api,exceptions,_
 import csv,os,string,datetime,logging
-#from path import path
+from path import Path
 import pdb, base64
 import dns.resolver
 from os.path import expanduser
@@ -143,7 +143,7 @@ class lubon_qlan_adaccounts_import(models.TransientModel):
 		basepath=expanduser("~")
 		basepath +='/odoo-imports/adaccounts'
 		destpath=basepath + '/hist'
-		p = path(basepath)
+		p = Path(basepath)
 		for f in p.files(pattern='Daily-2*.csv'):
 			
 			s=f.stripext().basename().lstrip('Daily-')
@@ -178,7 +178,7 @@ class lubon_qlan_adaccounts_import(models.TransientModel):
 					'objectguid':row['objectguid'],
 					}).process_import()
 				cleanfile.close()
-				q=path(f)
+				q=Path(f)
 				q.move(destpath)
 		
 	@api.one		

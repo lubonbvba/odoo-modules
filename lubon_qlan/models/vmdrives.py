@@ -1,7 +1,7 @@
 from openerp.osv import osv
 from openerp import tools, models, fields, api, _
 import csv,os,string,pdb, logging
-#from path import path
+from path import Path
 import openerp.addons.decimal_precision as dp
 import openerp
 from datetime import datetime,timedelta
@@ -26,7 +26,7 @@ class lubon_qlan_drives(models.Model):
 		basepath=expanduser("~")
 		basepath +='/odoo-imports/ShadowCopies'
 		destpath=basepath + '/hist'
-		p = path(basepath)
+		p = Path(basepath)
 		for f in p.files(pattern='Daily-2*.json'):
 			
 #			s=f.stripext().basename().lstrip('Daily-')

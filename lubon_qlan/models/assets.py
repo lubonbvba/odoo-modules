@@ -122,13 +122,13 @@ class lubon_qlan_assets(models.Model):
 	@api.one
 	def _vc_login(self):
 		try:
-			#context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-			#context.verify_mode = ssl.CERT_NONE
+			context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+			context.verify_mode = ssl.CERT_NONE
 			service_instance = connect.SmartConnect(host=self.vc_dns,
 				user=self.vc_password_id.user,
 				pwd=self.vc_password_id.decrypt()[0],
-				port=self.vc_port)
-				#sslContext=context)
+				port=self.vc_port,
+				sslContext=context)
 
 #			atexit.register(connect.Disconnect, service_instance)
 #			pdb.set_trace()
@@ -147,15 +147,15 @@ class lubon_qlan_assets(models.Model):
 			vc.vc_get_all()
 	@api.one
 	def _vc_get_containerview(self,viewType):
-		#context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-#		context.verify_mode = ssl.CERT_NONE
+		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+		context.verify_mode = ssl.CERT_NONE
 		global containerView
 		global content
 		service_instance = connect.SmartConnect(host=self.vc_dns,
 				user=self.vc_password_id.user,
 				pwd=self.vc_password_id.decrypt()[0],
-				port=self.vc_port)
-#				sslContext=context)
+				port=self.vc_port,
+				sslContext=context)
 		atexit.register(connect.Disconnect, service_instance)
 		content = service_instance.RetrieveContent()
 
