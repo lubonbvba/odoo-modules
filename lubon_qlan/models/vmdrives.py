@@ -36,7 +36,7 @@ class lubon_qlan_drives(models.Model):
 				reader = json.load(fi)
 				for a in reader:
 					self.updatedrive(a)
-			q=path(f)
+			q=Path(f)
 			q.move(destpath)		
 			# fi = open(f, 'rb')
 			# data = fi.read()

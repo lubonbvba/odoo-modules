@@ -10,24 +10,18 @@ from openerp import models, fields, api, _
 #     _name = 'lubon_asterisk.lubon_asterisk'
 
 #     name = fields.Char()
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
-class AsteriskServer(models.Model):
-    _inherit = 'asterisk.server'
-    server_starturl=fields.Char(string="URL", placeholder="https://mypbx.qlan.eu/pbx/proxyapi.php")
-    server_key=fields.Char(string="Key")
-    server_tenant=fields.Char(string="Tenant")
-    server_timeout=fields.Char(string="Timeout")
-    server_cid=fields.Char(string="CID", help="Default caller id to use")
+
 
 class PhoneCommon(orm.AbstractModel):
     _inherit = 'phone.common'
     
     def click2dial(self, cr, uid, erp_number, context=None):
     	#res = super(PhoneCommon, self).click2dial(self, cr, uid, erp_number, context)
-    	logger.info('Click2Dial:' + erp_number + " originator:")
+    	_logger.info('Click2Dial:' + erp_number + " originator:")
         user = self.pool['res.users'].browse(cr, uid, uid, context=context)
-        logger.info('Click2Dial:' + erp_number + " originator:" + user.name)
+        _logger.info('Click2Dial:' + erp_number + " originator:" + user.name)
     	ast_server=self.pool['asterisk.server']._get_asterisk_server_from_user(cr, uid, context=context)
     	#ast_server = self._get_asterisk_server_from_user(
         #    cr, uid, context=context)
@@ -51,7 +45,7 @@ class PhoneCommon(orm.AbstractModel):
 
     	response = urllib2.urlopen(dial_string)
         #pdb.set_trace()
-        logger.info('Call result:' + response.read())
+        _logger.info('Call result:' + response.read())
      
 
 
@@ -62,15 +56,25 @@ class PhoneCommon(orm.AbstractModel):
 #                _('Error:'),
 #                _('Missing phone number'))
 
-    def _get_calling_number(self, cr, uid, context=None):
 
+class AsteriskServer(models.Model):
+    _inherit = 'asterisk.server'
+    server_starturl=fields.Char(string="URL", placeholder="https://mypbx.qlan.eu/pbx/proxyapi.php")
+    server_key=fields.Char(string="Key")
+    server_tenant=fields.Char(string="Tenant")
+    server_timeout=fields.Char(string="Timeout")
+    server_cid=fields.Char(string="CID", help="Default caller id to use")
+
+    def _get_calling_number(self, cr, uid, context=None):
+        _logger.info("Start  _get_calling_number lubon_asterisk")
         user, ast_server, ast_manager = self._connect_to_asterisk(
             cr, uid, context=context)
         calling_party_number = False
         try:
             list_chan = ast_manager.Status()
-            from pprint import pprint
-            pprint(list_chan)
+            #pdb.set_trace()
+            #from pprint import pprint
+            #pprint(list_chan)
             _logger.debug("Result of Status AMI request: %s", list_chan)
             for chan in list_chan.values():
                 sip_account = user.asterisk_chan_type + '/' + user.resource
