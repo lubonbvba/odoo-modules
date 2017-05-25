@@ -9,6 +9,7 @@
 					<header>
 						<button type="object" string="Generate" name="generate_restorepoints_instances"/>
 						<button type="object" string="Check all" name="check_all_restorepoints"/>
+						<button type="object" string="Check incomplete" name="check_incomplete_restorepoints"/>
 					</header>
 					<div class="oe_right oe_button_box" name="buttons">
 						<button string="OK" type="action" class="oe_stat_button" name="%(qlan_restorepoints_instances_action)d" icon="fa-thumbs-up" context="{'search_default_stats_id': active_id, 'search_default_ok': True }">

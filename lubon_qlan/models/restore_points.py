@@ -75,13 +75,14 @@ class lubon_qlan_restore_points_stats(models.Model):
 		stats_id.number_target=len(vms)
 		return stats_id
 
-
-
+	@api.multi
+	def check_incomplete_restorepoints(self):
+		self.check_all_restorepoints(True)
 
 	@api.multi
-	def check_all_restorepoints(self):
+	def check_all_restorepoints(self,failedonly=False):
 		for instance in self.restorepoints_instances_ids:
-			instance.find_restorepoints()
+			instance.find_restorepoints(failedonly)
 #			instance.find_restorepoints('VmReplicaPoint')
 
 #		self.number_succeeded=self.env['lubon_qlan.restorepoints_instances'].search_count([('stats_id','=',self.id),('number_restore',">",0)])
@@ -146,25 +147,26 @@ class lubon_qlan_restorepoints_instances(models.Model):
 	result_href=fields.Char()
 
 	@api.multi
-	def find_restorepoints(self):
-		self.asset_id.get_restorepoints(self,'VmRestorePoint')
-		self.number_restore=len(self.restorepoints_ids.search([('veeamtype','=','VmRestorePoint'),('restorepoints_instances_id','=',self.id)]))
-		self.asset_id.get_restorepoints(self,'VmReplicaPoint')
-		self.number_replica=0 or len(self.restorepoints_ids.search([('veeamtype','=','VmReplicaPoint'),('restorepoints_instances_id','=',self.id)]))
-		if self.number_restore >= self.asset_id.vm_backup_req_restorepoints:
-			self.stat_restore_points=1
-		else:
-			self.stat_restore_points=0
-		if self.number_replica >= self.asset_id.vm_backup_req_veeam_replicas:
-			self.stat_veeam_replicas=1
-		else:
-			self.stat_veeam_replicas=0
-		if self.number_vsphere_replica >= self.asset_id.vm_backup_req_vsphere_replicas:
-			self.stat_vsphere_replicas=1
-		else:
-			self.stat_vsphere_replicas=0
+	def find_restorepoints(self,failedonly=False):
+		if not failedonly or (self.stat_general==0):
+			self.asset_id.get_restorepoints(self,'VmRestorePoint')
+			self.number_restore=len(self.restorepoints_ids.search([('veeamtype','=','VmRestorePoint'),('restorepoints_instances_id','=',self.id)]))
+			self.asset_id.get_restorepoints(self,'VmReplicaPoint')
+			self.number_replica=0 or len(self.restorepoints_ids.search([('veeamtype','=','VmReplicaPoint'),('restorepoints_instances_id','=',self.id)]))
+			if self.number_restore >= self.asset_id.vm_backup_req_restorepoints:
+				self.stat_restore_points=1
+			else:
+				self.stat_restore_points=0
+			if self.number_replica >= self.asset_id.vm_backup_req_veeam_replicas:
+				self.stat_veeam_replicas=1
+			else:
+				self.stat_veeam_replicas=0
+			if self.number_vsphere_replica >= self.asset_id.vm_backup_req_vsphere_replicas:
+				self.stat_vsphere_replicas=1
+			else:
+				self.stat_vsphere_replicas=0
 
-		self.stat_general=self.stat_restore_points * self.stat_veeam_replicas * self.stat_vsphere_replicas 	
+			self.stat_general=self.stat_restore_points * self.stat_veeam_replicas * self.stat_vsphere_replicas 	
 		#pdb.set_trace()
 	@api.multi		
 	def generate_restorepoints_instance(self, stats_id, asset_id):

@@ -59,6 +59,12 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>
+    <record model="ir.actions.act_window" id="qlan_account_move_lines_action">
+      <field name="name">Account move lines</field>
+      <field name="res_model">account.move.line</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>    
    <record model="ir.actions.act_window" id="qlan_isp_action">
       <field name="name">ISP info</field>
       <field name="res_model">lubon_qlan.isp</field>
@@ -1232,6 +1238,8 @@
           action="qlan_restorepoints_instances_action"/>
         <menuitem id="lubon_qlan_events_menu" name="Events" parent="lubon_qlan_tables_menu"
           action="qlan_events_action"/>
+        <menuitem id="lubon_qlan_ccount_move_lines_menu" name="Account move lines" parent="lubon_qlan_tables_menu"
+          action="qlan_account_move_lines_action"/>          
 
 
            </data>

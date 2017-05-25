@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_lubon_suppliers_info_import,access_lubon_suppliers_info_import,model_lubon_suppliers_info_import,,1,1,1,1
-access_lubon_suppliers_import_stats,access_lubon_suppliers_import_stats,model_lubon_suppliers_import_stats,,1,1,1,1
-access_lubon_suppliers_fieldnames,access_lubon_suppliers_fieldnames,model_lubon_suppliers_fieldnames,,1,1,1,1
