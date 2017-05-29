@@ -755,6 +755,7 @@
                       <!-- field name="name" placeholder="Lubon" widget="char2"/-->
                       <field name="alfacode" placeholder="LUB"/>
                       <field name="code" placeholder="C0000-001"/>
+                      <field name="active"/>
                       <field name="main_contact"/>
                     </group>
                     <group>

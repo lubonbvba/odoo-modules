@@ -7,3 +7,5 @@ import vmobjects
 import vmdrives
 import events
 import licenses
+import sessions
+import partner

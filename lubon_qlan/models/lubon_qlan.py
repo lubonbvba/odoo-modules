@@ -363,6 +363,7 @@ class lubon_qlan_sites(models.Model):
 	_name='lubon_qlan.sites'
 	_inherit='pad.common'
 	name=fields.Char(string="Site name")
+	active=fields.Boolean(default=True)
 	alfacode=fields.Char(string="Site Code")
 	filemaker_site_id=fields.Char(string='Filemaker site')
 	partner_id=fields.Many2one('res.partner', string="Address", domain="[('is_company','=',True)]")

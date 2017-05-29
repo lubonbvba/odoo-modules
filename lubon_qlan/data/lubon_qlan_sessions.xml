@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Task-related subtypes for messaging / Chatter -->
+        <record id="cm_getxasessions" model="cmd_execute.command">
+            <field name="name">Get XA Sessions</field>
+            <field name="cmd_type">wps</field>
+
+        </record>
+    </data>
+</openerp>

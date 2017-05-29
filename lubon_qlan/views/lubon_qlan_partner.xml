@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!-- Add instructor field to existing view -->
+        <record model="ir.ui.view" id="lubon_qlan_partner_form">
+            <field name="name">lubon_qlan.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Sites">
+                       <field name="site_responsible" />
+                            <field name="partner_id_reminder"/>
+                            <field name="formal_communication"/>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+    </data>
+</openerp>
