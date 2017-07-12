@@ -179,6 +179,12 @@ class lubon_tasks(models.Model):
 		pdb.set_trace()	
 		return body
 
+	@api.multi
+	def check_project(self):
+		#method to set project on incoming mails, if no project is set.
+		if not self.project_id:
+			self.project_id=1
+		
 
 
 	@api.multi

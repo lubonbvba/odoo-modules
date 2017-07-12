@@ -40,7 +40,7 @@
                     <field name="contact_person_id" required="True"/>
                     <field name="contact_person_phone" widget="phone"/>
 
-                    <field name="project_id" domain="['|','&amp;', ('state', 'in', ['open']),('partner_related_ids','in',partner_id), ('partner_id','=',partner_id)]" required="True" options="{'no_create': True}"/>
+                    <field name="project_id" domain="[ ('state', 'ilike', 'open'),'|',('partner_related_ids','in',partner_id), ('partner_id','=',partner_id)]" required="True" options="{'no_create': True}"/>
                 </xpath>
                  <xpath expr="//notebook/page[@string='Extra Info']" position="after">
                     <page string="Debug">

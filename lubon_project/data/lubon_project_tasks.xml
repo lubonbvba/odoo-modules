@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="lubon_project_task_project" model="ir.actions.server">
+            <field name="name">Check default project</field>
+            <field name="model_id" ref="model_project_task"/>
+            <field name="state">code</field>
+            <field name="code">action = self.check_project(cr, uid, context.get('active_ids', []), context=context)</field>
+        </record>
+    </data>
+</openerp>
