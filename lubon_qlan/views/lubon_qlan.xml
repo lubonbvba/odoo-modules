@@ -1043,6 +1043,20 @@
                   <field name="validcustomers_ids" widget="many2many_tags"/>
                 </group>
                 </group>
+              <notebook>
+                <page string="Session History">
+                  <field name="xasessions_ids">
+                    <tree>
+                      <field name="session_active"/>
+                      <field name="SessionName"/>
+                      <field name="logontime"/>
+                      <field name="sessionid"/>
+                      <field name="adaccount_id"/>
+                      <field name="asset_id"/>
+                    </tree>
+                  </field>
+                </page>
+              </notebook>  
               </sheet>
                         <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers"/>

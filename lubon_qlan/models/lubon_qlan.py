@@ -90,6 +90,7 @@ class lubon_qlan_adaccounts(models.Model):
 	validcontract_ids=fields.Many2many('account.analytic.account', compute='_getvalidcontract_ids',)
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="['&',('name','ilike',product),('analytic_account_id','in', validcontract_ids[0][2])]")	
 	exc_mb_size=fields.Float(string="Mailbox size")
+	xasessions_ids=fields.One2many('lubon_qlan.xasessions','adaccount_id')
 
 	@api.onchange('tenant_id')
 	@api.one

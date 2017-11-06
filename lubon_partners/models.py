@@ -10,11 +10,11 @@ from openerp.http import request
 # -*- coding: utf-8 -*-
 from openerp import fields, models
 
-class Partner(models.Model):
+class res_partner(models.Model):
 	_inherit = 'res.partner'
 
-	mail_invoice = fields.Char(string="Invoice e-mail", help="e-mail adress used to send invoices")
-	mail_reminder = fields.Char(string="Reminder e-mail", help="e-mail used to send reminders")
+	mail_invoice = fields.Char(string="Invoice e-mail (old)", help="e-mail adress used to send invoices")
+	mail_reminder = fields.Char(string="Reminder e-mail (old)", help="e-mail used to send reminders")
 	partner_id_invoice = fields.Many2one('res.partner', string="Invoice e-mail", help="e-mail adress used to send invoices")
 	partner_id_reminder = fields.Many2one('res.partner', string="Reminder e-mail", help="e-mail used to send reminders")
 	rate_hr=fields.Float(string="Hourly rate")

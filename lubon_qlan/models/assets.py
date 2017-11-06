@@ -231,23 +231,28 @@ class lubon_qlan_assets(models.Model):
 			time_filter=vim.event.EventFilterSpec.ByTime(beginTime=newest + datetime.timedelta(seconds=1))
 			filter_spec.time=time_filter                
 
-		event_res = eMgrRef.QueryEvents(filter_spec)
-		for e in event_res:
+		while True:
+			event_res = eMgrRef.QueryEvents(filter_spec)
+			if len(event_res) ==1:
+				break
+			logger.info("vc_get_events: Number of events: %d" % len(event_res))
+			for e in event_res:
+				#pdb.set_trace()
+				if not self.env['lubon_qlan.events'].search([('asset_id','=',self.id),('external_id',"=",e.key)]):
+					vm=self.env['lubon_qlan.assets'].search([('asset_name','=',e.vm.name),('parent_id','=',self.id)])
+					evt=self.env['lubon_qlan.events'].create({
+						'asset_id': self.id,
+						'external_id': e.key,
+						'event_type': e.eventTypeId,
+						'event_source_type':'vc',
+						'event_full': e.fullFormattedMessage,
+						'createtime': fields.Datetime.to_string(e.createdTime), 
+						'model': 'lubon_qlan.assets',
+						'related_id': vm.id,
+						})
+			time_filter=vim.event.EventFilterSpec.ByTime(beginTime=e.createdTime)
+			filter_spec.time=time_filter  
 			#pdb.set_trace()
-			if not self.env['lubon_qlan.events'].search([('asset_id','=',self.id),('external_id',"=",e.key)]):
-				vm=self.env['lubon_qlan.assets'].search([('asset_name','=',e.vm.name),('parent_id','=',self.id)])
-				evt=self.env['lubon_qlan.events'].create({
-					'asset_id': self.id,
-					'external_id': e.key,
-					'event_type': e.eventTypeId,
-					'event_source_type':'vc',
-					'event_full': e.fullFormattedMessage,
-					'createtime': fields.Datetime.to_string(e.createdTime), 
-					'model': 'lubon_qlan.assets',
-					'related_id': vm.id,
-					})
-
-		#pdb.set_trace()
 
 
 	@api.one
