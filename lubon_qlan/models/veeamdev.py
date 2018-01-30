@@ -43,10 +43,10 @@ def veeam_get(href):
     if r.status_code is 200:
         return r
     else:
-        print "error"
-        print r.status_code
+#        print "error"
+#        print r.status_code
         logger.error("url: %s" % href)
-        #pdb.set_trace()
+#        pdb.set_trace()
         return r
 
 
@@ -55,19 +55,20 @@ def veeam_get(href):
 def veeam_decode(href,attrname=None,attrvalue=None):
     result=[]
     r= veeam_get(href)
-
+    
     b=LET.fromstring(r.content)
+    pdb.set_trace()
     for ref in b:
-#        print ref.attrib
+        print ref.attrib
 #        pdb.set_trace()
 
         for links in ref:
-#            print links.attrib
+            print links.attrib
             #db.set_trace()
             for link in links:
                 #pdb.set_trace()
                 if not attrname  or ((attrname in link.keys()) and (link.attrib[attrname]==attrvalue)):
-#                    print link.attrib
+                    print link.attrib
                     result.append(link)
                 #s=veeam_get(link.attrib['Href'])
                 #c=LET.fromstring(s.content)
@@ -106,9 +107,9 @@ def get_restorepoints(vmname,date=None,querytype=None):
     date_end=datetime.strftime(date_end, "%Y-%m-%d") + " 12:00:00"
 #    pdb.set_trace()
 
-    result=veeam_decode(api_url + '/query?type='+ querytype +'&format=entities&filter=VmDisplayName=="'+ vmname +'";CreationTime>="'+date_start+'";CreationTime<"'+date_end+'"','Type',querytype)
-#    result=veeam_decode(api_url + '/query?type=VmRestorePoint&format=entities&filter=VmDisplayName=="'+ vmname +'";CreationTime>="'+date_start+'";CreationTime<"'+date_end+'"','Type','VmRestorePoint')
-#    result=veeam_decode(api_url + '/query?type=VmReplicaPoint&format=entities&filter=VmDisplayName=="'+ vmname +'";CreationTime>="'+date_start+'";CreationTime<"'+date_end+'"','Type','VmReplicaPoint')
+    result=veeam_decode(api_url + '/query?type='+ querytype +'&format=entities&filter=CreationTime>="'+date_start+'";CreationTime<"'+date_end+'"','Type',querytype)
+    pdb.set_trace()
+#2017-09-05    result=veeam_decode(api_url + '/query?type='+ querytype +'&format=entities&filter=VmDisplayName=="'+ vmname +'";CreationTime>="'+date_start+'";CreationTime<"'+date_end+'"','Type',querytype)
 
     links=result['result']
  #   print "nr of results:", len(links)
@@ -142,64 +143,8 @@ def get_restorepoints(vmname,date=None,querytype=None):
         res.append(restorepoint)
     return {'res': res,'href':result['href'], 'response':result['response']}    
 
-def get_all_points(date,querytype):
-    points=[]
-    if not date:
-        date=datetime.today() - timedelta(days=1)
-        date=datetime.strftime(date, "%Y-%m-%d")
-    date_start=date + " 12:00:00"
-    create_session()
-    result=veeam_get(api_url + '/query?type='+ querytype +'&format=entities&filter=CreationTime>="'+ date_start + '"')
-    a=LET.fromstring(result.content)
-    for b in a[0]:
-        #print len(b)
-        for c in b:
-      #      print c.keys()
-    #        print c.attrib['Name'].split('@')[0],c.attrib['Name'].split('@')[1],c.attrib['Type'],c.attrib['UID']
-            point={
-            'Name':c.attrib['Name'].split('@')[0],
-            'Date':c.attrib['Name'].split('@')[1],
-            'Type':c.attrib['Type'],
-            'UID':c.attrib['UID'],
-            }
-            for t in c:
-                #pdb.set_trace()
-                if t.tag.lower().find('creationtimeutc') > 0:
-                    #print 'creation time: ', t.text
-                   point['creationtimeutc']= t.text
-                elif t.tag.lower().find('algorithm') > 0:
-                    #print 'algorithm: ', t.text
-                    point['algorithm']= t.text
-                elif t.tag.lower().find('pointtype') > 0:
-                    #print 'pointtype: ', t.text
-                    point['pointtype']= t.text
-                elif t.tag.lower().find('hierarchyobjref') > 0:
-                    #print 'hierarchyobjref: ', t.text
-                    point['hierarchyobjref']= t.text
-
-            points.append(point)    
-    return points
 
 
-def test_functions():
-    #points = get_restorepoints("C0008ALF001","2018-01-22",'VmRestorePoint')
-    #print len (points)
-    create_session()
-    #result=veeam_get('http://q02mon003.q.lan:9399/api/restorePoints')
-    #result=veeam_get('http://q02mon003.q.lan:9399/api/query?type=VmRestorePoint&format=entities&filter=VmDisplayName=="Q02MON001";CreationTime>="2018-01-24 12:00:00";CreationTime<"2018-01-25 12:00:00"')
-    result=veeam_get('http://q02mon003.q.lan:9399/api/query?type=VmRestorePoint&format=entities&filter=CreationTime>="2018-01-26 12:00:00"')
-    #result=veeam_get('http://q02mon003.q.lan:9399/api/query?type=VmRestorePoint&format=entities&filter=VmDisplayName=="Q02MON001"')
-
-    a=LET.fromstring(result.content)
-    for b in a[0]:
-        print len(b)
-        for c in b:
-      #      print c.keys()
-            print c.attrib['Name'].split('@')[0],c.attrib['Name'].split('@')[1],c.attrib['Type'],c.attrib['UID']
-            for tag in c:
-                print tag
-
-     #       print c.attrib['UID']
-     #       print c.attrib['Href']
-
-    pdb.set_trace()
+points = get_restorepoints("C0008ALF001","2017-09-04",'VmReplicaPoint')
+#print len (points)
+#pdb.set_trace()
