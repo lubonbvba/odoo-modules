@@ -82,9 +82,10 @@ class lubon_qlan_restore_points_stats(models.Model):
 
 	@api.multi
 	def check_all_restorepoints(self,failedonly=False):
-		points = get_all_points(self.date, "VmRestorePoint")
-		for point in points:
-			self.addpoint(point)
+		for q in ['VmRestorePoint', 'VmReplicaPoint']:
+			points = get_all_points(self.date, q)
+			for point in points:
+				self.addpoint(point)
 		self.update_rate_stats()
 		#pdb.set_trace()
 
@@ -97,7 +98,7 @@ class lubon_qlan_restore_points_stats(models.Model):
 		p.creationtimeutc=point['Date']
 		p.algorithm=point['algorithm']
 		p.pointtype=point['pointtype']
-		p.hierarchyobjref=point['hierarchyobjref']
+#		p.hierarchyobjref=point['hierarchyobjref']
 		p.veeamtype=point['Type']
 		if not p.restorepoints_instances_id:
 			search_date=fields.Date.to_string(fields.Datetime.from_string(p.creationtimeutc) - timedelta(hours=12))
