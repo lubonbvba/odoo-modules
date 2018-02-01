@@ -50,6 +50,11 @@ class lubon_qlan_tenants(models.Model):
 		self.adaccounts_count=len(self.adaccounts_ids)
 	adaccounts_count=fields.Integer(compute=_adaccounts_count)
 
+	@api.one
+	def _contracts_count(self):
+		self.contracts_count=len(self.contract_ids)
+	contracts_count=fields.Integer(compute=_contracts_count)
+
 class lubon_qlan_adaccounts(models.Model):
 	_name = 'lubon_qlan.adaccounts'
 	_description = "AD Account"

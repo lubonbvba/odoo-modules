@@ -38,6 +38,15 @@
       <field name="view_mode">tree,form</field>
       <!--field name="domain">[["type","=",'delivery']]</field -->
     </record>
+    <record model="ir.actions.act_window" id="qlan_adaccounts_menu_action">
+      <field name="name">AD Accounts</field>
+      <field name="res_model">lubon_qlan.adaccounts</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+      <field name="context">{'search_default_account_to_complete': 1,'search_default_contract check':1,'search_default_obsolete':1 }</field>
+
+      <!--field name="domain">[["type","=",'delivery']]</field -->
+    </record>
     <record model="ir.actions.act_window" id="qlan_restore_points_stats_action">
       <field name="name">Restore points stats</field>
       <field name="res_model">lubon_qlan.restore_points_stats</field>
@@ -476,6 +485,19 @@
             </field>
         </field>
     </record>  
+        <record model="ir.ui.view" id="lubon_qlan_contracts_search_view">
+            <field name="name">lubon_qlan.contracts_search</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account_analytic_analysis.view_account_analytic_account_overdue_search"/>
+            <field name="arch" type="xml">
+              <field name="date" position="after">
+                <field name="id" invisible="True"/>
+            </field>
+        </field>
+    </record>  
+
+
+
   <record model="ir.ui.view" id="lubon_qlan_interfaces_form">
     <field name="name">lubon_qlan.interfaces_form</field>
     <field name="model">lubon_qlan.interfaces</field>
@@ -878,10 +900,14 @@
           <field name="model">lubon_qlan.tenants</field>
           <field name="arch" type="xml">
             <form string="Tenants form">
-              <sheet>                    <div class="oe_right oe_button_box" name="buttons">
+              <sheet>
+                <div class="oe_right oe_button_box" name="buttons">
                     <button type="action" class="oe_stat_button" name="%(qlan_adaccounts_action)d" icon="fa-shopping-cart" context="{'search_default_tenant_id': active_id, 'default_tenant_id': active_id}">
                       <field name="adaccounts_count" string="Accounts" widget="statinfo"/>
                     </button>
+                    <button type="action" class="oe_stat_button" name="%(qlan_contracts_action)d" icon="fa-briefcase" context="{'search_default_id':contract_ids[0][2]}">
+                      <field name="contracts_count" string="Contracts" widget="statinfo"/>
+                    </button>                    
                   </div>
                 <group col="3">
                   <group string="Admin">
@@ -1225,13 +1251,13 @@
           action="qlan_restore_points_stats_action"/>
         <menuitem id="lubon_qlan_isp_check_menu" name="ISP info" parent="lubon_qlan_checks_menu"
           action="qlan_isp_action"/>
-
+        <menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tenants_menu"
+            action="qlan_adaccounts_menu_action"/>
 
         <menuitem id="lubon_qlan_configuration_menu" name="Configuration"
           parent="main_lubon_qlan_menu" groups="base.group_no_one" sequence="999"/>
         <menuitem id="lubon_qlan_tables_menu" name="Tables" parent="lubon_qlan_configuration_menu"/>
-        <menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tables_menu"
-            action="qlan_adaccounts_action"/>
+
         <menuitem id="lubon_qlan_adaccounts_import_menu" name="AD Accounts import" parent="lubon_qlan_tables_menu"
               action="qlan_adaccounts_import_action"/>
         <menuitem id="lubon_qlan_messages_menu" name="Messages" parent="lubon_qlan_tables_menu"
