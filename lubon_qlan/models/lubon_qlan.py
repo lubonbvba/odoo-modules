@@ -17,6 +17,7 @@ class lubon_qlan_tenants(models.Model):
 	_description = 'Tenant'
 	_rec_name = 'code'
 	_sql_constraints = [('code_unique','UNIQUE(code)','Code has to be unique')]
+	active=fields.Boolean(default=True)
 	code = fields.Char(oldname='name', required=True, help='Tenant code', index=True )
 	tenant_name = fields.Char(string='Name', required=True, oldname='descript_name', help="Descriptive name of the tenant")
 	qadm_password = fields.Char(help="Password for qadm@upn user")

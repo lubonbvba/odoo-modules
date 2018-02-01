@@ -968,6 +968,9 @@
                  </page>
 
                  <page string="Contracts">
+                  <group>
+                  <field name="active"/>
+                  </group>
                   <field name="contract_ids"/>
                 </page>
                 <page string="Credentials">
