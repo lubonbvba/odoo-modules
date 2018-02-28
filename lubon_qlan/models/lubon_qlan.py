@@ -32,8 +32,11 @@ class lubon_qlan_tenants(models.Model):
 	ip_ids=fields.One2many('lubon_qlan.ip','tenant_id')
 	vlan_ids=fields.One2many('lubon_qlan.vlan','tenant_id')
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
-
+	account_source_ids=fields.One2many('lubon_qlan.account_source','tenant_id')
+	
 	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
+	adusers_ids=fields.One2many('lubon_qlan.adusers', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
+	adgroups_ids=fields.One2many('lubon_qlan.adgroups', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
 	assets_ids=fields.One2many('lubon_qlan.assets', 'tenant_id')
 
 	credential_ids=fields.One2many('lubon_credentials.credentials','tenant_id')
@@ -52,6 +55,16 @@ class lubon_qlan_tenants(models.Model):
 	adaccounts_count=fields.Integer(compute=_adaccounts_count)
 
 	@api.one
+	def _adusers_count(self):
+		self.adusers_count=len(self.adusers_ids)
+	adusers_count=fields.Integer(compute=_adusers_count)
+
+	@api.one
+	def _adgroups_count(self):
+		self.adgroups_count=len(self.adgroups_ids)
+	adgroups_count=fields.Integer(compute=_adgroups_count)
+
+	@api.one
 	def _contracts_count(self):
 		self.contracts_count=len(self.contract_ids)
 	contracts_count=fields.Integer(compute=_contracts_count)
@@ -61,7 +74,7 @@ class lubon_qlan_adaccounts(models.Model):
 	_description = "AD Account"
 	_inherit = ['mail.thread','ir.needaction_mixin']
 	_sql_constraints = [('guid_unique','UNIQUE(objectguid)','objectguid has to be unique')]
-	_rec_name = 'samaccountname'
+	_rec_name = 'name'
 	_mail_post_access = 'read'
 	_track = {
         'product': {
@@ -78,25 +91,31 @@ class lubon_qlan_adaccounts(models.Model):
     }
 
 
-
-
+    #qlan fields
+	tenant_id=fields.Many2one('lubon_qlan.tenants',track_visibility='onchange') #, required=True)
+	active=fields.Boolean(default=True)
 	account_created=fields.Boolean(default=True, track_visibility='onchange')
+	account_source_id=fields.Many2one('lubon_qlan.account_source')
 	name=fields.Char()
-	samaccountname=fields.Char()
-	logonname=fields.Char()
+	displayname=fields.Char()
 	product=fields.Char(track_visibility='onchange')
-	objectguid=fields.Char(required=True)
 	date_first=fields.Datetime(help="Date of first import")
 	date_last=fields.Datetime(help="Date last seen")
-	ad_enabled=fields.Boolean(string="Enabled",default=True,track_visibility='onchange')
-	tenant_id=fields.Many2one('lubon_qlan.tenants',track_visibility='onchange') #, required=True)
 	person_id=fields.Many2one('res.partner', string="Related person", domain="['&',('type','=','contact'),('parent_id','in', validcustomers_ids[0][2])]")
 	contract_id=fields.Many2one('account.analytic.account', string="Contract" )
 	validcustomers_ids=fields.Many2many('res.partner', compute='_getvalidcustomer_ids',)
 	validcontract_ids=fields.Many2many('account.analytic.account', compute='_getvalidcontract_ids',)
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="['&',('name','ilike',product),('analytic_account_id','in', validcontract_ids[0][2])]")	
-	exc_mb_size=fields.Float(string="Mailbox size")
-	xasessions_ids=fields.One2many('lubon_qlan.xasessions','adaccount_id')
+	ad_date_created=fields.Datetime(help="Date created in ad")
+
+	#adobject fields
+	distinguishedname=fields.Char(index=True)
+	objectguid=fields.Char(required=True, index=True)
+	memberofstring=fields.Char(help="String used to detect changes in group membership.")
+	memberof=fields.Many2many('lubon_qlan.adaccounts',relation='lubon_qlan_adaccounts_groups',column1="member",column2="container")
+	members=fields.Many2many('lubon_qlan.adaccounts',relation='lubon_qlan_adaccounts_groups', column1="container",column2="member" )
+	membercount=fields.Integer(string="Nr Memb")
+	email_address_ids=fields.One2many('lubon_qlan.email_address','adaccounts_id')
 
 	@api.onchange('tenant_id')
 	@api.one
@@ -118,6 +137,70 @@ class lubon_qlan_adaccounts(models.Model):
 	def check_product(self):
 		if not self.account_created:
 			self.contract_line_id=False
+
+	@api.multi
+	def checkmailaddresses(self,addresslist):
+		if addresslist:
+			current_list=self.email_address_ids
+			for address in addresslist:
+				email=self.email_address_ids.search([('email_address','ilike',address)])
+				if not email:
+					email=self.email_address_ids.create({
+						'email_address':address,
+						'adaccounts_id':self.id,
+						})
+				email.email_address=address	
+				email.is_default= 'SMTP' in email.email_address
+				current_list=current_list - email
+			for email in current_list:
+				email.unlink()
+		
+
+class lubon_qlan_adusers(models.Model):
+	_name = 'lubon_qlan.adusers'
+	_inherit = ['mail.thread']
+	_inherits = {'lubon_qlan.adaccounts':'account_id'}
+	_description = "AD Users"	#ad user fields
+	_rec_name='name'
+	account_id=fields.Many2one('lubon_qlan.adaccounts', required=True, ondelete='cascade')
+	samaccountname=fields.Char()
+	logonname=fields.Char()
+	last_logon=fields.Datetime(help="Last logon date")
+	ad_enabled=fields.Boolean(string="Enabled",default=True,track_visibility='onchange')
+	exc_mb_size=fields.Float(string="Mailbox size")
+	xasessions_ids=fields.One2many('lubon_qlan.xasessions','adaccount_id')
+	legacyexchangedn=fields.Char()
+	mailnickname=fields.Char()
+	mail=fields.Char()
+	scriptpath=fields.Char()
+	targetaddress=fields.Char()
+	objectclass=fields.Char()
+	first_name=fields.Char()
+	last_name=fields.Char()
+	mobile=fields.Char()
+
+	@api.multi
+	def refresh(self):
+		self.account_source_id.run_single_sync(self.objectguid)
+
+
+
+class lubon_qlan_email_address(models.Model):
+	_name = 'lubon_qlan.email_address'
+	_order = 'is_default DESC, email_address'
+	email_address=fields.Char()
+	is_default=fields.Boolean()
+	adaccounts_id=fields.Many2one('lubon_qlan.adaccounts')
+
+
+class lubon_qlan_groups(models.Model):
+	_name = 'lubon_qlan.adgroups'
+	_inherit = ['mail.thread']
+	_inherits = {'lubon_qlan.adaccounts':'account_id'}
+	_description = "AD Groups"	#ad user fields
+	account_id=fields.Many2one('lubon_qlan.adaccounts', required=True,ondelete='cascade')
+
+
 
 
 

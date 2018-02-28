@@ -34,7 +34,7 @@ class account_analytic_invoice_line(models.Model):
 	@api.one
 	@api.depends('name')
 	def _compute_display_name(self):
-		pdb.set_trace()
+		#pdb.set_trace()
 		self.display_name=""
 		if self.name:
 			self.display_name=self.name

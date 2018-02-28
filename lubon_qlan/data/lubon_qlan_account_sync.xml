@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="ast_qlan" model="lubon_qlan.account_source_type">
+            <field name="name">QLAN</field>
+            <field name="single_tenant">False</field>
+        </record>
+        <record id="ast_o365" model="lubon_qlan.account_source_type">
+            <field name="name">Office 365</field>
+            <field name="single_tenant">True</field>
+        </record>        
+        <record id="ast_google" model="lubon_qlan.account_source_type">
+            <field name="name">Google</field>
+            <field name="single_tenant">True</field>
+        </record>        
+        <record id="ast_windows" model="lubon_qlan.account_source_type">
+            <field name="name">Windows Domain</field>
+            <field name="single_tenant">True</field>
+        </record>        
+        <record id="cm_getfullaccountinfo" model="cmd_execute.command">
+            <field name="name">Get Full account info</field>
+            <field name="cmd_type">wps</field>
+            <field name="method">True</field>
+        </record>
+        <record id="ir_cron_lubon_qlan_account_sync_scheduler" model="ir.cron">
+            <field name="name">Account sync schedulers</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="model">lubon_qlan.account_source</field>
+            <field name="function">cron_scheduler</field>
+            <field name="args">['']</field>
+            <!-- Active flag is set on fetchmail_server.create/write -->
+            <field name="active" eval="False"/>
+        </record>
+    </data>
+</openerp>

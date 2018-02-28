@@ -36,11 +36,22 @@
       <field name="res_model">lubon_qlan.adaccounts</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
-      <!--field name="domain">[["type","=",'delivery']]</field -->
+    </record>
+    <record model="ir.actions.act_window" id="qlan_adusers_action">
+      <field name="name">AD Users</field>
+      <field name="res_model">lubon_qlan.adusers</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    <record model="ir.actions.act_window" id="qlan_adgroups_action">
+      <field name="name">AD Groups</field>
+      <field name="res_model">lubon_qlan.adgroups</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
     </record>
     <record model="ir.actions.act_window" id="qlan_adaccounts_menu_action">
-      <field name="name">AD Accounts</field>
-      <field name="res_model">lubon_qlan.adaccounts</field>
+      <field name="name">AD Users</field>
+      <field name="res_model">lubon_qlan.adusers</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
       <field name="context">{'search_default_account_to_complete': 1,'search_default_contract check':1,'search_default_obsolete':1 }</field>
@@ -905,6 +916,12 @@
                     <button type="action" class="oe_stat_button" name="%(qlan_adaccounts_action)d" icon="fa-shopping-cart" context="{'search_default_tenant_id': active_id, 'default_tenant_id': active_id}">
                       <field name="adaccounts_count" string="Accounts" widget="statinfo"/>
                     </button>
+                    <button type="action" class="oe_stat_button" name="%(qlan_adusers_action)d" icon="fa-shopping-cart" context="{'search_default_tenant_id': active_id, 'default_tenant_id': active_id}">
+                      <field name="adusers_count" string="Users" widget="statinfo"/>
+                    </button>                    
+                     <button type="action" class="oe_stat_button" name="%(qlan_adgroups_action)d" icon="fa-shopping-cart" context="{'search_default_tenant_id': active_id, 'default_tenant_id': active_id}">
+                      <field name="adgroups_count" string="Groups" widget="statinfo"/>
+                    </button>                    
                     <button type="action" class="oe_stat_button" name="%(qlan_contracts_action)d" icon="fa-briefcase" context="{'search_default_id':contract_ids[0][2]}">
                       <field name="contracts_count" string="Contracts" widget="statinfo"/>
                     </button>                    
@@ -929,9 +946,9 @@
                   </group>
                 </group>
                 <notebook>
-                  <page string="AD Accounts">
-                    <field name="adaccounts_ids" context="{'default_tenant_id' : active_id }">
-                      <tree string="Accounts" editable="bottom">
+                  <page string="AD Users">
+                    <field name="adusers_ids" context="{'default_tenant_id' : active_id }">
+                      <tree string="Users" zeditable="bottom">
                         <field name="tenant_id" invisible="True"/>
                         <field name="name"/>
                         <field name="samaccountname"/>                              
@@ -947,6 +964,16 @@
                     </field>
                   </page>
                   <page string="AD Groups">
+                    <field name="adgroups_ids" context="{'default_tenant_id' : active_id }">
+<!--                       <tree string="Groups">
+                        <field name="tenant_id" invisible="True"/>
+                        <field name="name"/>
+                        <field name="displayname"/>                              
+                      </tree> -->
+                    </field>
+                  </page>
+                  <page string="Sources">
+                    <field name="account_source_ids" context="{'default_tenant_id': active_id, 'default_name': tenant_name}"/>
                   </page>
                   <page string="Servers">
                     <field name="assets_ids" context="{'default_tenant_id': active_id}"/>
@@ -1000,7 +1027,7 @@
                 <search>
                   <field name="date_first"/>
                   <field name="date_last"/>
-                  <field name="name" string="Name, product ..." filter_domain="['|','|',('samaccountname','ilike',self),('logonname','ilike',self),('product','ilike',self)]"/>
+                  <field name="name" string="Name, product ..." filter_domain="['|','|',('name','ilike',self),('distinguishedname','ilike',self),('product','ilike',self)]"/>
                   <field name="product" filter_domain="[('product','ilike',self)]"/>
                   <field name="tenant_id" filter_domain="[('tenant_id','ilike',self)]"/>
                   <filter name="notenant" string="No Tenant"
@@ -1030,15 +1057,14 @@
               <field name="name">adaccounts.tree</field>
               <field name="model">lubon_qlan.adaccounts</field>
               <field name="arch" type="xml">
-                <tree string="Ad accounts Tree" editable="top">
+                <tree string="Ad accounts Tree" zeditable="top">
                   <field name="tenant_id"/>
-                  <field name="samaccountname"/>
-                  <field name="logonname"/>
+                  <!--field name="samaccountname"/-->
+                  <!--field name="logonname"/-->
                   <field name="name"/>
-                  <field name="date_first"/>
-                  <field name="date_last"/>
+                  <field name="ad_date_created"/>
                   <field name="product"/>
-                  <field name="ad_enabled"/>
+                  <!--field name="ad_enabled"/-->
                   <field name="account_created"/>
                   <field name="validcontract_ids" invisible="True"/>
                   <field name="contract_line_id"/>
@@ -1056,23 +1082,44 @@
                   <field name="name"/>
                   <field name="person_id" context="{'default_email': logonname}"/>
                   <field name="product"/>
-                  <field name="ad_enabled"/>
+                  <field name="account_source_id"/>
+                  <field name="distinguishedname"/>
+                  <!-- field name="ad_enabled"/ -->
                   <field name="account_created"/>
                   <field name="contract_line_id" />
-                  <field name="exc_mb_size" />
+                  <!--field name="exc_mb_size" /-->
                 </group>
                 <group>
-                  <field name="tenant_id"/>
+<!--                   <field name="tenant_id"/>
                   <field name="samaccountname"/>
+                  <field name="ad_date_created"/>
                   <field name="logonname"/>
+                  <field name="last_logon"/>
                   <field name="date_first"/>
                   <field name="date_last"/>
+                  <field name="distinguishedname"/>
                   <field name="objectguid"/>
                   <field name="validcontract_ids" widget="many2many_tags"/>
-                  <field name="validcustomers_ids" widget="many2many_tags"/>
+                  <field name="validcustomers_ids" widget="many2many_tags"/> -->
+                </group>
+                <group string="Mail Related">
+<!--                   <field name="legacyExchangeDN"/>
+                  <field name="mailNickname"/>
+                  <field name="targetAddress"/> -->
                 </group>
                 </group>
-              <notebook>
+                <notebook>
+                  <page string="Group membership">
+                    <field name="memberof">
+                      <tree>
+                        <field name="name"/>
+                        <field name="displayname"/>
+                        <field name="distinguishedname"/>
+                      </tree>
+                    </field>
+                  </page>
+                </notebook>
+<!--               <notebook>
                 <page string="Session History">
                   <field name="xasessions_ids">
                     <tree>
@@ -1085,7 +1132,7 @@
                     </tree>
                   </field>
                 </page>
-              </notebook>  
+              </notebook> -->  
               </sheet>
                         <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers"/>
@@ -1248,8 +1295,8 @@
 
         <menuitem id="adtenants_menu" name="AD Tenants" parent="lubon_qlan_tenants_menu"
           action="qlan_tenants_action" groups="qlan_user"/>
-        <menuitem id="contracts_menu" name="Contracts" parent="lubon_qlan_tenants_menu"
-            action="qlan_contracts_action" groups="qlan_manager"/>
+        <!-- menuitem id="contracts_menu" name="Contracts" parent="lubon_qlan_tenants_menu"
+            action="qlan_contracts_action" groups="qlan_manager"/ -->
         <menuitem id="lubon_qlan_restore_points_stats_menu" name="Stats" parent="lubon_qlan_backup_menu"
           action="qlan_restore_points_stats_action"/>
         <menuitem id="lubon_qlan_isp_check_menu" name="ISP info" parent="lubon_qlan_checks_menu"

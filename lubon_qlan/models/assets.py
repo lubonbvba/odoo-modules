@@ -37,7 +37,7 @@ class lubon_qlan_assets(models.Model):
 	asset_type=fields.Selection([('switch','Switch'),('server','Physical server'),('firewall','Firewall'),('vm','Virtual machine'),('vc','Vcenter'),])
 	asset_remarks=fields.Html(string="Remarks")
 	lot=fields.Char(string="Serial", help="Serial Number")
-	part=fields.Char(string="Part n°", help="Manufacturer part number")
+	part=fields.Char(string="Part nr", help="Manufacturer part number")
 	warranty_end_date=fields.Date(string="End date warranty")
 	sequence=fields.Integer()
 	notes=fields.Html()

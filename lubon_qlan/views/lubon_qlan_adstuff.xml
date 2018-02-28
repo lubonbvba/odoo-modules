@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+		<record model="ir.ui.view" id="adusers_search_view">
+			<field name="name">adusers.search</field>
+			<field name="model">lubon_qlan.adusers</field>
+			<field name="arch" type="xml">
+				<search>
+					<field name="date_first"/>
+					<field name="date_last"/>
+					<field name="name" string="Name, product ..." filter_domain="['|','|',('name','ilike',self),('distinguishedname','ilike',self),('product','ilike',self)]"/>
+					<field name="product" filter_domain="[('product','ilike',self)]"/>
+					<field name="tenant_id" filter_domain="[('tenant_id','ilike',self)]"/>
+					<filter name="notenant" string="No Tenant"
+						domain="[('tenant_id', '=', False)]"/>
+					<filter name="notenant" string="No Product"
+							domain="[('product', 'not ilike', '-')]"/>
+					<filter name="account_to_complete" string="To complete win"
+								domain="['|', ('product', 'not ilike', '-'),('tenant_id', '=', False)]"/>            
+					<filter name="contract check" string="Contract not ok"
+									domain="[('product', '!=', 'LUB-USR-000'),('account_created', '=', True),('contract_line_id', '=', False)]"/>                   
+					<filter name="obsolete" string="Obsolete"
+										domain="['|','&amp;',('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') ),('contract_line_id','!=',False),('account_created','=',False)]"/>
+					<group string="Group By">
+						<filter name="by_tenant" string="Tenant"
+												context="{'group_by': 'tenant_id'}"/>
+						<filter name="by_product" string="Product"
+													context="{'group_by': 'product'}"/>
+						<filter name="by_contract_line_id" string="Contract line"
+														context="{'group_by': 'contract_line_id'}"/>
+						<filter name="by_date_first" string="First Date"
+															context="{'group_by': 'date_first'}"/>
+						</group>
+				</search>
+			</field>
+		</record>            
+		<record model="ir.ui.view" id="adusers_tree_view">
+			<field name="name">adusers.tree</field>
+			<field name="model">lubon_qlan.adusers</field>
+			<field name="arch" type="xml">
+				<tree string="Ad accounts Tree" zeditable="top">
+					<field name="tenant_id"/>
+					<!--field name="samaccountname"/-->
+					<!--field name="logonname"/-->
+					<field name="name"/>
+					<field name="ad_date_created"/>
+					<field name="product"/>
+					<!--field name="ad_enabled"/-->
+					<field name="account_created"/>
+					<field name="ad_enabled"/>
+					<field name="validcontract_ids" invisible="True"/>
+					<field name="contract_line_id"/>
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="adusers_form_view">
+			<field name="name">adusers.form</field>
+			<field name="model">lubon_qlan.adusers</field>
+			<field name="arch" type="xml">
+				<form string="Ad accounts">
+					<header>
+						<button string="Passwd reset"/>
+						<button string="Disable"/>
+						<button string="Unlock"/>
+						<button name='refresh' type='object' string="Refresh"/>
+					</header>
+					<sheet>
+						<group>
+							<group>
+								<field name="person_id" context="{'default_email': logonname, 'default_name': displayname, 'default_mobile': mobile}"/>
+								<field name="displayname"/>
+								<field name="tenant_id"/>
+								<field name="product"/>
+								<field name="account_source_id"/>
+								<field name="ad_enabled"/>
+								<field name="active"/>
+								<field name="account_created"/>
+								<field name="contract_line_id" />
+							</group>
+						<group>
+                  
+                  <field name="samaccountname"/>
+                  <field name="ad_date_created"/>
+                  <field name="logonname"/>
+                  <field name="last_logon"/>
+                  <field name="date_first"/>
+                  <field name="date_last"/>
+              	</group>
+
+	          </group>
+	          <notebook>
+	          	<page string="Group membership">
+	          		<field name="memberof">
+	          			<tree>
+	          				<field name="name"/>
+	          				<field name="displayname"/>
+	          				<field name="distinguishedname"/>
+	          				<field name="membercount"/>
+	          			</tree>
+	          		</field>
+	          	</page>
+	          	<page string="Session History">
+	          		<field name="xasessions_ids">
+	          			<tree>
+	          				<field name="session_active"/>
+	          				<field name="SessionName"/>
+	          				<field name="logontime"/>
+	          				<field name="sessionid"/>
+	          				<field name="adaccount_id"/>
+	          				<field name="asset_id"/>
+	          			</tree>
+	          		</field>
+	          	</page>
+	          	<page string="Mail">
+	          		<group>
+	          			<field name="legacyexchangedn"/>
+	          			<field name="mail"/>
+	          			<field name="mailnickname"/>
+	          			<field name="targetaddress"/>
+	          		</group>
+	          		<field name="email_address_ids">
+	          			<tree>
+	          				<field name="email_address"/>
+	          				<field name="is_default"/>
+	          			</tree>
+	          		</field>
+	          	</page>
+	          	<page string="Details/Debug">
+	          		<group>
+	          			<field name="last_name"/>
+	          			<field name="first_name"/>
+	          			<field name="scriptpath"/>
+	          			<field name="mobile"/>
+	          			<field name="distinguishedname"/>
+	          			<field name="objectguid"/>
+	          			<field name="validcontract_ids" widget="many2many_tags"/>
+	          			<field name="validcustomers_ids" widget="many2many_tags"/>
+	          		</group>
+	          	</page>
+	          </notebook>
+	      </sheet>
+	        	<div class="oe_chatter">
+	        		<field name="message_follower_ids" widget="mail_followers"/>
+	        		<field name="message_ids" widget="mail_thread"/>
+	        	</div>
+	    		</form>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="new_adusers_wizard">
+			<field name="name">new_adusers.wizard</field>
+			<field name="model">lubon_qlan.new_aduser</field>
+			<field name="arch" type="xml">
+				<form string="New AD User">
+					<sheet>
+						<group>
+							<group>
+								<field name="tenant_id" readonly="1"/>
+								<field name="person_id" domain="[('parent_id','in', validcustomers_ids[0][2]),('type','=','contact')]" options="{'no_quick_create':True,'no_create_edit':True, 'no_open':True}"/>
+								<field name="validcustomers_ids" widget="many2many_tags" readonly="1" invisible="True"/>
+								<field name="validcontract_ids" widget="many2many_tags" readonly="1" invisible="True"/>
+								<field name="customer_id" domain="[('id','in', validcustomers_ids[0][2])]" options="{'no_quick_create':True,'no_create_edit':True, 'no_open':True}"/>
+								<field name="contract_id" domain="[('id','in', validcontract_ids[0][2])]" options="{'no_quick_create':True,'no_create_edit':True, 'no_open':True}"/>
+
+							</group>
+							<group>
+								<field name="displayname"/>
+								<field name="last_name"/>
+								<field name="first_name"/>
+								<field name="alias"/>
+								<field name="upn" string="@"/>
+								<field name="email"/>
+								<field name="mobile"/>
+							</group>							
+						</group>
+
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="adgroups_tree_view">
+			<field name="name">adgroups.tree</field>
+			<field name="model">lubon_qlan.adgroups</field>
+			<field name="arch" type="xml">
+				<tree string="Ad groups">
+					<field name="tenant_id"/>
+					<!--field name="samaccountname"/-->
+					<!--field name="logonname"/-->
+					<field name="name"/>
+					<field name="displayname"/>
+					<field name="membercount"/>
+					<field name="account_created"/>
+					<field name="validcontract_ids" invisible="True"/>
+					<field name="contract_line_id"/>
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="adgroups_search_view">
+			<field name="name">adgroups.search</field>
+			<field name="model">lubon_qlan.adgroups</field>
+			<field name="arch" type="xml">
+				<search>
+					<field name="date_first"/>
+					<field name="date_last"/>
+					<field name="name" string="Name, product ..." filter_domain="['|','|',('name','ilike',self),('distinguishedname','ilike',self),('product','ilike',self)]"/>
+					<field name="product" filter_domain="[('product','ilike',self)]"/>
+					<field name="tenant_id" filter_domain="[('tenant_id','ilike',self)]"/>
+					<filter name="notenant" string="No Tenant"
+						domain="[('tenant_id', '=', False)]"/>
+					<filter name="notenant" string="No Product"
+							domain="[('product', 'not ilike', '-')]"/>
+					<filter name="account_to_complete" string="To complete win"
+								domain="[('tenant_id', '=', False)]"/>            
+					<filter name="contract check" string="Contract not ok"
+									domain="[('product', '!=', 'LUB-USR-000'),('account_created', '=', True),('contract_line_id', '=', False)]"/>                   
+					<filter name="obsolete" string="Obsolete"
+										domain="['|','&amp;',('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') ),('contract_line_id','!=',False),('account_created','=',False)]"/>
+					<group string="Group By">
+						<filter name="by_tenant" string="Tenant"
+												context="{'group_by': 'tenant_id'}"/>
+						<filter name="by_product" string="Product"
+													context="{'group_by': 'product'}"/>
+						<filter name="by_contract_line_id" string="Contract line"
+														context="{'group_by': 'contract_line_id'}"/>
+						<filter name="by_date_first" string="First Date"
+															context="{'group_by': 'date_first'}"/>
+						</group>
+				</search>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="adgroups_form_view">
+			<field name="name">adgroups.form</field>
+			<field name="model">lubon_qlan.adgroups</field>
+			<field name="arch" type="xml">
+				<form string="Ad groups">
+					<header>
+						<button name='refresh' type='object' string="Refresh"/>
+					</header>
+					<sheet>
+						<group>
+							<group>
+								<field name="displayname"/>
+								<field name="tenant_id"/>
+								<field name="product"/>
+								<field name="account_source_id"/>
+								<field name="account_created"/>
+								<field name="contract_line_id" />
+							</group>
+						<group>
+                  <field name="ad_date_created"/>
+                  <field name="date_first"/>
+                  <field name="date_last"/>
+              	</group>
+
+	          </group>
+	          <notebook>
+	          	<page string="Group members">
+	          		<field name="members">
+	          			<tree>
+	          				<field name="name"/>
+	          				<field name="displayname"/>
+	          				<field name="distinguishedname"/>
+	          			</tree>
+	          		</field>
+	          	</page>
+
+	          	<page string="Group membership">
+	          		<field name="memberof">
+	          			<tree>
+	          				<field name="name"/>
+	          				<field name="displayname"/>
+	          				<field name="distinguishedname"/>
+	          			</tree>
+	          		</field>
+	          	</page>
+	          	<page string="Mail">
+	          		<group>
+	          			<!-- field name="legacyexchangedn"/ -->
+	          			<!-- field name="mailnickname"/ -->
+	          			<!-- field name="targetaddress"/ -->
+	          		</group>
+	          		<field name="email_address_ids">
+	          			<tree>
+	          				<field name="email_address"/>
+	          				<field name="is_default"/>
+	          			</tree>
+	          		</field>
+	          	</page>
+	          	<page string="Details/Debug">
+	          		<group>
+	          			<field name="distinguishedname"/>
+	          			<field name="objectguid"/>
+	          			<field name="validcontract_ids" widget="many2many_tags"/>
+	          			<field name="validcustomers_ids" widget="many2many_tags"/>
+	          		</group>
+	          	</page>
+	          </notebook>
+	      </sheet>
+	        	<div class="oe_chatter">
+	        		<field name="message_follower_ids" widget="mail_followers"/>
+	        		<field name="message_ids" widget="mail_thread"/>
+	        	</div>
+	    		</form>
+			</field>
+		</record>
+
+
+      <act_window id="act_new_aduser"
+        name="New AD user"
+        src_model="lubon_qlan.tenants"
+        res_model="lubon_qlan.new_aduser"
+        view_mode="form"
+        target="new"
+        context="{'default_tenant_id': active_id,
+        			'default_validcustomers_ids': validcustomers_ids,
+        			'default_validcontract_ids': contract_ids,
+        			'default_upn': upn,
+         		}"
+        key2="client_action_multi"/>		
+	</data>
+</openerp>
+

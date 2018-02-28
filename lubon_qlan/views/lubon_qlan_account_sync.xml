@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+	<record model="ir.ui.view" id="lubon_qlan_account_source_type_tree">
+        <field name="name">lubon_qlan.account_source_type.tree</field>
+        <field name="model">lubon_qlan.account_source_type</field>
+        <field name="arch" type="xml">
+            <tree string="Source types">
+                <field name="name"/>
+                <field name="single_tenant"/>
+            </tree>
+        </field>
+    </record>
+	<record model="ir.ui.view" id="lubon_qlan_account_source_tree">
+        <field name="name">lubon_qlan.account_source.tree</field>
+        <field name="model">lubon_qlan.account_source</field>
+        <field name="arch" type="xml">
+            <tree string="Sources">
+                <field name="name"/>
+                <field name="tenant_id" invisible="True"/>
+                <field name="account_source_type_id"/>
+                <field name="include_in_schedule"/>
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="lubon_qlan_account_source_form">
+        <field name="name">lubon_qlan.account_source.form</field>
+        <field name="model">lubon_qlan.account_source</field>
+        <field name="arch" type="xml">
+            <form string="Sources">
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="include_in_schedule"/>
+                        <field name="tenant_id" />
+                        <field name="account_source_type_id"/>
+                        <field name="endpoints_id"/>
+
+                        <!--field name="command_id"/ -->
+<!--                         <field name="user_command"/>
+                        <field name="group_command"/>
+                        <field name="command_options"/>
+ -->                    </group>
+                    <group>
+                        <button name="run_sync" type="object" string="Run"/>
+                        <field name="last_full_run_start"/>
+                        <field name="last_full_run_stop"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Accounts">
+                        <field name="adaccount_ids"/>
+                    </page>
+                    <page string="Users">
+                        <field name="adusers_ids"/>
+                    </page>
+                    <page string="Groups">
+                        <field name="adgroups_ids"/>
+                    </page>
+
+                </notebook>    
+            </form>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="qlan_account_source_type_action">
+      <field name="name">Account source types</field>
+      <field name="res_model">lubon_qlan.account_source_type</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    <record model="ir.actions.act_window" id="qlan_account_source_action">
+      <field name="name">Account source</field>
+      <field name="res_model">lubon_qlan.account_source</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+        <menuitem id="lubon_qlan_account_source_menu" name="Account sources" parent="lubon_qlan_tables_menu"
+          action="qlan_account_source_action"/>
+        <menuitem id="lubon_qlan_account_source_type_menu" name="Source Types" parent="lubon_qlan_tables_menu"
+          action="qlan_account_source_type_action"/>
+
+    </data>
+</openerp>
