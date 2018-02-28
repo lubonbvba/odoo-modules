@@ -18,7 +18,7 @@
 					<filter name="account_to_complete" string="To complete win"
 								domain="['|', ('product', 'not ilike', '-'),('tenant_id', '=', False)]"/>            
 					<filter name="contract check" string="Contract not ok"
-									domain="[('product', '!=', 'LUB-USR-000'),('account_created', '=', True),('contract_line_id', '=', False)]"/>                   
+									domain="[('product', 'not like', '%-000'),('account_created', '=', True),('contract_line_id', '=', False)]"/>                   
 					<filter name="obsolete" string="Obsolete"
 										domain="['|','&amp;',('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') ),('contract_line_id','!=',False),('account_created','=',False)]"/>
 					<group string="Group By">
