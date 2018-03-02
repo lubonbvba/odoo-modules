@@ -49,7 +49,7 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>
-    <record model="ir.actions.act_window" id="qlan_adaccounts_menu_action">
+    <record model="ir.actions.act_window" id="qlan_adusers_menu_action">
       <field name="name">AD Users</field>
       <field name="res_model">lubon_qlan.adusers</field>
       <field name="view_type">form</field>
@@ -1301,8 +1301,8 @@
           action="qlan_restore_points_stats_action"/>
         <menuitem id="lubon_qlan_isp_check_menu" name="ISP info" parent="lubon_qlan_checks_menu"
           action="qlan_isp_action"/>
-        <menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tenants_menu"
-            action="qlan_adaccounts_menu_action"/>
+        <menuitem id="lubon_qlan_adaccounts_menu" name="AD Users" parent="lubon_qlan_tenants_menu"
+            action="qlan_adusers_menu_action"/>
 
         <menuitem id="lubon_qlan_configuration_menu" name="Configuration"
           parent="main_lubon_qlan_menu" groups="base.group_no_one" sequence="999"/>

@@ -14,9 +14,9 @@
 					<filter name="notenant" string="No Tenant"
 						domain="[('tenant_id', '=', False)]"/>
 					<filter name="notenant" string="No Product"
-							domain="[('product', 'not ilike', '-')]"/>
+							domain="[('product', '=', False)]"/>
 					<filter name="account_to_complete" string="To complete win"
-								domain="['|', ('product', 'not ilike', '-'),('tenant_id', '=', False)]"/>            
+								domain="['|', ('product', '=', False),('tenant_id', '=', False)]"/>            
 					<filter name="contract check" string="Contract not ok"
 									domain="[('product', 'not like', '%-000'),('account_created', '=', True),('contract_line_id', '=', False)]"/>                   
 					<filter name="obsolete" string="Obsolete"
