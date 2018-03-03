@@ -2,6 +2,7 @@
 from openerp.osv import osv
 from openerp import models, fields, api, _
 from datetime import datetime,timedelta
+from passgen import passgen
 import re
 import pdb,logging
 #from path import path
@@ -209,6 +210,8 @@ class lubon_qlan_new_aduser(models.TransientModel):
 	last_name=fields.Char() 
 	email=fields.Char() 
 	upn=fields.Char() 
+	logon_script=fields.Char() 
+	mail_db=fields.Char() 
 	alias=fields.Char() 
 	mobile=fields.Char(placeholder="+32475963182") 
 	samaccountname=fields.Char()
@@ -216,8 +219,14 @@ class lubon_qlan_new_aduser(models.TransientModel):
 	contract_line_id=fields.Many2one('account.analytic.invoice.line')
 	validcustomers_ids=fields.Many2many('res.partner')
 	validcontract_ids=fields.Many2many('account.analytic.account')
+	password_never_expires=fields.Boolean()
+	debug=fields.Boolean()
 
 
+	def _generate_password(self):
+		return passgen(length=12, punctuation=False, digits=True, letters=True, case='both')
+
+	password=fields.Char(default=_generate_password)
 
 	@api.multi
 	@api.onchange('tenant_id')
@@ -226,12 +235,36 @@ class lubon_qlan_new_aduser(models.TransientModel):
 			self.customer_id=self.validcustomers_ids[0]
 		if len(self.validcontract_ids)==1:
 			self.contract_id=self.validcontract_ids[0]
+		self.mail_db=self.tenant_id.default_mail_db	
+		self.logon_script=self.tenant_id.default_logon_script
+		self.password_never_expires=self.tenant_id.default_password_never_expires	
 
 	@api.multi
 	@api.onchange('first_name','last_name')
-	def set_alias(self):
+	def set_name_related(self):
+		self.displayname=""
+		self.email=""
 		self.alias=self.tenant_id.code + "-"
 		if self.first_name:
 			self.alias += self.first_name[:2].lower()
+			self.displayname += self.first_name
+			self.email+=self.first_name.lower()
 		if self.last_name:
 			self.alias += self.last_name[:2].lower()
+			if self.first_name:
+				self.displayname += " "
+				self.email += "."
+			self.displayname += self.last_name
+			self.email += self.last_name.lower()
+	@api.multi
+	def create_user(self):
+		cmd={'parameters':
+				{
+				'strTenant':self.tenant_id.code,
+				'strReseller':self.tenant_id.reseller_partner_id.reseller_code,
+				'strPassword': self.password,
+				}
+			}
+
+		pdb.set_trace()
+

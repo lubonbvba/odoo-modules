@@ -28,12 +28,18 @@ class lubon_qlan_tenants(models.Model):
 	is_citrix=fields.Boolean()
 	is_mailonly=fields.Boolean()
 	is_qfilteronly=fields.Boolean()
-	pbx_password=fields.Char(string="Pbx password")
+
 	ip_ids=fields.One2many('lubon_qlan.ip','tenant_id')
 	vlan_ids=fields.One2many('lubon_qlan.vlan','tenant_id')
+	
+	reseller_partner_id=fields.Many2one('res.partner')
+	cmd_endpoint=fields.Many2one('cmd_execute.endpoints')
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
 	account_source_ids=fields.One2many('lubon_qlan.account_source','tenant_id')
-	
+	default_logon_script=fields.Char()
+	default_mail_db=fields.Char()
+	default_password_never_expires=fields.Boolean()
+
 	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
 	adusers_ids=fields.One2many('lubon_qlan.adusers', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
 	adgroups_ids=fields.One2many('lubon_qlan.adgroups', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
@@ -182,6 +188,30 @@ class lubon_qlan_adusers(models.Model):
 	@api.multi
 	def refresh(self):
 		self.account_source_id.run_single_sync(self.objectguid)
+
+	@api.multi
+	def disable_user(self):
+		parameters={
+			'identity':self.objectguid,
+		}
+		cmd={'parameters':parameters,
+			'cmd':'disable-adaccount',
+			
+			}	
+		self.tenant_id.cmd_endpoint.execute_json(cmd,debug=False)
+		self.refresh()
+
+	@api.multi
+	def enable_user(self):
+		parameters={
+			'identity':self.objectguid,
+		}
+		cmd={'parameters':parameters,
+			'cmd':'enable-adaccount',
+			
+			}	
+		self.tenant_id.cmd_endpoint.execute_json(cmd,debug=False)
+		self.refresh()
 
 
 

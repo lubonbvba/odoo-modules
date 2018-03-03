@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="lubon_qlan_product_form">
+            <field name="name">lubon_qlan.product_form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <page string="Information" position="after">
+                    <page string="Subscription options" attrs="{'invisible':[('type','not in',['qsubscription'])]}">
+                        <group>
+                            <group>
+                                <field name="is_option"/>
+                                
+                                <field name="valid_options" widget="many2many_tags" domain="['&amp;','&amp;',('type','in',['qsubscription']),('id','!=',active_id ),('is_option','=',True )]" attrs="{'invisible':[('is_option','=',True)]}"/>
+
+                                <field name="option_in" widget="many2many_tags" readonly="1" attrs="{'invisible':[('is_option','=',False)]}"/>
+                            </group>
+                            <group>
+                                <field name="reference_model" attrs="{'invisible':[('is_option','=',True)]}"/>
+                                <field name="quantity_type"/>
+                                <field name="quantity_method" attrs="{'invisible':[('quantity_type','in',['fixed'])]}"/>
+                                <field name="cmd_create"/>
+                                <field name="cmd_delete"/>
+                                <field name="cmd_modify"/>
+                            </group>
+                        </group>
+                    </page>
+                </page>
+            </field>
+        </record>
+    </data>
+</openerp>

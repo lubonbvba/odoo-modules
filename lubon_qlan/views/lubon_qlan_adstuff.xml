@@ -60,7 +60,9 @@
 				<form string="Ad accounts">
 					<header>
 						<button string="Passwd reset"/>
-						<button string="Disable"/>
+						<button string="Disable" type='object' name='disable_user' attrs="{'invisible':[('ad_enabled','=',False)]}"/>
+						<button string="Enable" type='object' name='enable_user' attrs="{'invisible':[('ad_enabled','=',True)]}"/>
+
 						<button string="Unlock"/>
 						<button name='refresh' type='object' string="Refresh"/>
 					</header>
@@ -155,26 +157,45 @@
 						<group>
 							<group>
 								<field name="tenant_id" readonly="1"/>
+								<field name="customer_id" domain="[('id','in', validcustomers_ids[0][2])]" options="{'no_quick_create':True,'no_create_edit':True, 'no_open':True}" required="1"/>
+
 								<field name="person_id" domain="[('parent_id','in', validcustomers_ids[0][2]),('type','=','contact')]" options="{'no_quick_create':True,'no_create_edit':True, 'no_open':True}"/>
 								<field name="validcustomers_ids" widget="many2many_tags" readonly="1" invisible="True"/>
 								<field name="validcontract_ids" widget="many2many_tags" readonly="1" invisible="True"/>
-								<field name="customer_id" domain="[('id','in', validcustomers_ids[0][2])]" options="{'no_quick_create':True,'no_create_edit':True, 'no_open':True}"/>
-								<field name="contract_id" domain="[('id','in', validcontract_ids[0][2])]" options="{'no_quick_create':True,'no_create_edit':True, 'no_open':True}"/>
-
+								<field name="contract_id" domain="[('partner_id','=',customer_id),('id','in', validcontract_ids[0][2])]" options="{'no_quick_create':True,'no_create_edit':True, 'no_open':True}" required="1"/>
+								<field name="contract_line_id" domain="[('analytic_account_id','=',contract_id)]"  options="{'no_quick_create':True,'no_create_edit':True, 'no_open':True}"  required="1"/>
 							</group>
 							<group>
-								<field name="displayname"/>
+								
 								<field name="last_name"/>
 								<field name="first_name"/>
-								<field name="alias"/>
-								<field name="upn" string="@"/>
-								<field name="email"/>
+								<field name="displayname" required="1"/>
+								<field name="alias" required="1"/>
+								<field name="upn" string="@" required="1"/>
+								<field name="email" required="1"/>
 								<field name="mobile"/>
 							</group>							
 						</group>
-
+						<group>
+							<group>
+								<field name='password_never_expires'/>
+								<field name='password' required="1"/>
+							</group>
+							<group>
+								<field name="logon_script"/>
+								<field name="mail_db"/>
+							</group>
+						</group>
+						<group>
+							<field name="debug"/>
+						</group>
 					</sheet>
+					<footer>
+					<button name='create_user' string="Create" type="object" class="oe_highlight"/>
+					<button name='Cancel' string="Cancel" special="cancel"/>
+				</footer>
 				</form>
+
 			</field>
 		</record>
 		<record model="ir.ui.view" id="adgroups_tree_view">

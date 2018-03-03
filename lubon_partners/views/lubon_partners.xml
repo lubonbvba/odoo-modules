@@ -29,6 +29,9 @@
                             <field name="updatestelephony"/>
                         </group>
                     </group>
+                    <group>
+                        <field name="reseller_code"/>
+                    </group>
                      <group string="Rate settings">
                         <field name="rate_hr"/>
                         <field name="rate_day"/>

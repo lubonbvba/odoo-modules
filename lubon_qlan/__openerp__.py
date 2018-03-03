@@ -35,6 +35,7 @@
         'views/lubon_qlan_partner.xml',
         'views/lubon_qlan_account_sync.xml',
         'views/lubon_qlan_adstuff.xml',
+        'views/lubon_qlan_product.xml',
         'reports/lubon_qlan_invoice.xml',
         'reports/restore_points.xml',
         'data/lubon_qlan_data.xml',

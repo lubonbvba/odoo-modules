@@ -10,3 +10,4 @@ import licenses
 import sessions
 import partner
 import account_sync
+import product

@@ -972,44 +972,46 @@
                       </tree> -->
                     </field>
                   </page>
-                  <page string="Sources">
-                    <field name="account_source_ids" context="{'default_tenant_id': active_id, 'default_name': tenant_name}"/>
-                  </page>
+
                   <page string="Servers">
                     <field name="assets_ids" context="{'default_tenant_id': active_id}"/>
                   </page>
-                  <page string="Settings">
+                  <!-- page string="Settings">
                    <group string="Security">
                      <field name="qtest_password" />
                      <field name="qadm_password" />
                      </group>
-
-                     <!-- field name="credential_ids" domain="[('tenant_id','=',active_id),(credentials_type','ilike','tenant_admin')]" context="{'default_credentials_type':'tenant_admin'}"/ -->
-                     <!-- field name="is_telephony"/ -->
-                   
-                 </page>	
-                 <page string="Telephony">
+                 </page -->
+                    <page string="Credentials">
                    <group>
-                     <field name="pbx_password"/>
-                   </group>
-                 </page>
-
-                 <page string="Contracts">
-                  <group>
-                  <field name="active"/>
-                  </group>
-                  <field name="contract_ids"/>
-                </page>
-                <page string="Credentials">
+                     <field name="qtest_password" />
+                     <field name="qadm_password" />
+                     </group>                      
                   <field name="credential_ids"/>
                 </page>
 
+                     <!-- field name="credential_ids" domain="[('tenant_id','=',active_id),(credentials_type','ilike','tenant_admin')]" context="{'default_credentials_type':'tenant_admin'}"/ -->
+                     <!-- field name="is_telephony"/ -->
+                   	
+                 <page string="Provisioning">
+                  <group>
+                  <group>
+                  <field name="active"/>
+                  <field name="reseller_partner_id" domain="[('reseller_code','!=',False)]"/>"
+                  <field name='cmd_endpoint'/>
+                  </group>
+                  <group>
+                    <field name="default_logon_script"/>
+                    <field name="default_mail_db"/>
+                    <field name="default_password_never_expires"/>
+                  </group>
+                </group>
+                  <field name="contract_ids"/>
+                </page>
 
-                      <!--page string="Customers">
-                        <field name="validcustomers_ids"/>
-                      </page -->
-                      <page string="Sales orders">
-                      </page>
+                  <page string="Sources">
+                    <field name="account_source_ids" context="{'default_tenant_id': active_id, 'default_name': tenant_name}"/>
+                  </page>
                     </notebook>
                   </sheet>
                         <div class="oe_chatter">
