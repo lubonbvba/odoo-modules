@@ -11,6 +11,7 @@
 					<field name="name" string="Name, product ..." filter_domain="['|','|',('name','ilike',self),('distinguishedname','ilike',self),('product','ilike',self)]"/>
 					<field name="product" filter_domain="[('product','ilike',self)]"/>
 					<field name="tenant_id" filter_domain="[('tenant_id','ilike',self)]"/>
+					<field name="account_source_id" filter_domain="[('account_source_id','ilike',self)]"/>
 					<filter name="notenant" string="No Tenant"
 						domain="[('tenant_id', '=', False)]"/>
 					<filter name="notenant" string="No Product"
@@ -48,6 +49,7 @@
 					<!--field name="ad_enabled"/-->
 					<field name="account_created"/>
 					<field name="ad_enabled"/>
+					<field name="ad_lockedout"/>
 					<field name="validcontract_ids" invisible="True"/>
 					<field name="contract_line_id"/>
 				</tree>
@@ -63,30 +65,33 @@
 						<button string="Disable" type='object' name='disable_user' attrs="{'invisible':[('ad_enabled','=',False)]}"/>
 						<button string="Enable" type='object' name='enable_user' attrs="{'invisible':[('ad_enabled','=',True)]}"/>
 
-						<button string="Unlock"/>
+						<button string="Unlock" attrs="{'invisible':[('ad_lockedout','=',False)]}"/>
+						<button name='update_values' type='object' string="Update"/>
 						<button name='refresh' type='object' string="Refresh"/>
 					</header>
 					<sheet>
 						<group>
 							<group>
+
 								<field name="person_id" context="{'default_email': logonname, 'default_name': displayname, 'default_mobile': mobile}"/>
-								<field name="displayname"/>
-								<field name="tenant_id"/>
-								<field name="product"/>
-								<field name="account_source_id"/>
-								<field name="ad_enabled"/>
+								<field name="displayname" readonly="1"/>
+								<field name="tenant_id" readonly="1"/>
+								<field name="product" readonly="1"/>
+								<field name="account_source_id" readonly="1"/>
+								<field name="ad_enabled" readonly="1"/>
+								<field name="ad_lockedout" readonly="1"/>
 								<field name="active"/>
-								<field name="account_created"/>
+								<field name="account_created" readonly="1"/>
 								<field name="contract_line_id" />
 							</group>
 						<group>
                   
-                  <field name="samaccountname"/>
-                  <field name="ad_date_created"/>
-                  <field name="logonname"/>
-                  <field name="last_logon"/>
-                  <field name="date_first"/>
-                  <field name="date_last"/>
+                  <field name="samaccountname" readonly="1" />
+                  <field name="ad_date_created" readonly="1"/>
+                  <field name="logonname" readonly="1"/>
+                  <field name="last_logon" readonly="1"/>
+                  <field name="date_first" readonly="1"/>
+                  <field name="date_last" readonly="1"/>
               	</group>
 
 	          </group>
@@ -115,10 +120,10 @@
 	          	</page>
 	          	<page string="Mail">
 	          		<group>
-	          			<field name="legacyexchangedn"/>
-	          			<field name="mail"/>
-	          			<field name="mailnickname"/>
-	          			<field name="targetaddress"/>
+	          			<field name="legacyexchangedn"  readonly="1"/>
+	          			<field name="mail"  readonly="1"/>
+	          			<field name="mailnickname"  readonly="1"/>
+	          			<field name="targetaddress"  readonly="1"/>
 	          		</group>
 	          		<field name="email_address_ids">
 	          			<tree>
@@ -129,12 +134,12 @@
 	          	</page>
 	          	<page string="Details/Debug">
 	          		<group>
-	          			<field name="last_name"/>
-	          			<field name="first_name"/>
-	          			<field name="scriptpath"/>
-	          			<field name="mobile"/>
-	          			<field name="distinguishedname"/>
-	          			<field name="objectguid"/>
+	          			<field name="last_name"  readonly="1"/>
+	          			<field name="first_name"  readonly="1"/>
+	          			<field name="scriptpath"  readonly="1"/>
+	          			<field name="mobile"  readonly="1"/>
+	          			<field name="distinguishedname"  readonly="1"/>
+	          			<field name="objectguid"  readonly="1"/>
 	          			<field name="validcontract_ids" widget="many2many_tags"/>
 	          			<field name="validcustomers_ids" widget="many2many_tags"/>
 	          		</group>

@@ -378,6 +378,10 @@
         </page> 
         <page string="Events" attrs="{'invisible': [('asset_type','!=', 'vc')]}">
             <button name="vc_get_events" type="object" string="Get events"/>
+            <button name="vc_cleanup_events" type="object" string="Clean up"/>
+            <group>
+            <field name="vc_event_retentiontime"/>
+          </group>
             <field name="vc_events_ids">
               <tree>
                 <field name="createtime"/>
@@ -389,6 +393,12 @@
                 <field name="event_full"/>
             </tree>
             </field>
+        </page>
+        <page string="Contract">
+          <group>
+            <field name='validcontract_ids' widget="many2many_tags" readonly="1"/>
+            <field name='contract_line_id'/>
+          </group>
         </page>
           <!-- page string="Config">
             <button name="act_add_interfaces_to_assets"  string="Add interfaces" type="action" context="{'default_asset_id': active_id}" groups="base.group_user"/>
@@ -478,7 +488,7 @@
     <field name="inherit_id" ref="lubon_credentials.lubon_credentials_tree_view"/>
     <field name="arch" type="xml">
       <field name="description" position="before">
-        <field name="site_id"/>
+        <field name="site_id" invisible="True"/>
         <field name="asset_id" invisible="True"/>
         <field name="tenant_id" invisible="True"/>
       </field>
@@ -911,6 +921,9 @@
           <field name="model">lubon_qlan.tenants</field>
           <field name="arch" type="xml">
             <form string="Tenants form">
+              <header>
+                <button name="new_user" type="object" string="New User"/>
+              </header>
               <sheet>
                 <div class="oe_right oe_button_box" name="buttons">
                     <button type="action" class="oe_stat_button" name="%(qlan_adaccounts_action)d" icon="fa-shopping-cart" context="{'search_default_tenant_id': active_id, 'default_tenant_id': active_id}">
@@ -948,19 +961,19 @@
                 <notebook>
                   <page string="AD Users">
                     <field name="adusers_ids" context="{'default_tenant_id' : active_id }">
-                      <tree string="Users" zeditable="bottom">
+<!--                       <tree string="Users" zeditable="bottom">
                         <field name="tenant_id" invisible="True"/>
-                        <field name="name"/>
+                        <field name="displayname"/>
                         <field name="samaccountname"/>                              
                         <field name="logonname"/>
                         <field name="product"/>
                         <field name="contract_id"/>
                         <field name="ad_enabled"/>
                         <field name="account_created"/>
-                        <!-- field name="main_partner" invisible="False"/ -->
+                        
                         <field name="validcustomers_ids" invisible="True" />
                         <field name="person_id" domain="[('type','=','contact'),('parent_id.id','in', validcustomers_ids[0][2])]"/>
-                      </tree>
+                      </tree> -->
                     </field>
                   </page>
                   <page string="AD Groups">

@@ -173,6 +173,7 @@ class lubon_qlan_adusers(models.Model):
 	logonname=fields.Char()
 	last_logon=fields.Datetime(help="Last logon date")
 	ad_enabled=fields.Boolean(string="Enabled",default=True,track_visibility='onchange')
+	ad_lockedout=fields.Boolean(string="AD Locked",track_visibility='onchange')
 	exc_mb_size=fields.Float(string="Mailbox size")
 	xasessions_ids=fields.One2many('lubon_qlan.xasessions','adaccount_id')
 	legacyexchangedn=fields.Char()
@@ -212,7 +213,24 @@ class lubon_qlan_adusers(models.Model):
 			}	
 		self.tenant_id.cmd_endpoint.execute_json(cmd,debug=False)
 		self.refresh()
-
+	@api.multi
+	def update_values(self):
+		# context = self.env.context.copy()
+		# context['cmd_execute_object'] = self.id
+		# action = {
+		# 'name': self.name,
+		# 'view_type': 'form',
+		# 'view_mode': 'form',
+		# 'res_model': 'lubon_qlan.new_aduser',
+		# 'context': context,
+		# 'type': 'ir.actions.act_window',
+		# 'target': 'new',
+		# 'domain': [],
+		# }      
+		# return action
+		cmd=self.env['cmd_execute.command'].browse(self.env.ref('lubon_qlan.cm_update_ad_user').id)
+		action=cmd.run_command(self)
+		return action
 
 
 class lubon_qlan_email_address(models.Model):

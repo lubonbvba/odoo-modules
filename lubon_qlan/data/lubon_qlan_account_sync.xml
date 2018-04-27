@@ -22,6 +22,11 @@
             <field name="cmd_type">wps</field>
             <field name="method">True</field>
         </record>
+        <record id="cm_update_ad_user" model="cmd_execute.command">
+            <field name="name">Update AD User</field>
+            <field name="cmd_type">wps</field>
+            <field name="method">False</field>
+        </record>        
         <record id="ir_cron_lubon_qlan_account_sync_scheduler" model="ir.cron">
             <field name="name">Account sync schedulers</field>
             <field name="interval_number">1</field>

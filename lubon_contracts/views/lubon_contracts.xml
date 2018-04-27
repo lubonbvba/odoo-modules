@@ -50,6 +50,7 @@
                 </xpath>
                 <xpath expr='//field[@name="uom_id"]' position="before">
                     <field name="counted_items"/>
+                    <field name="used_items"/>
                     <field name="line_ok"/>
                 </xpath>
                 <xpath expr='//field[@name="price_subtotal"]' position="replace">

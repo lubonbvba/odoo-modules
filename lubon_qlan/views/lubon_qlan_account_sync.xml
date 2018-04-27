@@ -41,8 +41,9 @@
                         <field name="group_command"/>
                         <field name="command_options"/>
  -->                    </group>
+                            <button name="run_sync" type="object" string="Run"/>
+
                     <group>
-                        <button name="run_sync" type="object" string="Run"/>
                         <field name="last_full_run_start"/>
                         <field name="last_full_run_stop"/>
                     </group>

@@ -36,6 +36,9 @@ class lubon_qlan_assets(models.Model):
 	asset_name=fields.Char(required=True, string="Eqpt. name")
 	asset_type=fields.Selection([('switch','Switch'),('server','Physical server'),('firewall','Firewall'),('vm','Virtual machine'),('vc','Vcenter'),])
 	asset_remarks=fields.Html(string="Remarks")
+
+	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', validcontract_ids[0][2])]")	
+	validcontract_ids=fields.Many2many('account.analytic.account', related='tenant_id.contract_ids')
 	lot=fields.Char(string="Serial", help="Serial Number")
 	part=fields.Char(string="Part nr", help="Manufacturer part number")
 	warranty_end_date=fields.Date(string="End date warranty")
@@ -81,6 +84,8 @@ class lubon_qlan_assets(models.Model):
 	vc_portgroups_ids=fields.One2many("lubon_qlan.portgroups","asset_id")
 	vc_datastores_ids=fields.One2many("lubon_qlan.datastores","asset_id")
 	vc_events_ids=fields.One2many("lubon_qlan.events","asset_id")
+	vc_event_retentiontime=fields.Integer(help="Days events should be retained", default=180)
+	
 	@api.multi
 	def new_asset(self,site_id,quant_id):
 		asset = self.create({
@@ -173,6 +178,7 @@ class lubon_qlan_assets(models.Model):
 		self.vc_get_datastores()
 		self.vc_get_vms()
 		self.vc_get_events()
+		#self.vc_cleanup_events()
 
 
 	@api.one
@@ -217,6 +223,14 @@ class lubon_qlan_assets(models.Model):
 			datastore.capacity=child.summary.capacity/(1024*1024*1024)
 			datastore.rate_free=int(10000*datastore.free/datastore.capacity)/100
 			#pdb.set_trace()
+	
+	@api.multi
+	def vc_cleanup_events(self):
+		logger.info("Start vc_cleanup_events %s" % self.asset_name)
+		cleandate=fields.Date.to_string(fields.Date.from_string(fields.Date.context_today(self)) - datetime.timedelta(days=self.vc_event_retentiontime))
+		events=self.vc_events_ids.search([('asset_id','=',self.id),('createtime','<',cleandate)])
+		logger.info("Cleaning %s %d events" % (self.asset_name, len(events)))
+		events.unlink()
 	@api.multi
 	def vc_get_events(self,context=None,eventTypeId='hbr.primary.DeltaCompletedEvent'):
 		logger.info("Start vc_get_events %s" % self.asset_name)

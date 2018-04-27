@@ -17,7 +17,8 @@
                                 <field name="option_in" widget="many2many_tags" readonly="1" attrs="{'invisible':[('is_option','=',False)]}"/>
                             </group>
                             <group>
-                                <field name="reference_model" attrs="{'invisible':[('is_option','=',True)]}"/>
+                                <field name="reference_model"/>
+                                <field name="reference_count"/>
                                 <field name="quantity_type"/>
                                 <field name="quantity_method" attrs="{'invisible':[('quantity_type','in',['fixed'])]}"/>
                                 <field name="cmd_create"/>
@@ -25,6 +26,25 @@
                                 <field name="cmd_modify"/>
                             </group>
                         </group>
+                        <group string="Possible options" attrs="{'invisible':[('is_option','=',True)]}">
+                        <field name="option_ids" context="{'default_parent_product_id': active_id}">
+                            <tree  editable="top" >
+                                <field name="parent_product_id" invisible="1" />
+                                <field name="product_id" zdomain="[('is_option','=',True),('reference_model','=', reference_model)]"/>
+                                <field name="nr_included"/>
+                            </tree>
+                        </field>
+                        </group>
+                        <group string='Option in' attrs="{'invisible':[('is_option','!=',True)]}">
+                            <field name="option_in_ids" context="{'default_product_id': active_id}">
+                                <tree editable="top">
+                                   <field name="product_id" invisible="1"/> 
+                                   <field name="parent_product_id" domain="[('type','=','qsubscription')]"/> 
+                                   <field name="nr_included"/>
+                                </tree>
+                            </field>    
+                        </group>
+
                     </page>
                 </page>
             </field>

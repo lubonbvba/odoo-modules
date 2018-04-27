@@ -16,6 +16,8 @@ class account_analytic_invoice_line(models.Model):
 	line_ok=fields.Boolean(compute="_set_line_state")
 	adaccount_ids=fields.One2many('lubon_qlan.adaccounts','contract_line_id')
 	counted_items=fields.Integer(compute="_count_items", string="Counted", help="This number is the total of items counted in the tenant")
+	used_items=fields.Integer(compute="_count_used", string="Used", help="The number of items used/assigned")
+
 	@api.multi
 	@api.depends('adaccount_ids')
 	def _count_items(self):
@@ -30,6 +32,18 @@ class account_analytic_invoice_line(models.Model):
 			if line.adaccount_ids:
 				if line.counted_items != line.quantity:
 					line.line_ok=False
+	@api.multi
+	def _count_used(self):
+		
+		for line in self:
+			n=0
+			if line.product_id.reference_model:
+				lines=self.env[line.product_id.reference_model.model].search([('contract_line_id','=',line.id)])
+				if lines:
+					for item in lines:
+						n+=1
+			line.used_items=n
+
 
 	@api.one
 	@api.depends('name')

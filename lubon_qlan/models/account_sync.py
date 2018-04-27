@@ -129,6 +129,7 @@ class lubon_qlan_account_source(models.Model):
 	 			adaccount.scriptpath=self.returnkeyvalue(item,'scriptpath')	
 	 			adaccount.samaccountname=item['samaccountname']	
 	 			adaccount.ad_enabled=item['enabled']
+	 			adaccount.ad_lockedout=item['lockedout']
 	 			adaccount.logonname=item['userprincipalname']
 	 			adaccount.ad_date_created=self._calcwin32epoch(item['createtimestamp'])
 
@@ -146,6 +147,7 @@ class lubon_qlan_account_source(models.Model):
 					if len(partner)==1:
 						adaccount.person_id=partner
 			if str(item['memberof']) != adaccount.memberofstring:
+				logger.info("sync_object_level: Processing group membership: %s" % item['samaccountname'])
 				adaccount.memberofstring=item['memberof']
 				groups=[]
 				for group in item['memberof']:
