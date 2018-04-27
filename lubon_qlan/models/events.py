@@ -7,7 +7,7 @@ from datetime import datetime,timedelta
 class lubon_qlan_events(models.Model):
 	_name = 'lubon_qlan.events'
 	_description = 'Events'
-#	_order = "createtime desc"
+	_order = "createtime desc"
 
 	_sql_constraints = [
     

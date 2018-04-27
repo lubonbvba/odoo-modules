@@ -244,6 +244,7 @@ class lubon_qlan_assets(models.Model):
 			newest=fields.Datetime.from_string(oldevents[0].createtime) 
 			time_filter=vim.event.EventFilterSpec.ByTime(beginTime=newest + datetime.timedelta(seconds=1))
 			filter_spec.time=time_filter                
+		#	logger.info("vc_get_events time filter: %s" % fields.Datetime.to_string(newest))
 
 		while True:
 			event_res = eMgrRef.QueryEvents(filter_spec)
