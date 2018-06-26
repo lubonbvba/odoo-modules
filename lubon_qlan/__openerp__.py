@@ -17,10 +17,10 @@
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
     'category': 'Lubon customer',
-    'version': '8.0.0.39.0',
+    'version': '8.0.0.40.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','pad', 'analytic','stock','hr_timesheet_invoice', 'lubon_base','lubon_credentials','lubon_partners', 'cmd_execute'],
+    'depends': ['base','pad', 'analytic','stock','hr_timesheet_invoice', 'lubon_base','lubon_credentials','lubon_partners', 'cmd_execute','aws'],
 
     # always loaded
     'data': [
@@ -36,6 +36,7 @@
         'views/lubon_qlan_account_sync.xml',
         'views/lubon_qlan_adstuff.xml',
         'views/lubon_qlan_product.xml',
+        'views/qlan_aws_glacier.xml',
         'reports/lubon_qlan_invoice.xml',
         'reports/restore_points.xml',
         'data/lubon_qlan_data.xml',

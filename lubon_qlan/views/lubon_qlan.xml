@@ -321,6 +321,9 @@
               </tree>
             </field>
           </page>
+          <page string="Glacier Vaults" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
+            <field name='glacier_vault_archive_ids'/>
+          </page>
 
           <page string="Drives" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
             <button type="object" name="get_vm_drives" string="Get drives"/>

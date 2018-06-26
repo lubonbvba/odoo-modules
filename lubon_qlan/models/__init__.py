@@ -11,3 +11,4 @@ import sessions
 import partner
 import account_sync
 import product
+import qlan_aws_glacier

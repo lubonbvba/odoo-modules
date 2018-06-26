@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!-- Add instructor field to existing view -->
+        <record model="ir.ui.view" id="lubon_qlan_aws_glacier_vault_archives_form">
+            <field name="name">lubon_qlan.aws_glacier_vault_archives_form</field>
+            <field name="model">aws.glacier_vault_archives</field>
+            <field name="inherit_id" ref="aws.aws_glacier_vault_archives_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name='tenant_id'/>
+                    <field name='asset_id'/>
+                    <field name='backup_type'/>
+                    <field name='backup_date'/>
+                    <field name='last_update'/>
+                </field>
+                <button name='inventory_vault' position='after'>
+                    <button name="process_payload" string="Decode" type="object"/>
+                </button>
+                    
+            </field>
+        </record>
+        <record model="ir.ui.view" id="lubon_qlan_aws_glacier_vault_archives_tree">
+            <field name="name">lubon_qlan.aws_glacier_vault_archives_tree</field>
+            <field name="model">aws.glacier_vault_archives</field>
+            <field name="inherit_id" ref="aws.aws_glacier_vault_archives_tree"/>
+            <field name="arch" type="xml">
+                <field name="size" position="after">
+                    <field name='tenant_id'/>
+                    <field name='asset_id'/>
+                    <field name='backup_type'/>
+                    <field name='backup_date'/>
+                    <field name='last_update'/>
+                    <button name="process_payload" string="Decode" type="object"/>
+                </field>
+            </field>
+        </record>        
+    </data>
+</openerp>

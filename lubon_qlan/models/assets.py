@@ -26,6 +26,7 @@ class lubon_qlan_assets(models.Model):
 	_order = 'asset_name'
 	parent_id=fields.Many2one('lubon_qlan.assets', string="Part of")
 
+	
 	child_ids=fields.One2many('lubon_qlan.assets','parent_id')
 	is_container=fields.Boolean(string="Container", help="Can contain other devices")
 	show_in_site=fields.Boolean(string="Show", help="Show in sites", default=True)
@@ -37,6 +38,7 @@ class lubon_qlan_assets(models.Model):
 	asset_type=fields.Selection([('switch','Switch'),('server','Physical server'),('firewall','Firewall'),('vm','Virtual machine'),('vc','Vcenter'),])
 	asset_remarks=fields.Html(string="Remarks")
 
+	glacier_vault_archive_ids=fields.One2many('aws.glacier_vault_archives', 'asset_id')
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', validcontract_ids[0][2])]")	
 	validcontract_ids=fields.Many2many('account.analytic.account', related='tenant_id.contract_ids')
 	lot=fields.Char(string="Serial", help="Serial Number")
