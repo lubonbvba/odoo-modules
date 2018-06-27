@@ -26,12 +26,12 @@
             <field name="inherit_id" ref="aws.aws_glacier_vault_archives_tree"/>
             <field name="arch" type="xml">
                 <field name="size" position="after">
-                    <field name='tenant_id'/>
-                    <field name='asset_id'/>
-                    <field name='backup_type'/>
-                    <field name='backup_date'/>
-                    <field name='last_update'/>
-                    <button name="process_payload" string="Decode" type="object"/>
+                    <field name='tenant_id' readonly='True'/>
+                    <field name='asset_id' readonly='True'/>
+                    <field name='backup_type' readonly='True'/>
+                    <field name='backup_date' readonly='True'/>
+                    <field name='last_update' readonly='True'/>
+                    <field name='marked_for_delete'/>
                 </field>
             </field>
         </record>        
