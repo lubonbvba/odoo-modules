@@ -31,7 +31,7 @@
                     <field name='backup_type' readonly='True'/>
                     <field name='backup_date' readonly='True'/>
                     <field name='last_update' readonly='True'/>
-                    <field name='marked_for_delete'/>
+                   
                 </field>
             </field>
         </record>        

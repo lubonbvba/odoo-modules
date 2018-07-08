@@ -4,6 +4,17 @@
 <record model="ir.ui.view" id="lubon_contracts_lubon_contracts_tree">
             <field name="name">lubon_contracts_tree</field>
             <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account.view_account_analytic_account_search"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+                    <field name="id"/>
+                </field> 
+            </field>
+        </record>
+
+<record model="ir.ui.view" id="lubon_contracts_lubon_contracts_search">
+            <field name="name">lubon_contracts_search</field>
+            <field name="model">account.analytic.account</field>
             <field name="inherit_id" ref="account.view_account_analytic_account_list"/>
             <field name="arch" type="xml">
                 <field name="date" position="after">
@@ -15,8 +26,6 @@
 
             </field>
         </record>
-
-
         <record model="ir.ui.view" id="lubon_contracts_lubon_contracts">
             <field name="name">lubon_contracts</field>
             <field name="model">account.analytic.account</field>

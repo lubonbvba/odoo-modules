@@ -68,6 +68,12 @@ class lubon_qlan_assets(models.Model):
 	vm_check_backup=fields.Boolean(track_visibility='onchange', default=True)
 	vm_restorepoints_ids=fields.One2many('lubon_qlan.restorepoints',"asset_id")
 	vm_latest_restore_point=fields.Datetime()
+	vm_glacier_block=fields.Boolean(help='Block glacier settings from tenant')
+	vm_glacier_cleanup=fields.Boolean(help='Cleanup glacier automatically')
+	vm_glacier_month_retention_age=fields.Integer(default=180, string='Retention days month', help="Retention time in days for the monthly backups")
+	vm_glacier_month_retention_num=fields.Integer(default=6,string='Monthly minimum #', help="Minimum number of monthly backups to keep")
+	vm_glacier_week_retention_age=fields.Integer(default=90,string='Retention days week', help="Retention time in days for the weekly backups")
+	vm_glacier_week_retention_num=fields.Integer(default=13,string='Weekly minimum #', help="Minimum number of weekly backups to keep")
 
 	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances',"asset_id")
 	vm_snapshots_ids=fields.One2many("lubon_qlan.snapshots","asset_id")
@@ -382,4 +388,34 @@ class lubon_qlan_assets(models.Model):
 		#pdb.set_trace()
 		for vm in vms:
 			vm.get_restorepoints()
+
+	@api.multi
+	def glacier_mark_obsoletes(self):
+		if self.vm_glacier_cleanup:
+			weeklys=self.glacier_vault_archive_ids.search([('asset_id','=',self.id),('backup_type','=','W'),('marked_for_delete','=',False)]).sorted(key=lambda r: r.backup_date,reverse=True)
+			monthlys=self.glacier_vault_archive_ids.search([('asset_id','=',self.id),('backup_type','=','M'),('marked_for_delete','=',False)]).sorted(key=lambda r: r.backup_date,reverse=True)
+			w_obsolete=weeklys-weeklys[0:self.vm_glacier_week_retention_num]
+			m_obsolete=monthlys-monthlys[0:self.vm_glacier_month_retention_num]
+			
+			for a in w_obsolete:
+				if (fields.Datetime.from_string(fields.Datetime.now())-  fields.Datetime.from_string(a.backup_date)).days > self.vm_glacier_week_retention_age:
+					a.marked_for_delete=True
+
+			for a in m_obsolete:
+				if (fields.Datetime.from_string(fields.Datetime.now())-  fields.Datetime.from_string(a.backup_date)).days > self.vm_glacier_month_retention_age:
+					a.marked_for_delete=True
+
+
+	@api.multi
+	def glacier_reset_obsoletes(self):
+		archives=self.glacier_vault_archive_ids.search([('asset_id','=',self.id),('marked_for_delete','=',True),('delete_initiated','=',False)])
+		for a in archives:
+			a.marked_for_delete=False
+
+
+	@api.multi
+	def glacier_process_obsoletes(self, dummy=None):
+		vms=self.env['lubon_qlan.assets'].search([('asset_type','=','vm'),('vm_glacier_cleanup','=',True)])
+		for vm in vms:
+			vm.glacier_mark_obsoletes()
 

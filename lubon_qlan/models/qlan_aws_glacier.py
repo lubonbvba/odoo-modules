@@ -13,7 +13,7 @@ class glacier_archives(models.Model):
 	backup_type = fields.Selection([('W','Weekly'),('M','Monthly'),('S', 'System file'),('U','Unknown')])
 	backup_date = fields.Datetime(help='Backup period identifier')
 	last_update = fields.Datetime(help='Date the backup was synthesized')
-	marked_for_delete =fields.Boolean()
+
 	@api.multi
 	def process_payload(self):
 		payload=ast.literal_eval(self.archivedescription)
@@ -27,6 +27,7 @@ class glacier_archives(models.Model):
 					filename=path[path.rfind('/')+1:]
 					dotvmpos=filename.find('.vm')
 					vmname=filename[:dotvmpos]
+					self.backup_type=path[path.rfind('.')-1]
 					self.backup_type=path[path.rfind('.')-1]
 					backupdate=filename[filename.rfind('-')-17:len(filename)-6].replace('T',' ')
 					self.backup_date=fields.Datetime.to_string(datetime.strptime(backupdate,"%Y-%m-%d %H%M%S"))
@@ -46,3 +47,5 @@ class glacier_archives(models.Model):
 		if not archive_id.backup_type:#pdb.set_trace()
 			archive_id.process_payload()
 		return archive_id
+
+		

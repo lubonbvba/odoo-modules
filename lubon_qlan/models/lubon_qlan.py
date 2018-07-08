@@ -52,6 +52,15 @@ class lubon_qlan_tenants(models.Model):
 	main_contact=fields.Many2one('res.partner', string="Main contact", domain="[['type','=','contact'],['is_company','=',False]]")
 	tel_dedicated=fields.Char(string='Incoming tel',help="Number that is dedicated to the customer, with respect to SLA")
 #	qlan_adaccounts_import_ids=fields.One2many('lubon_qlan_adaccounts_import','tenant')
+
+	vm_glacier_cleanup=fields.Boolean(help='Cleanup glacier automatically')
+	vm_glacier_month_retention_age=fields.Integer(default=180, string='Retention days month', help="Retention time in days for the monthly backups")
+	vm_glacier_month_retention_num=fields.Integer(default=6,string='Monthly minimum #', help="Minimum number of monthly backups to keep")
+	vm_glacier_week_retention_age=fields.Integer(default=90,string='Retention days week', help="Retention time in days for the weekly backups")
+	vm_glacier_week_retention_num=fields.Integer(default=13,string='Weekly minimum #', help="Minimum number of weekly backups to keep")
+
+
+
 	def _getvalidcustomer_ids(self):
 		for rec in self.contract_ids:
 			self.validcustomers_ids=self.validcustomers_ids + rec.partner_id
@@ -74,6 +83,17 @@ class lubon_qlan_tenants(models.Model):
 	def _contracts_count(self):
 		self.contracts_count=len(self.contract_ids)
 	contracts_count=fields.Integer(compute=_contracts_count)
+	
+	@api.multi
+	def set_glacier_for_all_vm(self):
+		for vm in self.assets_ids:
+			if vm.asset_type == 'vm' and not vm.vm_glacier_block:
+				vm.vm_glacier_cleanup=self.vm_glacier_cleanup
+				vm.vm_glacier_week_retention_num=self.vm_glacier_week_retention_num
+				vm.vm_glacier_week_retention_age=self.vm_glacier_week_retention_age
+				vm.vm_glacier_month_retention_num=self.vm_glacier_month_retention_num
+				vm.vm_glacier_month_retention_age=self.vm_glacier_month_retention_age
+
 
 class lubon_qlan_adaccounts(models.Model):
 	_name = 'lubon_qlan.adaccounts'
