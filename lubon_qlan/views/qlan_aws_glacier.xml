@@ -31,9 +31,22 @@
                     <field name='backup_type' readonly='True'/>
                     <field name='backup_date' readonly='True'/>
                     <field name='last_update' readonly='True'/>
-                   
+                </field>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="lubon_qlan_aws_glacier_vault_archives_search">
+            <field name="name">lubon_qlan.aws_glacier_vault_archives_search</field>
+            <field name="model">aws.glacier_vault_archives</field>
+            <field name="inherit_id" ref="aws.aws_glacier_vault_archives_search"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name='tenant_id' />
+                    <!--field name='asset_id' /-->
+                    <field name="asset_id" string="Asset" filter_domain="[('asset_id','child_of',self)]"/>
+                    <field name='backup_type'/>
                 </field>
             </field>
         </record>        
+
     </data>
 </openerp>
