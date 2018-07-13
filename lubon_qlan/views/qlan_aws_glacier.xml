@@ -43,6 +43,7 @@
                     <field name='tenant_id' />
                     <!--field name='asset_id' /-->
                     <field name="asset_id" string="Asset" filter_domain="[('asset_id','child_of',self)]"/>
+                    <field name='vault_id'/>
                     <field name='backup_type'/>
                 </field>
             </field>
