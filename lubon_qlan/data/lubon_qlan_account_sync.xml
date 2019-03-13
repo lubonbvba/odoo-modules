@@ -7,7 +7,7 @@
         </record>
         <record id="ast_o365" model="lubon_qlan.account_source_type">
             <field name="name">Office 365</field>
-            <field name="single_tenant">True</field>
+            <field name="single_tenant">False</field>
         </record>        
         <record id="ast_google" model="lubon_qlan.account_source_type">
             <field name="name">Google</field>

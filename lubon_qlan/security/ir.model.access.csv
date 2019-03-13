@@ -27,3 +27,4 @@ access_lubon_qlan_adgroups,access_lubon_qlan_adgroups,model_lubon_qlan_adgroups,
 access_lubon_qlan_adusers,access_lubon_qlan_adusers,model_lubon_qlan_adusers,qlan_user,1,1,1,0
 access_lubon_qlan_email_address,access_lubon_qlan_email_address,model_lubon_qlan_email_address,qlan_user,1,1,1,0
 access_product_qoptions,access_product_qoptions,model_product_qoptions,,1,1,1,0
+access_lubon_qlan_tenants_o365,access_lubon_qlan_tenants_o365,model_lubon_qlan_tenants_o365,,1,1,1,1

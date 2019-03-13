@@ -54,7 +54,7 @@
 			<field name="res_model">lubon_qlan.adusers</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
-			<field name="context">{'search_default_account_to_complete': 1,'search_default_contract check':1,'search_default_obsolete':1 }</field>
+			<field name="context">{'search_default_account_to_complete': 1,'search_default_contract check':1,'search_default_obsolete':1,'search_default_qlan':1 }</field>
 
 			<!--field name="domain">[["type","=",'delivery']]</field -->
 		</record>
@@ -905,6 +905,17 @@
 				</form>
 			</field>
 		</record>
+		<record model="ir.ui.view" id="tenants_o365_tree_view">
+			<field name="name">tenants_o365.tree</field>
+			<field name="model">lubon_qlan.tenants_o365</field>
+			<field name="arch" type="xml">
+				<tree string="Tenants O365 Tree" default_order="name">
+					<field name="name"/>
+					<field name="defaultdomainname"/>
+					<field name="tenant_id"/>
+				</tree>
+			</field>
+		</record>
 		<record model="ir.ui.view" id="tenants_tree_view">
 			<field name="name">tenants.tree</field>
 			<field name="model">lubon_qlan.tenants</field>
@@ -1297,6 +1308,14 @@
 											<field name="view_mode">tree,form</field>
 											<!--field name="domain">[["type","=",'delivery']]</field -->
 										</record>
+										<record model="ir.actions.act_window" id="qlan_tenants_365_action">
+											<field name="name">Office 365 Tenants</field>
+											<field name="res_model">lubon_qlan.tenants_o365</field>
+											<!-- field name="view_type">form</field -->
+											<field name="view_mode">tree,form</field>
+											<!--field name="domain">[["type","=",'delivery']]</field -->
+										</record>
+
 										<record model="ir.actions.act_window" id="qlan_contracts_action">
 											<field name="name">Contracts</field>
 											<field name="res_model">account.analytic.account</field>
@@ -1361,6 +1380,9 @@
 
 				<menuitem id="adtenants_menu" name="AD Tenants" parent="lubon_qlan_tenants_menu"
 					action="qlan_tenants_action" groups="qlan_user"/>
+				<menuitem id="adtenants_365_menu" name="Office 365 Tenants" parent="lubon_qlan_tenants_menu"
+					action="qlan_tenants_365_action" groups="qlan_user"/>
+	
 				<!-- menuitem id="contracts_menu" name="Contracts" parent="lubon_qlan_tenants_menu"
 						action="qlan_contracts_action" groups="qlan_manager"/ -->
 				<menuitem id="lubon_qlan_restore_points_stats_menu" name="Stats" parent="lubon_qlan_backup_menu"

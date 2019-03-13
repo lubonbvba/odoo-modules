@@ -22,6 +22,9 @@
 									domain="[('product', 'not like', '%-000'),('account_created', '=', True),('contract_line_id', '=', False)]"/>                   
 					<filter name="obsolete" string="Obsolete"
 										domain="['|','&amp;',('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') ),('contract_line_id','!=',False),('account_created','=',False)]"/>
+					<separator/>					
+					<filter name="qlan" string="Qlan" domain="[('account_source_id','ilike','qlan')]"/> 
+
 					<group string="Group By">
 						<filter name="by_tenant" string="Tenant"
 												context="{'group_by': 'tenant_id'}"/>

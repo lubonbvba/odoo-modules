@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from openerp.osv import osv
-from openerp import models, fields, api, _
+from openerp import models, fields, api,exceptions, _
 from datetime import datetime,timedelta
 from passgen import passgen
 import re
@@ -9,10 +9,11 @@ import pdb,logging
 logger = logging.getLogger(__name__)
 
 ad_allusers_command="get-aduser -filter * -properties * "
-ad_singleuser_command="get-aduser -properties * -identity "
+ad_singleuser_command="get-aduser -server q01dc003.q.lan -properties * -identity "
 ad_allgroups_command="get-adgroup -filter * -properties * "
 ad_output_modifier=" | select-object * | convertto-json"
 
+o365_allusers_command=""
 
 class lubon_qlan_account_source_type(models.Model):
 	_name = 'lubon_qlan.account_source_type'
@@ -36,8 +37,10 @@ class lubon_qlan_account_source(models.Model):
 	adgroups_ids=fields.One2many('lubon_qlan.adgroups','account_source_id')
 	last_full_run_start=fields.Datetime()
 	last_full_run_stop=fields.Datetime()
-#	user_command=fields.Char(help="Command used to get users", default="get-aduser -filter * -properties * | select-object * | convertto-json")
-#	group_command=fields.Char(help="Command used to get groups", default="get-adgroup -filter * -properties * | select-object * | convertto-json")
+	credential_id=fields.Many2one('lubon_credentials.credentials',  string='credential' , help="Credential to be used on the service, eg office 365")
+	tenant_command=fields.Text(help="Command used to get all tenants", default="get-aduser -filter * -properties * | select-object * | convertto-json")
+	user_command=fields.Text(help="Command used to get all users", default="get-aduser -filter * -properties * | select-object * | convertto-json")
+	group_command=fields.Text(help="Command used to get all groups", default="get-adgroup -filter * -properties * | select-object * | convertto-json")
 
 	@api.onchange('tenant_id','account_source_type_id')
 	def _set_name(self):
@@ -60,16 +63,22 @@ class lubon_qlan_account_source(models.Model):
 # 			cmd += " " + self.command_options
 		logger.info("Run_sync: Start Full sync %s" % self.name)
  		self.last_full_run_start=fields.Datetime.now()
-		logger.info("Run_sync: Retrieving groups")
- 		result=self.endpoints_id.execute(ad_allgroups_command + ad_output_modifier)
- 		logger.info("Run_sync: Processing groups")
- 		ids=(self.sync_object_level(result,'group',self.env['lubon_qlan.adgroups']))
-		logger.info("Run_sync: Retrieving users")
- 		result=self.endpoints_id.execute(ad_allusers_command + ad_output_modifier)
- 		logger.info("Run_sync: Processing users")
- 		ids += self.sync_object_level(result,'user',self.env['lubon_qlan.adusers'])
- 		logger.info("Run_sync: Processing obsoletes")
-  		self.check_obsolete_accounts(ids)
+ 		#Account source type = Windows
+ 		if (self.account_source_type_id.id == self.env.ref('lubon_qlan.ast_windows').id):
+			logger.info("Run_sync: Retrieving groups")
+ 			result=self.endpoints_id.execute(ad_allgroups_command + ad_output_modifier)
+ 			logger.info("Run_sync: Processing groups")
+ 			ids=(self.sync_object_level(result,'group',self.env['lubon_qlan.adgroups']))
+			logger.info("Run_sync: Retrieving users")
+ 			result=self.endpoints_id.execute(ad_allusers_command + ad_output_modifier)
+ 			logger.info("Run_sync: Processing users")
+ 			ids += self.sync_object_level(result,'user',self.env['lubon_qlan.adusers'])
+ 			logger.info("Run_sync: Processing obsoletes")
+  			self.check_obsolete_accounts(ids)
+  		#Account source type = O365	
+ 		if (self.account_source_type_id.id == self.env.ref('lubon_qlan.ast_o365').id):
+ 			pdb.set_trace()
+
   		self.last_full_run_stop=fields.Datetime.now()
  		logger.info("Run_sync: End Full sync %s" % self.name) 		
 
@@ -77,6 +86,7 @@ class lubon_qlan_account_source(models.Model):
  	def run_single_sync(self,identity):
  		command=ad_singleuser_command + identity + ad_output_modifier
  		result=self.endpoints_id.execute(command)
+ 		#pdb.set_trace()
  		self.sync_object_level([result],'user',self.env['lubon_qlan.adusers'])
 
 
@@ -197,6 +207,43 @@ class lubon_qlan_account_source(models.Model):
 		#pdb.set_trace()
 		return result
 
+	@api.multi	
+	def get_tenants(self):
+		#Office 365
+		if (self.account_source_type_id.id == self.env.ref('lubon_qlan.ast_o365').id):
+			self.env['lubon_qlan.tenants_o365'].refresh_tenants(self)
+
+
+class lubon_qlan_tenants_o365(models.Model):
+	_name = 'lubon_qlan.tenants_o365'
+	_description = 'Office 365 tenants'
+	name=fields.Char()
+	tenant_id=fields.Char()
+	defaultdomainname=fields.Char()
+	
+
+	@api.multi
+	def refresh_tenants(self,account_source_id):
+		user=account_source_id.credential_id.user
+		password=account_source_id.credential_id.decrypt()
+		command_line="$user='" + account_source_id.credential_id.user+"'"
+		command_line += "\n\r$pword=ConvertTo-SecureString  -AsPlainText -Force -String '" + account_source_id.credential_id.decrypt()[0]+"'"
+		command_line += "\n\r$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pword"
+		command_line += "\n\rconnect-msolservice -Credential $Credential"
+		command_line += "\n\r" + account_source_id.tenant_command
+		command_line += "\n\r"
+		result=account_source_id.endpoints_id.execute(command_line,'')
+		for tenant in result:
+			tenant_id=self.search([('tenant_id','=',tenant['TenantId'])])
+			if not tenant_id:
+				tenant_id=self.create({
+					'tenant_id': tenant['TenantId']
+					})
+			if tenant_id:
+				tenant_id.name=tenant['Name']
+				#tenant_id.defaultdomainname=tenant['DefaultDomainName']
+			else:
+				pdb.set_trace()
 
 
 class lubon_qlan_new_aduser(models.TransientModel):

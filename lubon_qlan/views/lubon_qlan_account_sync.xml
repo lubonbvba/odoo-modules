@@ -28,6 +28,9 @@
         <field name="model">lubon_qlan.account_source</field>
         <field name="arch" type="xml">
             <form string="Sources">
+                <header>
+                    <button name="run_sync" type="object" string="Run"/>
+                </header>
                 <group>
                     <group>
                         <field name="name"/>
@@ -35,19 +38,23 @@
                         <field name="tenant_id" />
                         <field name="account_source_type_id"/>
                         <field name="endpoints_id"/>
-
-                        <!--field name="command_id"/ -->
-<!--                         <field name="user_command"/>
-                        <field name="group_command"/>
-                        <field name="command_options"/>
- -->                    </group>
-                            <button name="run_sync" type="object" string="Run"/>
-
-                    <group>
+                     </group>
+                     <group string="Commands"/>
+                        <group>
+                            <field name="credential_id" context="{'default_model': 'lubon_qlan.account_source','default_related_id': active_id}"/>
+                            <field name="tenant_command"/>
+                            <field name="user_command"/>
+                            <field name="group_command"/>
+                        <group/>
+                            <group>
+                             <button name='get_tenants' string="Get tenants" type="object"/>
+                            </group>
+                        </group>
+                    </group>
+                    <group string="Status">
                         <field name="last_full_run_start"/>
                         <field name="last_full_run_stop"/>
                     </group>
-                </group>
                 <notebook>
                     <page string="Accounts">
                         <field name="adaccount_ids"/>
