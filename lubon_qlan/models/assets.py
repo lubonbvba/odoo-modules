@@ -420,4 +420,5 @@ class lubon_qlan_assets(models.Model):
 			logging.info("Processing VM: %s" % (vm.asset_name))
 			vm.glacier_mark_obsoletes()
 		#initiate delete of all obsolete archives on glacier	
-		self.glacier_vault_archive_ids.search([('asset_id','=',self.id),('marked_for_delete','=',True),('delete_initiated','=',False)]).delete_archive()	
+		obsoletes=self.glacier_vault_archive_ids.search([('marked_for_delete','=',True),('delete_initiated','=',False)])
+		obsoletes.delete_archive()
