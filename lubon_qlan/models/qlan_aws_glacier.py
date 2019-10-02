@@ -16,33 +16,37 @@ class glacier_archives(models.Model):
 
 	@api.multi
 	def process_payload(self):
-		payload=ast.literal_eval(self.archivedescription)
-		if "UTCDateModified" in payload.keys():
-			self.last_update=fields.Datetime.to_string(datetime.strptime(payload['UTCDateModified'].replace('T', ' ').replace('Z',''),"%Y%m%d %H%M%S"))
-		if "Path" in payload.keys():
-			self.backup_type='U'
-			try:
-				path=payload['Path']
-				if '.vbk' in path:
-					filename=path[path.rfind('/')+1:]
-					dotvmpos=filename.find('.vm')
-					vmname=filename[:dotvmpos]
-					self.backup_type=path[path.rfind('.')-1]
-					self.backup_type=path[path.rfind('.')-1]
-					backupdate=filename[filename.rfind('-')-17:len(filename)-6].replace('T',' ')
-					self.backup_date=fields.Datetime.to_string(datetime.strptime(backupdate,"%Y-%m-%d %H%M%S"))
-					asset_id=self.env['lubon_qlan.assets'].search([('asset_name','=',vmname),('asset_type','=','vm')])
-					if len(asset_id)==1:
-						self.asset_id=asset_id
-						self.tenant_id=asset_id.tenant_id
-			except:
-				logging.error("Unable to process payload on archive %s" % (path))
-			if '.vbm' in path or 'settings.list' in path:
-				self.backup_type="S"
-
+		for a in self:
+			payload=ast.literal_eval(a.archivedescription)
+			if "UTCDateModified" in payload.keys():
+				a.last_update=fields.Datetime.to_string(datetime.strptime(payload['UTCDateModified'].replace('T', ' ').replace('Z',''),"%Y%m%d %H%M%S"))
+			if "Path" in payload.keys():
+				a.backup_type='U'
+				try:
+					path=payload['Path']
+					if '.vbk' in path:
+						filename=path[path.rfind('/')+1:]
+						dotvmpos=filename.find('.vm')
+						vmname=filename[:dotvmpos]
+						a.backup_type=path[path.rfind('.')-1]
+						a.backup_type=path[path.rfind('.')-1]
+	#					backupdate=filename[filename.rfind('-')-17:len(filename)-6].replace('T',' ')
+						backupdate=filename[filename.rfind('T')-10:filename.rfind('T')+7].replace('T',' ')
+	#					pdb.set_trace()
+						a.backup_date=fields.Datetime.to_string(datetime.strptime(backupdate,"%Y-%m-%d %H%M%S"))
+						asset_id=self.env['lubon_qlan.assets'].search([('asset_name','=',vmname),('asset_type','=','vm')])
+						if len(asset_id)==1:
+							a.asset_id=asset_id
+							a.tenant_id=asset_id.tenant_id
+				except:
+					logging.error("Unable to process payload on archive %s" % (path))
+				if '.vbm' in path or 'settings.list' in path:
+					a.backup_type="S"
+			#pdb.set_trace()		
 
 	@api.multi
-	def checkarchive(self,vault,archive):
+	def checkarchive(self,vault=None,archive=None):
+		#pdb.set_trace()
 		archive_id=super(glacier_archives, self).checkarchive(vault,archive)
 		if not archive_id.backup_type:#pdb.set_trace()
 			archive_id.process_payload()

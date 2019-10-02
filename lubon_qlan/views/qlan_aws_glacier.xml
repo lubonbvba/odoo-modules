@@ -48,6 +48,20 @@
                 </field>
             </field>
         </record>        
+         <record id="lubon_qlan_aws_glacier_decode_all" model="ir.actions.server">
+            <field name="name">Decode</field>
+            <field name="model_id" ref="model_aws_glacier_vault_archives"/>
+            <field name="state">code</field>
+            <field name="code">
+                self.process_payload(cr, uid, context.get('active_ids', []), context)
+            </field>
+        </record>
 
+        <record id="ir_lubon_qlan_aws_glacier_decode_all" model="ir.values">
+            <field eval="'client_action_multi'" name="key2"/>
+            <field eval="'aws.glacier_vault_archives'" name="model"/>
+            <field name="name">Decode</field>
+            <field eval="'ir.actions.server,%d'%lubon_qlan_aws_glacier_decode_all" name="value"/>
+        </record>
     </data>
 </openerp>
