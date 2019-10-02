@@ -391,19 +391,19 @@ class lubon_qlan_assets(models.Model):
 
 	@api.multi
 	def glacier_mark_obsoletes(self):
-		if self.vm_glacier_cleanup:
-			weeklys=self.glacier_vault_archive_ids.search([('asset_id','=',self.id),('backup_type','=','W'),('marked_for_delete','=',False)]).sorted(key=lambda r: r.backup_date,reverse=True)
-			monthlys=self.glacier_vault_archive_ids.search([('asset_id','=',self.id),('backup_type','=','M'),('marked_for_delete','=',False)]).sorted(key=lambda r: r.backup_date,reverse=True)
-			w_obsolete=weeklys-weeklys[0:self.vm_glacier_week_retention_num]
-			m_obsolete=monthlys-monthlys[0:self.vm_glacier_month_retention_num]
+		for asset in self:
+				weeklys=asset.glacier_vault_archive_ids.search([('asset_id','=',asset.id),('backup_type','=','W'),('marked_for_delete','=',False)]).sorted(key=lambda r: r.backup_date,reverse=True)
+				monthlys=asset.glacier_vault_archive_ids.search([('asset_id','=',asset.id),('backup_type','=','M'),('marked_for_delete','=',False)]).sorted(key=lambda r: r.backup_date,reverse=True)
+				w_obsolete=weeklys-weeklys[0:asset.vm_glacier_week_retention_num]
+				m_obsolete=monthlys-monthlys[0:asset.vm_glacier_month_retention_num]
 			
-			for a in w_obsolete:
-				if (fields.Datetime.from_string(fields.Datetime.now())-  fields.Datetime.from_string(a.backup_date)).days > self.vm_glacier_week_retention_age:
-					a.marked_for_delete=True
+				for a in w_obsolete:
+					if (fields.Datetime.from_string(fields.Datetime.now())-  fields.Datetime.from_string(a.backup_date)).days > asset.vm_glacier_week_retention_age:
+						a.marked_for_delete=True
 
-			for a in m_obsolete:
-				if (fields.Datetime.from_string(fields.Datetime.now())-  fields.Datetime.from_string(a.backup_date)).days > self.vm_glacier_month_retention_age:
-					a.marked_for_delete=True
+				for a in m_obsolete:
+					if (fields.Datetime.from_string(fields.Datetime.now())-  fields.Datetime.from_string(a.backup_date)).days > asset.vm_glacier_month_retention_age:
+						a.marked_for_delete=True
 
 
 	@api.multi
@@ -417,5 +417,7 @@ class lubon_qlan_assets(models.Model):
 	def glacier_process_obsoletes(self, dummy=None):
 		vms=self.env['lubon_qlan.assets'].search([('asset_type','=','vm'),('vm_glacier_cleanup','=',True)])
 		for vm in vms:
+			logging.info("Processing VM: %s" % (vm.asset_name))
 			vm.glacier_mark_obsoletes()
-
+		#initiate delete of all obsolete archives on glacier	
+		self.glacier_vault_archive_ids.search([('asset_id','=',self.id),('marked_for_delete','=',True),('delete_initiated','=',False)]).delete_archive()	

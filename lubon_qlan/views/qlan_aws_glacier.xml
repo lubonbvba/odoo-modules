@@ -63,5 +63,20 @@
             <field name="name">Decode</field>
             <field eval="'ir.actions.server,%d'%lubon_qlan_aws_glacier_decode_all" name="value"/>
         </record>
+         <record id="lubon_qlan_aws_glacier_mark_obsoletes" model="ir.actions.server">
+            <field name="name">Mark Obsolete Glacier Archives (vm)</field>
+            <field name="model_id" ref="model_lubon_qlan_assets"/>
+            <field name="state">code</field>
+            <field name="code">
+                self.glacier_mark_obsoletes(cr, uid, context.get('active_ids', []), context)
+            </field>
+        </record>
+
+        <record id="ir_lubon_qlan_aws_glacier_mark_obsoletes" model="ir.values">
+            <field eval="'client_action_multi'" name="key2"/>
+            <field eval="'lubon_qlan.assets'" name="model"/>
+            <field name="name">Mark Obsolete Glacier Archives (vm)</field>
+            <field eval="'ir.actions.server,%d'%lubon_qlan_aws_glacier_mark_obsoletes" name="value"/>
+        </record>        
     </data>
 </openerp>
