@@ -46,6 +46,7 @@
 					<field name="tenant_id"/>
 					<!--field name="samaccountname"/-->
 					<!--field name="logonname"/-->
+					<field name="displayname"/>
 					<field name="name"/>
 					<field name="ad_date_created"/>
 					<field name="product"/>

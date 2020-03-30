@@ -8,7 +8,7 @@ import pdb,logging
 from datetime import datetime,timedelta
 
 logger = logging.getLogger(__name__)
-api_url = 'http://q02mon003.q.lan:9399/api'
+api_url = 'https://q02mon003.q.lan:9398/api'
 username = "q\\admlbonjean"
 
 session = False
@@ -19,34 +19,19 @@ def create_session():
     session = requests.Session()
     f=open('/home/odoo/.odoo/admlbonjean.pass','r')
     password=f.readlines()[0].replace('\n', '')
-    r = session.post(api_url+'/sessionMngr/?v=latest', auth=(username, password))
+    r = session.post(api_url+'/sessionMngr/?v=latest', auth=(username, password), verify=False)
+    session.headers.update({'X-RestSvcSessionId': r.headers['X-RestSvcSessionId']})
     #print r
     return
 
 def veeam_get(href):
-
-#    href    = api_url+"/backupServers" #+backupServer+"/credentials/"+credential
- #   href    = api_url+"//jobs" #+backupServer+"/credentials/"+credential
-#    print href
-    root    = ET.Element("CredentialsInfo")
-    root.set("Type", "Credentials")
-    root.set("xmlns", "http://www.veeam.com/ent/v1.0")
-    root.set("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-    root.set("Href", href)
-
-#    credid  = ET.SubElement(root, "Id").text = credential
-#    descr   = ET.SubElement(root, "Description").text = description
-
-    headers = {"Content-Type": "text/xml"}
-    r = session.get(href, headers=headers, data=ET.tostring(root))
-#    return r
-    if r.status_code is 200:
+    r = session.get(href, verify=False)
+    if r.status_code == 200:
         return r
     else:
         print "error"
         print r.status_code
         logger.error("url: %s" % href)
-        #pdb.set_trace()
         return r
 
 

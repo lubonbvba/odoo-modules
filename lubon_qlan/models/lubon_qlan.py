@@ -372,7 +372,7 @@ class lubon_qlan_vlan(models.Model):
 	vlan_tag_str=fields.Char(help="Vlan tag string converted for search reasons")
 	ipv4=fields.Char(string="IPv4 Net name")
 	ipv4_net=fields.Char(string="IPv4 Net")
-	ipv4_mask=fields.Selection([("32","/32"),("30","/30"),("29","/29"),("28","/28"),("27","/27"),("26","/26"),("25","/25"),("24","/24"),("16","/16"),("12","/12"),("8","/8")])
+	ipv4_mask=fields.Selection([("32","/32"),("30","/30"),("29","/29"),("28","/28"),("27","/27"),("26","/26"),("25","/25"),("24","/24"),("22","/22"),("16","/16"),("12","/12"),("8","/8")])
 	ipv6=fields.Char(string="IPv6 Net")
 	ipv4_gw=fields.Char(string="IPv4 GW")
 	ipv4_dhcp=fields.Char(string="IPv4 DHCP server")

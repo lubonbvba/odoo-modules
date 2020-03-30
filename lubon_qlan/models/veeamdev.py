@@ -8,19 +8,21 @@ import pdb,logging
 from datetime import datetime,timedelta
 
 logger = logging.getLogger(__name__)
-api_url = 'http://q02mon003.q.lan:9399/api'
+api_url = 'https://q02mon003.q.lan:9398/api'
 username = "q\\admlbonjean"
 
 session = False
 
 def create_session():
     global session
-
+    global token
     session = requests.Session()
     f=open('/home/odoo/.odoo/admlbonjean.pass','r')
     password=f.readlines()[0].replace('\n', '')
-    r = session.post(api_url+'/sessionMngr/?v=latest', auth=(username, password))
+    r = session.post(api_url+'/sessionMngr/?v=latest', auth=(username, password), verify=False)
     #print r
+    session.headers.update({'X-RestSvcSessionId': r.headers['X-RestSvcSessionId']})
+    #pdb.set_trace()
     return
 
 def veeam_get(href):
@@ -28,25 +30,25 @@ def veeam_get(href):
 #    href    = api_url+"/backupServers" #+backupServer+"/credentials/"+credential
  #   href    = api_url+"//jobs" #+backupServer+"/credentials/"+credential
 #    print href
-    root    = ET.Element("CredentialsInfo")
-    root.set("Type", "Credentials")
-    root.set("xmlns", "http://www.veeam.com/ent/v1.0")
-    root.set("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-    root.set("Href", href)
+ #   root    = ET.Element("CredentialsInfo")
+ #   root.set("Type", "Credentials")
+ #   root.set("xmlns", "http://www.veeam.com/ent/v1.0")
+ #   root.set("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
+ #   root.set("Href", href)
 
 #    credid  = ET.SubElement(root, "Id").text = credential
 #    descr   = ET.SubElement(root, "Description").text = description
 
-    headers = {"Content-Type": "text/xml"}
-    r = session.get(href, headers=headers, data=ET.tostring(root))
+ #   headers = {"Content-Type": "text/xml"}
+    r = session.get(href,  verify=False)
 #    return r
     if r.status_code is 200:
         return r
     else:
-#        print "error"
-#        print r.status_code
-        logger.error("url: %s" % href)
-#        pdb.set_trace()
+        print "error"
+        print r.status_code
+#        logger.error("url: %s" % href)
+        pdb.set_trace()
         return r
 
 
@@ -106,10 +108,11 @@ def get_restorepoints(vmname,date=None,querytype=None):
     date_end=datetime.strptime(date, "%Y-%m-%d").date() + timedelta(days=1)
     date_end=datetime.strftime(date_end, "%Y-%m-%d") + " 12:00:00"
 #    pdb.set_trace()
-
-    result=veeam_decode(api_url + '/query?type='+ querytype +'&format=entities&filter=CreationTime>="'+date_start+'";CreationTime<"'+date_end+'"','Type',querytype)
-    pdb.set_trace()
+    result=veeam_decode(api_url + '/query?type='+ querytype +'&format=entities&filter=VmDisplayName=="'+ vmname +'"','Type',querytype)
 #2017-09-05    result=veeam_decode(api_url + '/query?type='+ querytype +'&format=entities&filter=VmDisplayName=="'+ vmname +'";CreationTime>="'+date_start+'";CreationTime<"'+date_end+'"','Type',querytype)
+
+#    result=veeam_decode(api_url + '/query?type='+ querytype +'&format=entities&filter=CreationTime>="'+date_start+'";CreationTime<"'+date_end+'"','Type',querytype)
+    pdb.set_trace()
 
     links=result['result']
  #   print "nr of results:", len(links)
@@ -145,6 +148,6 @@ def get_restorepoints(vmname,date=None,querytype=None):
 
 
 
-points = get_restorepoints("C0008ALF001","2017-09-04",'VmReplicaPoint')
+points = get_restorepoints("C0008ALF001","2020-02-21",'VmRestorePoint')
 #print len (points)
 #pdb.set_trace()
