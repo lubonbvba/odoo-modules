@@ -35,7 +35,7 @@ class PhoneCommon(orm.AbstractModel):
         dial_string+="&reqtype=DIAL"
         dial_string+="&source="+user.internal_number
         dial_string+="&destclid="+ast_server.server_cid
-        dial_string+="&sourceclid="+ast_number + "<Dial:>"
+        dial_string+="&sourceclid="+ast_number + "<Click2Dial>"
         dial_string+="&dest="+ast_number
         dial_string+="&account="+user.internal_number+"-"+ast_server.server_tenant
         if ast_server.server_timeout:
@@ -45,6 +45,7 @@ class PhoneCommon(orm.AbstractModel):
 
     	response = urllib2.urlopen(dial_string)
         #pdb.set_trace()
+        _logger.info('Dial String :' + dial_string)
         _logger.info('Call result:' + response.read())
      
 
