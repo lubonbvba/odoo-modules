@@ -176,6 +176,7 @@
 				<field name="tenant_id"/>
 				<field name="licenses_id"/>
 				<filter name="VM with snapshot" domain="[('asset_type','=','vm'),('vm_snapshots_count','!=',0)]" />
+				<filter name="No glacier autoclean" domain="[('asset_type','=','vm'),('vm_check_backup','=',True),('vm_glacier_cleanup','=',False),('glacier_vault_archive_ids','!=',False)]" />
 				<filter name="Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',True)]" />
 				<filter name="Excluded from Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',False)]" />
 				 <filter string="Missing VM" name="last7" domain="[('asset_type','=','vm'),('parent_id','!=',False),
@@ -330,6 +331,7 @@
 							<group>
 								<button name='glacier_mark_obsoletes' type='object' string='Mark Obsoletes'/>
 								<button name='glacier_reset_obsoletes' type='object' string='Reset Obsoletes'/>
+								<button name='glacier_set_backup_type' type='object' string='Set type'/>
 							</group>
 						</group>
 						<group>

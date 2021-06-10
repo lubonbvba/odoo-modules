@@ -14,6 +14,7 @@ from openerp.exceptions import Warning
 import pdb, logging
 from veeam import get_restorepoints
 import datetime
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 containerView = ""
@@ -390,6 +391,22 @@ class lubon_qlan_assets(models.Model):
 			vm.get_restorepoints()
 
 	@api.multi
+	def glacier_set_backup_type(self):
+		monthlys=self.glacier_vault_archive_ids.search([('asset_id','=',self.id),('backup_type','=','M')]).sorted(key=lambda r: r.backup_date,reverse=True)
+		unknowns=self.glacier_vault_archive_ids.search([('asset_id','=',self.id),('backup_type','=','U')]).sorted(key=lambda r: r.backup_date,reverse=False)
+		if monthlys:
+			latest= fields.Datetime.from_string(monthlys[0].backup_date)
+			if latest:
+				for a in unknowns:
+					thisdate=fields.Datetime.from_string(a.backup_date)
+					if (thisdate.month> latest.month and thisdate.year==latest.year) or thisdate.year > latest.year:
+						a.backup_type='M'
+						latest=thisdate
+					else:
+						a.backup_type='W'
+
+
+	@api.multi
 	def glacier_mark_obsoletes(self):
 		for asset in self:
 				weeklys=asset.glacier_vault_archive_ids.search([('asset_id','=',asset.id),('backup_type','=','W'),('marked_for_delete','=',False)]).sorted(key=lambda r: r.backup_date,reverse=True)
@@ -415,11 +432,16 @@ class lubon_qlan_assets(models.Model):
 
 	@api.multi
 	def glacier_process_obsoletes(self, dummy=None):
+		vms=self.env['lubon_qlan.assets'].search([('asset_type','=','vm'),('glacier_vault_archive_ids','!=',False)])
+		for vm in vms:
+			logging.info("Processing set backup type VM: %s" % (vm.asset_name))
+			vm.glacier_set_backup_type()
 		vms=self.env['lubon_qlan.assets'].search([('asset_type','=','vm'),('vm_glacier_cleanup','=',True)])
 		for vm in vms:
-			logging.info("Processing VM: %s" % (vm.asset_name))
+			logging.info("Processing mark obsoletes VM: %s" % (vm.asset_name))
 			vm.glacier_mark_obsoletes()
 		#initiate delete of all obsolete archives on glacier	
-		obsoletes=self.glacier_vault_archive_ids.search([('marked_for_delete','=',True),('delete_initiated','=',False)])
-		for archive in obsoletes:
-			archive.delete_archive()
+# next 3 lines actually delete the archives.		
+#		obsoletes=self.glacier_vault_archive_ids.search([('marked_for_delete','=',True),('delete_initiated','=',False)])
+#		for archive in obsoletes:
+#			archive.delete_archive()
