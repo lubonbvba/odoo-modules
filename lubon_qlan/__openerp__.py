@@ -10,7 +10,7 @@
         This module is custom made to manage the data center operations of qlan
     """,
 
-    'author': "Lubon bvba",
+    'author': "Lubon bv",
     'website': "http://www.lubon.be",
 
     # Categories can be used to filter modules in modules listing
