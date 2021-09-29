@@ -79,6 +79,7 @@ class lubon_qlan_assets(models.Model):
 	vm_restorepoints_instances_ids=fields.One2many('lubon_qlan.restorepoints_instances',"asset_id")
 	vm_snapshots_ids=fields.One2many("lubon_qlan.snapshots","asset_id")
 	vm_drives_ids=fields.One2many("lubon_qlan.drives","asset_id")
+	vm_update_type=fields.Selection([('kaseya','Kaseya'),('mecm','MECM'),('manual','Manual'),('no','No')])
 
 	vm_snapshots_count=fields.Integer()
 	vm_date_last=fields.Datetime(help="Date last inventoried")

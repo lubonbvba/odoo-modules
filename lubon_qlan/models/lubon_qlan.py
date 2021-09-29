@@ -191,6 +191,7 @@ class lubon_qlan_adusers(models.Model):
 	account_id=fields.Many2one('lubon_qlan.adaccounts', required=True, ondelete='cascade')
 	samaccountname=fields.Char()
 	logonname=fields.Char()
+	last_passwd_change=fields.Datetime(help="Last password change")
 	last_logon=fields.Datetime(help="Last logon date")
 	ad_enabled=fields.Boolean(string="Enabled",default=True,track_visibility='onchange')
 	ad_lockedout=fields.Boolean(string="AD Locked",track_visibility='onchange')

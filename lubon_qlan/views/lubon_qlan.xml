@@ -175,11 +175,12 @@
 				<field name="asset_type"/>
 				<field name="tenant_id"/>
 				<field name="licenses_id"/>
+				<field name="vm_update_type"/>
 				<filter name="VM with snapshot" domain="[('asset_type','=','vm'),('vm_snapshots_count','!=',0)]" />
 				<filter name="No glacier autoclean" domain="[('asset_type','=','vm'),('vm_check_backup','=',True),('vm_glacier_cleanup','=',False),('glacier_vault_archive_ids','!=',False)]" />
 				<filter name="Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',True)]" />
 				<filter name="Excluded from Backup" domain="[('asset_type','=','vm'),('vm_check_backup','=',False)]" />
-				 <filter string="Missing VM" name="last7" domain="[('asset_type','=','vm'),('parent_id','!=',False),
+				 <filter string="Obsolete VM" name="last7" domain="[('asset_type','=','vm'),('parent_id','!=',False),
 					'|', ('vm_date_last','=',False),
 					('vm_date_last','&lt;',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d')))]" 
 					help="VM Not seen for 7 days"/>
@@ -273,7 +274,7 @@
 					</page>
 					<page string="VM info" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
 						<group>
-						<group string="VM Details">
+						<group string="VMware Info">
 						<field name="vm_guestos"/>
 						<field name="vm_path_name"/>
 						<field name="vm_uuid_instance"/>
@@ -286,6 +287,10 @@
 						<field name="vm_snapshots_count" readonly="True"/>
 						<field name="vm_date_last"/>
 					</group>
+					<group string="Operation info">
+						<field name="vm_update_type"/>
+					</group>
+
 					<group string="Backup info">
 						<field name="vm_check_backup"/>
 						<field name="vm_latest_restore_point"/>
