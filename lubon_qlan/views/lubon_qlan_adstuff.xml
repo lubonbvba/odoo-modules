@@ -24,7 +24,8 @@
 										domain="['|','&amp;',('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') ),('contract_line_id','!=',False),('account_created','=',False)]"/>
 					<separator/>					
 					<filter name="qlan" string="Qlan" domain="[('account_source_id','ilike','qlan')]"/> 
-
+				 	<filter string="7 Days no login" name="last7" domain="[('last_logon','&lt;&gt;',False),('last_logon','&lt;',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d')))]" 
+					help="Not logged in for 7 days"/>
 					<group string="Group By">
 						<filter name="by_tenant" string="Tenant"
 												context="{'group_by': 'tenant_id'}"/>
@@ -52,6 +53,7 @@
 					<field name="product"/>
 					<!--field name="ad_enabled"/-->
 					<field name="account_created"/>
+					<field name="last_logon"/>
 					<field name="ad_enabled"/>
 					<field name="ad_lockedout"/>
 					<field name="validcontract_ids" invisible="True"/>
