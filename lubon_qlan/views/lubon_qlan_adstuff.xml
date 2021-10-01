@@ -24,7 +24,7 @@
 										domain="['|','&amp;',('date_last', '&lt;', context_today().strftime('%%Y-%%m-%%d') ),('contract_line_id','!=',False),('account_created','=',False)]"/>
 					<separator/>					
 					<filter name="qlan" string="Qlan" domain="[('account_source_id','ilike','qlan')]"/> 
-				 	<filter string="7 Days no login" name="last7" domain="[('last_logon','&lt;&gt;',False),('last_logon','&lt;',((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d')))]" 
+				 	<filter string="30 Days no login" name="last30" domain="[('last_logon','&lt;',((context_today()+datetime.timedelta(days=-30)).strftime('%Y-%m-%d')))]" 
 					help="Not logged in for 7 days"/>
 					<group string="Group By">
 						<filter name="by_tenant" string="Tenant"
