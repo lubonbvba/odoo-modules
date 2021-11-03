@@ -50,6 +50,21 @@ class sale_order(models.Model):
 		for line in self.order_line:
 			if not line.discount==0:
 				self.has_discount=True 	
+	
+	@api.multi		
+	def new_quote_from_contract(self, analytic_account_id):
+		order_id=self.create({
+			'partner_id': analytic_account_id.partner_id.id,
+			'quote_title': 'Renewal',
+			'project_id': analytic_account_id.id,
+		})
+		lines=analytic_account_id.recurring_invoice_line_ids.sorted(key=lambda r: r.sequence)
+		for line in lines:
+			n=self.env['sale.order.line'].create({
+				'order_id': order_id.id,
+				'product_id': line.product_id.id,
+			})
+
 
 
 class sale_order_line(models.Model):

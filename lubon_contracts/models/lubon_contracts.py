@@ -132,6 +132,10 @@ class account_analytic_account(models.Model):
 		res.update({'comment': contract.description})
 		res.update({'origin': contract.name})
 		return res
+    
+	@api.multi
+	def make_quote_from_contract(self):
+		self.env['sale.order'].new_quote_from_contract(self)
 
 
 class sale_order(models.Model):

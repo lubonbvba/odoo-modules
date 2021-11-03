@@ -46,6 +46,7 @@
                 <xpath expr='//field[@name="recurring_next_date"]' position="after">
                     <field name="check_before_invoice"/>
                     <field name="ready_for_invoice"/>
+                    <button string="Make quote" name="make_quote_from_contract" type="object"/>
                 </xpath> 
                 <xpath expr='//field[@name="product_id"]' position="attributes">
                     <attribute name="domain">[('sale_ok','=',True)]</attribute>
