@@ -63,6 +63,7 @@ class sale_order(models.Model):
 			n=self.env['sale.order.line'].create({
 				'order_id': order_id.id,
 				'product_id': line.product_id.id,
+				'product_uom_qty': line.quantity,
 			})
 
 
