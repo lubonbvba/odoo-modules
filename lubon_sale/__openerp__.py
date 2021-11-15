@@ -17,7 +17,7 @@
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
     'category': 'Uncategorized',
-    'version': '0.1',
+    'version': '0.2',
 
     # any module necessary for this one to work correctly
     'depends': ['base','sale','sale_margin'],
@@ -29,6 +29,7 @@
 	'views/lubon_sale.xml',
 	'reports/lubon_sale_reports.xml',
     'reports/lubon_sale_contract.xml',
+    'reports/lubon_sale_contract_table.xml',
 
     ],
     # only loaded in demonstration mode
