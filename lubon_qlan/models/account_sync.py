@@ -211,7 +211,72 @@ class lubon_qlan_account_source(models.Model):
 	def get_tenants(self):
 		#Office 365
 		if (self.account_source_type_id.id == self.env.ref('lubon_qlan.ast_o365').id):
-			self.env['lubon_qlan.tenants_o365'].refresh_tenants(self)
+			self.env['lubon_qlan.tenants_o365'].refresh_tenants_o365(self)
+
+
+
+class lubon_qlan_skus_o365(models.Model):
+	_name = 'lubon_qlan.skus_o365'
+	_description = 'Office 365 sku names'
+	_rec_name='Service_plan_name'
+
+	product_display_name=fields.Char()
+	string_id=fields.Char()
+	GUID=fields.Char()
+	Service_plan_name=fields.Char()
+	service_plan_id=fields.Char()
+	Service_plan_included_friendly_names=fields.Char()
+
+
+
+class lubon_qlan_subscribedskus_o365(models.Model):
+	_name = 'lubon_qlan.subscribedskus_o365'
+	_description = 'Office 365 subscribed skus'
+	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365')
+	capabilityStatus=fields.Char()
+	consumedUnits=fields.Integer()
+	o365_id=fields.Char()
+	skuId=fields.Char()
+	skuPartNumber=fields.Char()
+	appliesTo=fields.Char()
+	enabled=fields.Integer()
+	suspended=fields.Integer()
+	warning=fields.Integer()
+	friendly_name=fields.Char()
+     
+	@api.multi
+	def refresh(self,o365_tenant_id):
+		result=o365_tenant_id.account_source_id.endpoints_id.execute('https://graph.microsoft.com/beta/subscribedskus',url='https://login.microsoftonline.com/' + o365_tenant_id.defaultdomainname)
+		for sku in result['value']:
+			#pdb.set_trace()
+			subscribedsku=self.search([('o365_tenant_id','=',o365_tenant_id.id),('skuId','=',sku['skuId'])])
+			if not subscribedsku:
+				subscribedsku=self.create ({
+					'o365_tenant_id':o365_tenant_id.id,
+					'skuId':sku['skuId'],
+					'skuPartNumber':sku['skuPartNumber'],
+					'o365_id':sku['id'],
+				})
+			skus=self.env['lubon_qlan.skus_o365'].search([('GUID','=',sku['skuId'])])
+			#pdb.set_trace()
+			if len(skus)>=1:
+				subscribedsku.friendly_name=skus[0].product_display_name
+			subscribedsku.consumedUnits=sku['consumedUnits']
+			subscribedsku.capabilityStatus=sku['capabilityStatus']
+			subscribedsku.enabled=sku['prepaidUnits']['enabled']
+			subscribedsku.warning=sku['prepaidUnits']['warning']
+			subscribedsku.suspended=sku['prepaidUnits']['suspended']
+
+
+
+class lubon_qlan_users_o365(models.Model):
+	_name = 'lubon_qlan.tenants_o365'
+	_description = 'Office 365 tenants'
+	name=fields.Char()
+	lastname=fields.Char()
+	firstname=fields.Char()
+
+
 
 
 class lubon_qlan_tenants_o365(models.Model):
@@ -220,30 +285,32 @@ class lubon_qlan_tenants_o365(models.Model):
 	name=fields.Char()
 	tenant_id=fields.Char()
 	defaultdomainname=fields.Char()
-	
+	qlan_tenant_id=fields.Many2one('lubon_qlan.tenants')
+	account_source_id=fields.Many2one('lubon_qlan.account_source')
+	get_details=fields.Boolean(default = True)
+	sku_ids=fields.One2many('lubon_qlan.subscribedskus_o365','o365_tenant_id')
 
 	@api.multi
-	def refresh_tenants(self,account_source_id):
-		user=account_source_id.credential_id.user
-		password=account_source_id.credential_id.decrypt()
-		command_line="$user='" + account_source_id.credential_id.user+"'"
-		command_line += "\n\r$pword=ConvertTo-SecureString  -AsPlainText -Force -String '" + account_source_id.credential_id.decrypt()[0]+"'"
-		command_line += "\n\r$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pword"
-		command_line += "\n\rconnect-msolservice -Credential $Credential"
-		command_line += "\n\r" + account_source_id.tenant_command
-		command_line += "\n\r"
-		result=account_source_id.endpoints_id.execute(command_line,'')
-		for tenant in result:
-			tenant_id=self.search([('tenant_id','=',tenant['TenantId'])])
+	def refresh_tenants_o365(self,account_source_id):
+
+		result=account_source_id.endpoints_id.execute('https://graph.microsoft.com/beta/contracts','')
+		for tenant in result['value']:
+#			pdb.set_trace()
+			tenant_id=self.search([('tenant_id','=',tenant['id'])])
 			if not tenant_id:
 				tenant_id=self.create({
-					'tenant_id': tenant['TenantId']
+					'tenant_id': tenant['id']
 					})
 			if tenant_id:
-				tenant_id.name=tenant['Name']
-				#tenant_id.defaultdomainname=tenant['DefaultDomainName']
+				tenant_id.name=tenant['displayName']
+				tenant_id.defaultdomainname=tenant['defaultDomainName']
+				tenant_id.account_source_id=account_source_id.id
 			else:
 				pdb.set_trace()
+	@api.multi
+	def refresh_subscribed_skus_o365(self,o365_tenant_id):
+		self.env['lubon_qlan.subscribedskus_o365'].refresh(self)
+
 
 
 class lubon_qlan_new_aduser(models.TransientModel):

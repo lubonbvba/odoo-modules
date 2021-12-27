@@ -912,17 +912,7 @@
 				</form>
 			</field>
 		</record>
-		<record model="ir.ui.view" id="tenants_o365_tree_view">
-			<field name="name">tenants_o365.tree</field>
-			<field name="model">lubon_qlan.tenants_o365</field>
-			<field name="arch" type="xml">
-				<tree string="Tenants O365 Tree" default_order="name">
-					<field name="name"/>
-					<field name="defaultdomainname"/>
-					<field name="tenant_id"/>
-				</tree>
-			</field>
-		</record>
+
 		<record model="ir.ui.view" id="tenants_tree_view">
 			<field name="name">tenants.tree</field>
 			<field name="model">lubon_qlan.tenants</field>
@@ -988,15 +978,12 @@
 										<field name="filemaker_site_id"/>
 										<field name="validcustomers_ids" widget="many2many_tags"/>
 										<field name="main_contact"/>
-										<field name="tel_dedicated"/>
 
 									</group>
 									<group string="Config">
 										<field name="ip"/>
 										<field name="is_citrix"/>
 										<field name="is_telephony"/>
-										<field name="is_mailonly"/>
-										<field name="is_qfilteronly"/>
 									</group>
 								</group>
 								<notebook>
@@ -1061,7 +1048,7 @@
 									</group>
 									<group>
 										<field name="default_logon_script"/>
-										<field name="default_mail_db"/>
+										
 										<field name="default_password_never_expires"/>
 									</group>
 								</group>
@@ -1284,7 +1271,20 @@
 						 </form>
 					 </field>
 				 </record>
-
+						<record model="ir.ui.view" id="qlan_skus_o365_tree_view">
+							<field name="name">aqlan_skus_o365.tree</field>
+							<field name="model">lubon_qlan.skus_o365</field>
+							<field name="arch" type="xml">
+								<tree string="SKUS O365 Tree">
+									<field name="product_display_name"/>			
+									<field name="string_id"/>
+									<field name="GUID"/>
+									<field name="Service_plan_name"/>
+									<field name="service_plan_id"/>
+									<field name="Service_plan_included_friendly_names"/>
+								</tree>
+							</field>
+						</record>
 				<!-- act_window id="launch_session_wizard"
 										name="Add Attendees"
 										src_model="openacademy.session"
@@ -1352,6 +1352,12 @@
 											<field name="view_type">form</field>
 											<field name="view_mode">tree,form</field>
 										</record>
+										<record model="ir.actions.act_window" id="qlan_skus_o365_action">
+											<field name="name">Credentials</field>
+											<field name="res_model">lubon_qlan.skus_o365</field>
+											<field name="view_type">form</field>
+											<field name="view_mode">tree,form</field>
+										</record>
 
 
 										<record model="ir.actions.act_window" id="qlan_memberships_action">
@@ -1402,6 +1408,8 @@
 				<menuitem id="lubon_qlan_configuration_menu" name="Configuration"
 					parent="main_lubon_qlan_menu" groups="base.group_no_one" sequence="999"/>
 				<menuitem id="lubon_qlan_tables_menu" name="Tables" parent="lubon_qlan_configuration_menu"/>
+				<menuitem id="lubon_qlan_skus_o365_menu" name="O365 SKU names" parent="lubon_qlan_tables_menu"
+							action="qlan_skus_o365_action"/>
 
 				<menuitem id="lubon_qlan_adaccounts_import_menu" name="AD Accounts import" parent="lubon_qlan_tables_menu"
 							action="qlan_adaccounts_import_action"/>

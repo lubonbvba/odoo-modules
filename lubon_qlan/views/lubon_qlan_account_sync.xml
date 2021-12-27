@@ -1,6 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
+		<record model="ir.ui.view" id="tenants_o365_tree_view">
+			<field name="name">tenants_o365.tree</field>
+			<field name="model">lubon_qlan.tenants_o365</field>
+			<field name="arch" type="xml">
+				<tree string="Tenants O365 Tree" default_order="name">
+					<field name="name"/>
+					<field name="defaultdomainname"/>
+					<field name="tenant_id"/>
+					<field name="qlan_tenant_id"/>
+                    <field name="get_details"/>
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="tenants_o365_form_view">
+			<field name="name">tenants_o365.form</field>
+			<field name="model">lubon_qlan.tenants_o365</field>
+			<field name="arch" type="xml">
+				<form string="Tenants O365 Form" default_order="name">
+					<sheet>
+						<group>
+					<field name="name"/>
+					<field name="defaultdomainname"/>
+					<field name="tenant_id"/>
+					<field name="qlan_tenant_id"/>
+					<field name="account_source_id"/>
+                    <field name="get_details"/>
+					</group>
+					<notebook>
+						<page string='Subscribed SKUS'>
+                            <button name='refresh_subscribed_skus_o365' string="Get subscribed skus" type="object"/>
+                            <field name="sku_ids">
+										<tree string="SKUS" editable="bottom">
+                                            <field name="o365_id"/>
+                                            <field name="friendly_name"/>
+											<field name="capabilityStatus"/>
+											<field name="consumedUnits"/>
+											<field name="skuPartNumber"/>
+											<field name="skuId"/>
+											<field name="enabled"/>
+											<field name="suspended"/>
+                							<field name="warning"/>
+                                        </tree>
+                            </field>
+						</page>
+					</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
 	<record model="ir.ui.view" id="lubon_qlan_account_source_type_tree">
         <field name="name">lubon_qlan.account_source_type.tree</field>
         <field name="model">lubon_qlan.account_source_type</field>

@@ -26,8 +26,6 @@ class lubon_qlan_tenants(models.Model):
 	ip = fields.Char(string='DC IP', help='Datacenter IP range')
 	is_telephony=fields.Boolean()
 	is_citrix=fields.Boolean()
-	is_mailonly=fields.Boolean()
-	is_qfilteronly=fields.Boolean()
 
 	ip_ids=fields.One2many('lubon_qlan.ip','tenant_id')
 	vlan_ids=fields.One2many('lubon_qlan.vlan','tenant_id')
@@ -37,7 +35,6 @@ class lubon_qlan_tenants(models.Model):
 	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
 	account_source_ids=fields.One2many('lubon_qlan.account_source','tenant_id')
 	default_logon_script=fields.Char()
-	default_mail_db=fields.Char()
 	default_password_never_expires=fields.Boolean()
 
 	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
@@ -50,7 +47,6 @@ class lubon_qlan_tenants(models.Model):
 	filemaker_site_id=fields.Char(string='Filemaker site')
 	validcustomers_ids=fields.Many2many('res.partner', string="Customers", compute="_getvalidcustomer_ids")
 	main_contact=fields.Many2one('res.partner', string="Main contact", domain="[['type','=','contact'],['is_company','=',False]]")
-	tel_dedicated=fields.Char(string='Incoming tel',help="Number that is dedicated to the customer, with respect to SLA")
 #	qlan_adaccounts_import_ids=fields.One2many('lubon_qlan_adaccounts_import','tenant')
 
 	vm_glacier_cleanup=fields.Boolean(help='Cleanup glacier automatically')
