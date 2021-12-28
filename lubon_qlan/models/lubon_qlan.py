@@ -41,6 +41,7 @@ class lubon_qlan_tenants(models.Model):
 	adusers_ids=fields.One2many('lubon_qlan.adusers', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
 	adgroups_ids=fields.One2many('lubon_qlan.adgroups', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
 	assets_ids=fields.One2many('lubon_qlan.assets', 'tenant_id')
+	users_o365_ids=fields.One2many('lubon_qlan.users_o365', 'qlan_tenant_id')
 
 	credential_ids=fields.One2many('lubon_credentials.credentials','tenant_id')
 

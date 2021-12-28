@@ -1035,6 +1035,20 @@
 										 </group>                      
 									<field name="credential_ids"/>
 								</page>
+								<page string='O365 Users'>
+								    <field name="users_o365_ids">
+										<tree string="users" editable="bottom">
+                                            <field name="o365_id"/>
+											<field name="mail"/>
+                                            <field name="principalname"/>
+                                            <field name="name"/>
+											<field name="lastname"/>
+											<field name="firstname"/>
+											<field name="domainname"/>
+             								<field name="qlan_tenant_id"/>
+                                        </tree>
+                            		</field>
+								</page>
 
 										 <!-- field name="credential_ids" domain="[('tenant_id','=',active_id),(credentials_type','ilike','tenant_admin')]" context="{'default_credentials_type':'tenant_admin'}"/ -->
 										 <!-- field name="is_telephony"/ -->

@@ -227,11 +227,45 @@ class lubon_qlan_skus_o365(models.Model):
 	service_plan_id=fields.Char()
 	Service_plan_included_friendly_names=fields.Char()
 
+class lubon_qlan_users_licenses_o365(models.Model):
+	_name = 'lubon_qlan.users_licenses_o365'
+	_description = 'MS 365 user assigned skus'	
+	user_o365_id = fields.Many2one('lubon_qlan.users_o365')
+	subscribedskus_o365 = fields.Many2one('lubon_qlan.subscribedskus_o365')
+	
+
+	@api.multi
+	def refresh(self,user_id):
+		result=user_id.o365_tenant_id.account_source_id.endpoints_id.execute('https://graph.microsoft.com/beta/users/'+ user_id.o365_id,url='https://login.microsoftonline.com/' + user_id.o365_tenant_id.defaultdomainname)
+		for license in result['assignedLicenses']:
+			activelicense=self.search([('user_o365_id','=',user_id.id),('subscribedskus_o365','=',license['skuId'])])
+		if not activelicense:
+			newsku=self.env['lubon_qlan.subscribedskus_o365'].search([('skuId','=',license['skuId']),('o365_tenant_id','=',user_id.o365_tenant_id.id)])[0]
+			activelicense=self.create({
+				'user_o365_id':user_id.id,
+				'subscribedskus_o365': newsku.id
+			})
+
+		pdb.set_trace()
+
+
+	@api.multi
+	def set_licenses(self,assignedLicenses,user_id):
+		for license in assignedLicenses:
+			activelicense=self.search([('user_o365_id','=',user_id.id),('subscribedskus_o365','=',license['skuId'])])
+		if not activelicense:
+			newsku=self.env['lubon_qlan.subscribedskus_o365'].search([('skuId','=',license['skuId']),('o365_tenant_id','=',user_id.o365_tenant_id.id)])[0]
+			activelicense=self.create({
+				'user_o365_id':user_id.id,
+				'subscribedskus_o365': newsku.id
+			})
+		pdb.set_trace()
 
 
 class lubon_qlan_subscribedskus_o365(models.Model):
 	_name = 'lubon_qlan.subscribedskus_o365'
 	_description = 'Office 365 subscribed skus'
+	_rec_name= 'friendly_name'
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365')
 	capabilityStatus=fields.Char()
 	consumedUnits=fields.Integer()
@@ -270,11 +304,42 @@ class lubon_qlan_subscribedskus_o365(models.Model):
 
 
 class lubon_qlan_users_o365(models.Model):
-	_name = 'lubon_qlan.tenants_o365'
-	_description = 'Office 365 tenants'
+	_name = 'lubon_qlan.users_o365'
+	_description = 'Office 365 users'
 	name=fields.Char()
+	o365_id=fields.Char()
 	lastname=fields.Char()
 	firstname=fields.Char()
+	principalname=fields.Char()
+	domainname=fields.Char()
+	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365')
+	mail=fields.Char()
+	qlan_tenant_id=fields.Many2one('lubon_qlan.tenants')
+	person_id=fields.Many2one('res.partner', string="Related person", domain="[('type','=','contact')]")
+	user_licenses_ids=fields.One2many('lubon_qlan.users_licenses_o365','user_o365_id')
+	
+	@api.multi
+	def refresh(self,o365_tenant_id):
+		result=o365_tenant_id.account_source_id.endpoints_id.execute('https://graph.microsoft.com/beta/users',url='https://login.microsoftonline.com/' + o365_tenant_id.defaultdomainname)
+		for user in result['value']:
+			user_o365=self.search([('o365_tenant_id','=',o365_tenant_id.id),('o365_id','=',user['id'])])
+			if not user_o365:
+				user_o365=self.create ({
+					'o365_tenant_id':o365_tenant_id.id,
+					'o365_id':user['id'],
+				})
+			#pdb.set_trace()
+			user_o365.lastname=user['surname']
+			user_o365.firstname=user['givenName']
+			user_o365.name=user['displayName']
+			user_o365.principalname=user['userPrincipalName']
+			user_o365.mail=user['mail']
+			user_o365.domainname=user['userPrincipalName'][user['userPrincipalName'].index('@') + 1 : ]
+			user_o365.qlan_tenant_id=o365_tenant_id.qlan_tenant_id
+
+	@api.multi
+	def refresh_licenses(self,o365_id):
+		self.env['lubon_qlan.users_licenses_o365'].refresh(self)		
 
 
 
@@ -289,6 +354,7 @@ class lubon_qlan_tenants_o365(models.Model):
 	account_source_id=fields.Many2one('lubon_qlan.account_source')
 	get_details=fields.Boolean(default = True)
 	sku_ids=fields.One2many('lubon_qlan.subscribedskus_o365','o365_tenant_id')
+	users_o365_ids=fields.One2many('lubon_qlan.users_o365','o365_tenant_id')
 
 	@api.multi
 	def refresh_tenants_o365(self,account_source_id):
@@ -310,6 +376,10 @@ class lubon_qlan_tenants_o365(models.Model):
 	@api.multi
 	def refresh_subscribed_skus_o365(self,o365_tenant_id):
 		self.env['lubon_qlan.subscribedskus_o365'].refresh(self)
+	@api.multi
+	def refresh_users_o365(self,o365_tenant_id):
+		self.env['lubon_qlan.users_o365'].refresh(self)
+
 
 
 

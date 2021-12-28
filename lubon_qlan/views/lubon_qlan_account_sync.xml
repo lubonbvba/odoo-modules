@@ -45,11 +45,101 @@
                                         </tree>
                             </field>
 						</page>
+                        <page string='Users'>
+                            <button name='refresh_users_o365' string="Get users" type="object"/>
+                            <field name="users_o365_ids">
+										<!--tree string="users" editable="bottom">
+                                            <field name="o365_id"/>
+											<field name="mail"/>
+                                            <field name="principalname"/>
+                                            <field name="name"/>
+											<field name="lastname"/>
+											<field name="firstname"/>
+											<field name="domainname"/>
+             								<field name="qlan_tenant_id"/>
+                                        </tree-->
+                            </field>
+						</page>
 					</notebook>
 					</sheet>
 				</form>
 			</field>
 		</record>
+        <record model="ir.ui.view" id="users_o365_tree_view">
+			<field name="name">users_o365.tree</field>
+			<field name="model">lubon_qlan.users_o365</field>
+			<field name="arch" type="xml">
+				<tree string="O365 users Tree" zeditable="top">
+                                            <field name="o365_id"/>
+											<field name="mail"/>
+                                            <field name="principalname"/>
+                                            <field name="name"/>
+											<field name="lastname"/>
+											<field name="firstname"/>
+											<field name="domainname"/>
+             								<field name="qlan_tenant_id"/>
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="users_o365_form_view">
+			<field name="name">users_o365.form</field>
+			<field name="model">lubon_qlan.users_o365</field>
+			<field name="arch" type="xml">
+				<form string="Ad accounts">
+					<!--header>
+						<button string="Passwd reset"/>
+						<button string="Disable" type='object' name='disable_user' attrs="{'invisible':[('ad_enabled','=',False)]}"/>
+						<button string="Enable" type='object' name='enable_user' attrs="{'invisible':[('ad_enabled','=',True)]}"/>
+
+						<button string="Unlock" attrs="{'invisible':[('ad_lockedout','=',False)]}"/>
+						<button name='update_values' type='object' string="Update"/>
+						<button name='refresh' type='object' string="Refresh"/>
+					</header-->
+					<sheet>
+						<group>
+							<group>
+								<field name="person_id" context="{'default_email': principalname, 'default_name': name}"/>
+								<field name="name" readonly="1"/>
+                            	<field name="principalname" readonly="1"/>
+								<field name="o365_tenant_id" readonly="1"/>
+                                <field name="qlan_tenant_id" readonly="1"/>
+							</group>
+						</group>
+                  
+	          <notebook>
+	          	<page string="Licenses">
+                  <button name='refresh_licenses' string="Get licenses" type="object"/>
+                  <field name="user_licenses_ids">
+                    <tree>
+                        <field name="user_o365_id"/>
+                        <field name="subscribedskus_o365"/>
+                    </tree>
+                  </field>
+	          	</page>
+	          	<page string="Billing">
+	          	</page>
+	          </notebook>
+	      </sheet>
+	        	<!--div class="oe_chatter">
+	        		<field name="message_follower_ids" widget="mail_followers"/>
+	        		<field name="message_ids" widget="mail_thread"/>
+	        	</div-->
+	    		</form>
+			</field>
+		</record>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	<record model="ir.ui.view" id="lubon_qlan_account_source_type_tree">
         <field name="name">lubon_qlan.account_source_type.tree</field>
@@ -132,6 +222,14 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>
+    <record model="ir.actions.act_window" id="qlan_users_o365_action">
+      <field name="name">O365 users</field>
+      <field name="res_model">lubon_qlan.users_o365</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+        <menuitem id="lubon_qlan_users_o365_menu" name="O365 Users" parent="lubon_qlan_tables_menu"
+          action="qlan_users_o365_action"/>
         <menuitem id="lubon_qlan_account_source_menu" name="Account sources" parent="lubon_qlan_tables_menu"
           action="qlan_account_source_action"/>
         <menuitem id="lubon_qlan_account_source_type_menu" name="Source Types" parent="lubon_qlan_tables_menu"
