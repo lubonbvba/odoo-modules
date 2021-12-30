@@ -16,16 +16,17 @@ class lubon_qlan_billing_history(models.Model):
 
 	@api.multi
 	def verify_billing_history_line(self,related,number,contract_line_id,description):
-		#pdb.set_trace()
 		
 		current_line=self.search([('related_model','ilike', str(related._model) ),('related_id','=',related.id)])
 		if not current_line:
-			self.create({
+			current_line=self.create({
 				'related_model': str(related._model),
 				'related_id': related.id,
 				'description': description,
 				'contract_line_id': contract_line_id.id,
 			})
+		current_line.contract_line_id=contract_line_id
+#		pdb.set_trace()
 
 
 

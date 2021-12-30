@@ -54,7 +54,9 @@ class lubon_qlan_users_licenses_o365(models.Model):
 					'user_o365_id':user_id.id,
 					'subscribedskus_o365': newsku.id
 				})
-			activelicense.billingconfig_tenant_o365=self.env['lubon_qlan.billingconfig_tenant_o365'].search([('domains_o365_id','=',user_id.o365_domains_id.id),('subscribedskus_o365_id','=',newsku.id)])
+			if not activelicense.billingconfig_tenant_o365.manual_exception:
+				# do not change license assignment if a manual one was assigned 		
+				activelicense.billingconfig_tenant_o365=self.env['lubon_qlan.billingconfig_tenant_o365'].search([('domains_o365_id','=',user_id.o365_domains_id.id),('subscribedskus_o365_id','=',newsku.id)])
 			if activelicense.billingconfig_tenant_o365:
 				self.env['lubon_qlan.billing_history'].verify_billing_history_line(activelicense,1,activelicense.billingconfig_tenant_o365.contract_line_id,"O365 license: %s" % activelicense.user_o365_id.name)
 
@@ -65,10 +67,11 @@ class lubon_qlan_billingconfig_tenant_o365(models.Model):
 	_description = 'Office 365 tenant billing config'
 	subscribedskus_o365_id=fields.Many2one('lubon_qlan.subscribedskus_o365',domain="[('invoicable','=',True),('id','in',valid_subscribedskus_o365_ids[0][2])]", required=True)
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365', ondelete='cascade', required=True)
-	domains_o365_id=fields.Many2one('lubon_qlan.domains_o365', domain="[('id','in',valid_domains_o365_ids[0][2]),('used_for_billing','=',True)]", required=True)
+	domains_o365_id=fields.Many2one('lubon_qlan.domains_o365', domain="[('id','in',valid_domains_o365_ids[0][2]),('used_for_billing','=',True)]", zrequired=True)
 	qlan_tenant_id=fields.Many2one('lubon_qlan.tenants', ondelete='cascade', required=True)
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
-	
+	manual_exception=fields.Boolean(help="Manual created entry to set on exceptions")
+	remark=fields.Char()
 	valid_domains_o365_ids=fields.Many2many('lubon_qlan.domains_o365', compute='_get_valid_domains_o365_ids')
 	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
 	valid_subscribedskus_o365_ids=fields.Many2many('lubon_qlan.subscribedskus_o365', compute='_get_valid_subscribedskus_o365_ids')
@@ -77,7 +80,10 @@ class lubon_qlan_billingconfig_tenant_o365(models.Model):
 	def name_get(self):
 		res=[]
 		for line in self:
-			res.append((line.id,self.domains_o365_id.name + " - " + line.subscribedskus_o365_id.friendly_name))
+			if line.domains_o365_id.name:
+				res.append((line.id,line.domains_o365_id.name + " - " + line.subscribedskus_o365_id.friendly_name  ))
+			if line.manual_exception:
+				res.append((line.id, "Manual - " + line.subscribedskus_o365_id.friendly_name + " " + line.remark ))	
 		return res
 
 

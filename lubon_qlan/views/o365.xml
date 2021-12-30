@@ -58,7 +58,8 @@
                                 <field name="subscribedskus_o365_id" />
                                 <field name="domains_o365_id" />
                                 <field name="contract_line_id" />
-
+								<field name="manual_exception" />
+								<field name="remark" />
                                 </tree>
                             </field>
 						</page>
@@ -161,7 +162,24 @@
 				</tree>
 			</field>
 		</record>
+        <record model="ir.ui.view" id="lubon_qlan_users_licenses_o365_tree_view">
+			<field name="name">lubon_qlan_users_licenses_o365.tree</field>
+			<field name="model">lubon_qlan.users_licenses_o365</field>
+			<field name="arch" type="xml">
+				<tree string="User licenses o365" editable="top">
+                    <field name="user_o365_id"/>
+                    <field name="subscribedskus_o365"/>
+					<field name="billingconfig_tenant_o365"/>
+				</tree>
+			</field>
+		</record>		
 
+    <record model="ir.actions.act_window" id="lubon_qlan_users_licenses_o365_action">
+      <field name="name">O365 user licenses</field>
+      <field name="res_model">lubon_qlan.users_licenses_o365</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
     <record model="ir.actions.act_window" id="qlan_users_o365_action">
       <field name="name">O365 users</field>
       <field name="res_model">lubon_qlan.users_o365</field>
@@ -190,5 +208,7 @@
           action="qlan_users_o365_action"/>
         <menuitem id="qlan_billingconfig_tenant_o365_menu" name="Billing config" parent="lubon_qlan_tables_menu"
           action="qlan_billingconfig_tenant_o365_action"/>
+    <menuitem id="lubon_qlan_users_licenses_o365_menu" name="O365 User license" parent="lubon_qlan_tables_menu"
+          action="lubon_qlan_users_licenses_o365_action"/>		  
      </data>
 </openerp>
