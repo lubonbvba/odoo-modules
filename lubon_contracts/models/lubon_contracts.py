@@ -6,7 +6,7 @@ import pdb
 class lubon_qlan_billing_history(models.Model):
 	_name = 'lubon_qlan.billing_history'
 	_description = 'Billing detail lines'
-
+	_sql_constraints = [('model_and_id','UNIQUE(related_model,related_id)','Related model/related id needs to be unique')]
 	related_model=fields.Char(help="Model that originated this line")
 	related_id=fields.Integer()
 	contract_line_id=fields.Many2one('account.analytic.invoice.line')
@@ -26,7 +26,8 @@ class lubon_qlan_billing_history(models.Model):
 				'contract_line_id': contract_line_id.id,
 			})
 		current_line.contract_line_id=contract_line_id
-#		pdb.set_trace()
+#
+# 		pdb.set_trace()
 
 
 
