@@ -23,7 +23,7 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'templates.xml',
         'views/lubon_contracts.xml',
         'views/contracts_state_wizard.xml',

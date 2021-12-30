@@ -3,6 +3,32 @@
 from openerp import models, fields, api
 import pdb
 
+class lubon_qlan_billing_history(models.Model):
+	_name = 'lubon_qlan.billing_history'
+	_description = 'Billing detail lines'
+
+	related_model=fields.Char(help="Model that originated this line")
+	related_id=fields.Integer()
+	contract_line_id=fields.Many2one('account.analytic.invoice.line')
+	date_start=fields.Datetime()
+	date_end=fields.Datetime()
+	description=fields.Char()
+
+	@api.multi
+	def verify_billing_history_line(self,related,number,contract_line_id,description):
+		#pdb.set_trace()
+		
+		current_line=self.search([('related_model','ilike', str(related._model) ),('related_id','=',related.id)])
+		if not current_line:
+			self.create({
+				'related_model': str(related._model),
+				'related_id': related.id,
+				'description': description,
+				'contract_line_id': contract_line_id.id,
+			})
+
+
+
 class account_analytic_invoice_line(models.Model):
 	_inherit = 'account.analytic.invoice.line'
 
@@ -15,8 +41,14 @@ class account_analytic_invoice_line(models.Model):
 	sequence=fields.Integer()
 	line_ok=fields.Boolean(compute="_set_line_state")
 	adaccount_ids=fields.One2many('lubon_qlan.adaccounts','contract_line_id')
-	counted_items=fields.Integer(compute="_count_items", string="Counted", help="This number is the total of items counted in the tenant")
-	used_items=fields.Integer(compute="_count_used", string="Used", help="The number of items used/assigned")
+	billing_history_ids=fields.One2many('lubon_qlan.billing_history','contract_line_id')
+	counted_items=fields.Integer(compute="_count_items", string="Counted (old)", help="This number is the total of items counted in the tenant")
+	used_items=fields.Integer(compute="_count_used", string="Used (old)", help="The number of items used/assigned")
+	billing_history_counted_items=fields.Integer(compute="_billing_history_count_items", string="Counted", help="This number is the total of items counted in the tenant")
+
+
+
+
 
 	@api.multi
 	@api.depends('adaccount_ids')
@@ -43,6 +75,15 @@ class account_analytic_invoice_line(models.Model):
 					for item in lines:
 						n+=1
 			line.used_items=n
+
+
+	@api.multi
+	@api.depends('billing_history_ids')
+	def _billing_history_count_items(self):
+		for line in self:
+			#pdb.set_trace()
+			line.billing_history_counted_items=len(line.billing_history_ids)
+
 
 
 	@api.one

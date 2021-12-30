@@ -56,7 +56,12 @@ class lubon_qlan_tenants(models.Model):
 	vm_glacier_week_retention_age=fields.Integer(default=90,string='Retention days week', help="Retention time in days for the weekly backups")
 	vm_glacier_week_retention_num=fields.Integer(default=13,string='Weekly minimum #', help="Minimum number of weekly backups to keep")
 
-
+	@api.multi
+	def name_get(self):
+		res=[]
+		for line in self:
+			res.append((line.id,line.code + " - " + line.tenant_name))
+		return res
 
 	def _getvalidcustomer_ids(self):
 		for rec in self.contract_ids:

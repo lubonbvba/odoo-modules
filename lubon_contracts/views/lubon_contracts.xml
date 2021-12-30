@@ -60,6 +60,7 @@
                 </xpath>
                 <xpath expr='//field[@name="uom_id"]' position="before">
                     <field name="counted_items"/>
+                    <field name="billing_history_counted_items"/>
                     <field name="used_items"/>
                     <field name="line_ok"/>
                 </xpath>
