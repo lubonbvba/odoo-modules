@@ -26,6 +26,26 @@
 
             </field>
         </record>
+
+       <record model="ir.ui.view" id="lubon_contracts_users_o365_form">
+			<field name="name">lubon_contracts_users_o365.form</field>
+			<field name="model">lubon_qlan.users_o365</field>
+            <field name="inherit_id" ref="lubon_qlan.users_o365_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr='//page[@name="billing"]' position="inside">
+			        <field name="billing_history_ids">
+				        <tree>
+				  	        <field name="related_model"/>
+				  	        <field name="related_user_model"/>
+				  	        <field name="description"/>
+				        </tree>
+				    </field>
+                </xpath>
+            </field>
+        </record>
+
+
+
         <record model="ir.ui.view" id="lubon_contracts_lubon_contracts">
             <field name="name">lubon_contracts</field>
             <field name="model">account.analytic.account</field>
@@ -92,3 +112,6 @@
         </record>
     </data>
 </openerp>
+
+
+

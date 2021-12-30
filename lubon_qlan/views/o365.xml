@@ -112,8 +112,9 @@
                     </tree>
                   </field>
 	          	</page>
-	          	<page string="Billing">
-	          	</page>
+	          	<page name='billing' string="Billing">
+					
+				</page>
 	          </notebook>
 	      </sheet>
 	    		</form>

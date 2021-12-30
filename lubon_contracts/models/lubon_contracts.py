@@ -9,13 +9,15 @@ class lubon_qlan_billing_history(models.Model):
 	_sql_constraints = [('model_and_id','UNIQUE(related_model,related_id)','Related model/related id needs to be unique')]
 	related_model=fields.Char(help="Model that originated this line")
 	related_id=fields.Integer()
+	related_user_model=fields.Char(help="Name of the user model that relates to this entry, eg office 365, active directory")
+	related_user_id=fields.Integer()	
 	contract_line_id=fields.Many2one('account.analytic.invoice.line')
 	date_start=fields.Datetime()
 	date_end=fields.Datetime()
 	description=fields.Char()
 
 	@api.multi
-	def verify_billing_history_line(self,related,number,contract_line_id,description):
+	def verify_billing_history_line(self,related,number,contract_line_id,description,related_user=None):
 		
 		current_line=self.search([('related_model','ilike', str(related._model) ),('related_id','=',related.id)])
 		if not current_line:
@@ -26,9 +28,19 @@ class lubon_qlan_billing_history(models.Model):
 				'contract_line_id': contract_line_id.id,
 			})
 		current_line.contract_line_id=contract_line_id
-#
+		if related_user:
+			current_line.related_user_model=str(related_user._model)
+			current_line.related_user_id=related_user.id
+		else:
+			current_line.related_user_model=None
+			current_line.related_user_id=None
+			
+
 # 		pdb.set_trace()
 
+class lubon_qlan_users_o365(models.Model):
+	_inherit = 'lubon_qlan.users_o365'
+	billing_history_ids= fields.One2many('lubon_qlan.billing_history','related_user_id', domain=[('related_user_model','=','lubon_qlan.users_o365')])
 
 
 class account_analytic_invoice_line(models.Model):
