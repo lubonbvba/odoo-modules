@@ -1117,7 +1117,9 @@
 									<field name="tenant_id" filter_domain="[('tenant_id','ilike',self)]"/>
 									<filter name="notenant" string="No Tenant"
 										domain="[('tenant_id', '=', False)]"/>
-									<filter name="notenant" string="No Product"
+									<filter name="activeornot" string="Active or not"
+										domain="['|',('active', '=', True),('active', '=', False)]"/>
+									<filter name="noproduct" string="No Product"
 										domain="[('product', 'not ilike', '-')]"/>
 									<filter name="account_to_complete" string="To complete win"
 										domain="['|', ('product', 'not ilike', '-'),('tenant_id', '=', False)]"/>            
@@ -1149,8 +1151,9 @@
 									<field name="name"/>
 									<field name="ad_date_created"/>
 									<field name="product"/>
-									<!--field name="ad_enabled"/-->
+									<field name="distinguishedname"/>
 									<field name="account_created"/>
+									<field name="date_last"/>
 									<field name="validcontract_ids" invisible="True"/>
 									<field name="contract_line_id"/>
 								</tree>
@@ -1172,6 +1175,7 @@
 									<!-- field name="ad_enabled"/ -->
 									<field name="account_created"/>
 									<field name="contract_line_id" />
+									<field name="objectguid"/>
 									<!--field name="exc_mb_size" /-->
 								</group>
 								<group>
@@ -1416,7 +1420,7 @@
 					action="qlan_restore_points_stats_action"/>
 				<menuitem id="lubon_qlan_isp_check_menu" name="ISP info" parent="lubon_qlan_checks_menu"
 					action="qlan_isp_action"/>
-				<menuitem id="lubon_qlan_adaccounts_menu" name="AD Users" parent="lubon_qlan_tenants_menu"
+				<menuitem id="lubon_qlan_users_menu" name="AD Users" parent="lubon_qlan_tenants_menu"
 						action="qlan_adusers_menu_action"/>
 
 				<menuitem id="lubon_qlan_configuration_menu" name="Configuration"
@@ -1424,7 +1428,8 @@
 				<menuitem id="lubon_qlan_tables_menu" name="Tables" parent="lubon_qlan_configuration_menu"/>
 				<menuitem id="lubon_qlan_skus_o365_menu" name="O365 SKU names" parent="lubon_qlan_tables_menu"
 							action="qlan_skus_o365_action"/>
-
+				<menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tables_menu"
+							action="qlan_adaccounts_action"/>
 				<menuitem id="lubon_qlan_adaccounts_import_menu" name="AD Accounts import" parent="lubon_qlan_tables_menu"
 							action="qlan_adaccounts_import_action"/>
 				<menuitem id="lubon_qlan_messages_menu" name="Messages" parent="lubon_qlan_tables_menu"

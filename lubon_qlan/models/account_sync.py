@@ -161,8 +161,10 @@ class lubon_qlan_account_source(models.Model):
 				adaccount.memberofstring=item['memberof']
 				groups=[]
 				for group in item['memberof']:
-					g=self.env['lubon_qlan.adaccounts'].search([('distinguishedname',"=",group)])
+					g=self.env['lubon_qlan.adaccounts'].search([('distinguishedname',"=",group),('account_created','=',True)])
 					if g:
+						if len(g)>1:
+							logger.error('Multiple groups found %s') % item['samaccountname']
 						groups.append(g.id)
 
 				if len(groups)>0:
