@@ -101,6 +101,10 @@ class lubon_qlan_tenants(models.Model):
     def refresh_licenses_ad(self,context):
         for user in self.adusers_ids:
             user.refresh_licenses_ad(user)
+        # for o365tenant in self.users_o365_ids:
+        #     o365tenant.refresh_thistenant_o365(self)
+
+
 
     @api.multi
     def set_glacier_for_all_vm(self):
@@ -315,7 +319,7 @@ class lubon_qlan_users_license_ad(models.Model):
                             'prd_group_id': config.ad_groups_licenses_id.id
                         })
         for activelicense in user_id.user_licenses_ids:
-            self.env['lubon_qlan.billing_history'].verify_billing_history_line(activelicense,1,activelicense.billingconfig_tenant_ad.contract_line_id,"QLAN license: %s" % activelicense.user_ad_id.name,related_user=user_id)            
+            self.env['lubon_qlan.billing_history'].verify_billing_history_line(activelicense,1,activelicense.billingconfig_tenant_ad.contract_line_id,"QLAN license: %s" % activelicense.user_ad_id.name,related_user=user_id,owner=user_id.logonname.lower())            
 
         
         #pdb.set_trace()

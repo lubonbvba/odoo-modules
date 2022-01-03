@@ -17,21 +17,23 @@ class lubon_qlan_billing_history(models.Model):
 	date_start=fields.Datetime()
 	date_end=fields.Datetime()
 	description=fields.Char()
+	owner=fields.Char(help='User/device that is used to group by')
 
 	@api.multi
-	def verify_billing_history_line(self,related,number,contract_line_id,description,related_user=None):
+	def verify_billing_history_line(self,related,number,contract_line_id,description,related_user=None,owner=None):
 		
 		current_line=self.search([('related_model','ilike', str(related._model) ),('related_id','=',related.id)])
 		if not current_line:
 			current_line=self.create({
 				'related_model': str(related._model),
 				'related_id': related.id,
-				'description': description,
 				'contract_line_id': contract_line_id.id,
 
 			})
 		current_line.contract_line_id=contract_line_id
 		current_line.contract_id=contract_line_id.analytic_account_id
+		current_line.description=description
+		current_line.owner=owner
 
 		if related_user:
 			current_line.related_user_model=str(related_user._model)
@@ -155,7 +157,7 @@ class account_analytic_account(models.Model):
 	_inherit = "account.analytic.account"
 	name=fields.Char(translate=False)
 	check_before_invoice=fields.Boolean(help="If this field is set, invoice can only be made if ready for invoice is checked")
-	ready_for_invoice=fields.Boolean(Store=True, compute="_set_ready_for_invoice",help="This needs to be set to signal that the invoice can be made.")
+	# ready_for_invoice=fields.Boolean(Store=True, compute="_set_ready_for_invoice",help="This needs to be set to signal that the invoice can be made.")
 	invoiced_lines=fields.One2many("account.invoice.line",'account_analytic_id', readonly=True)
 	quantity_hist=fields.Float(string="Historic balance", help="Credit before using odoo contracts")
 	partner_related_ids=fields.Many2many('res.partner')

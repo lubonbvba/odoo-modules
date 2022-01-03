@@ -58,7 +58,7 @@ class lubon_qlan_users_licenses_o365(models.Model):
 				# do not change license assignment if a manual one was assigned 		
 				activelicense.billingconfig_tenant_o365=self.env['lubon_qlan.billingconfig_tenant_o365'].search([('domains_o365_id','=',user_id.o365_domains_id.id),('subscribedskus_o365_id','=',newsku.id)])
 			if activelicense.billingconfig_tenant_o365:
-				self.env['lubon_qlan.billing_history'].verify_billing_history_line(activelicense,1,activelicense.billingconfig_tenant_o365.contract_line_id,"O365 license: %s" % activelicense.user_o365_id.name,related_user=user_id)
+				self.env['lubon_qlan.billing_history'].verify_billing_history_line(activelicense,1,activelicense.billingconfig_tenant_o365.contract_line_id,"O365 license: %s" % activelicense.user_o365_id.name,related_user=user_id,owner=user_id.principalname.lower())
 
 		#pdb.set_trace()
 
