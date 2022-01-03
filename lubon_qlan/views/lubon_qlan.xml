@@ -954,6 +954,7 @@
 						<form string="Tenants form">
 							<header>
 								<button name="new_user" type="object" string="New User"/>
+								<button name='refresh_licenses_ad' type='object' string="Refresh licenses ad"/>
 							</header>
 							<sheet>
 								<div class="oe_right oe_button_box" name="buttons">
@@ -1004,6 +1005,22 @@
 											</tree> -->
 										</field>
 									</page>
+
+			
+                        <page string='Billing config'>
+<!--                            <button name='load_billing_combinations_o365' string="Load combinations" type="object"/> -->
+                            <field name="billingconfig_tenants_ad_ids" context="{'default_qlan_tenant_id':active_id,}">
+                                <tree editable="top">
+                                <field name="valid_contract_ids" invisible="True" />                              
+                                <field name="qlan_tenant_id" zinvisible="True" />
+                                <field name="ad_groups_licenses_id" />
+<!--                                <field name="domains_o365_id" /> -->
+                                <field name="contract_line_id" />
+								<field name="manual_exception" />
+								<field name="remark" />
+                                </tree>
+                            </field>
+						</page>									
 									<page string="AD Groups">
 										<field name="adgroups_ids" context="{'default_tenant_id' : active_id }">
 <!--                       <tree string="Groups">
@@ -1068,6 +1085,10 @@
 								</group>
 									<field name="contract_ids"/>
 								</page>
+					<page string='Domains'>
+                            <field name="domains_o365_ids">
+                            </field>
+							</page>
 					<page string="Settings" >
 						<group string="Glacier">
 							<group>
@@ -1230,7 +1251,7 @@
 								</form>
 							</field>
 						</record>
-
+<!--
 						<record model="ir.ui.view" id="adaccounts_import_tree_view">
 							<field name="name">adaccounts_import.tree</field>
 							<field name="model">lubon_qlan.adaccounts_import</field>
@@ -1289,6 +1310,7 @@
 						 </form>
 					 </field>
 				 </record>
+-->				 
 						<record model="ir.ui.view" id="qlan_skus_o365_tree_view">
 							<field name="name">aqlan_skus_o365.tree</field>
 							<field name="model">lubon_qlan.skus_o365</field>
@@ -1349,14 +1371,13 @@
 											<!--field name="domain">[["type","=",'delivery']]</field -->
 										</record>
 
-										<record model="ir.actions.act_window" id="qlan_adaccounts_import_action">
+<!--										<record model="ir.actions.act_window" id="qlan_adaccounts_import_action">
 											<field name="name">AD Accounts Import</field>
 											<field name="res_model">lubon_qlan.adaccounts_import</field>
 											<field name="view_type">form</field>
 											<field name="view_mode">tree,form</field>
-											<!--field name="domain">[["type","=",'delivery']]</field -->
 										</record>
-
+-->
 										<record model="ir.actions.act_window" id="qlan_messages_action">
 											<field name="name">Messages</field>
 											<field name="res_model">mail.message</field>
@@ -1430,8 +1451,8 @@
 							action="qlan_skus_o365_action"/>
 				<menuitem id="lubon_qlan_adaccounts_menu" name="AD Accounts" parent="lubon_qlan_tables_menu"
 							action="qlan_adaccounts_action"/>
-				<menuitem id="lubon_qlan_adaccounts_import_menu" name="AD Accounts import" parent="lubon_qlan_tables_menu"
-							action="qlan_adaccounts_import_action"/>
+<!---				<menuitem id="lubon_qlan_adaccounts_import_menu" name="AD Accounts import" parent="lubon_qlan_tables_menu"
+							action="qlan_adaccounts_import_action"/> -->
 				<menuitem id="lubon_qlan_messages_menu" name="Messages" parent="lubon_qlan_tables_menu"
 								action="qlan_messages_action"/>
 				<menuitem id="lubon_qlan_credentials_menu" name="Credentials" parent="lubon_qlan_tables_menu"

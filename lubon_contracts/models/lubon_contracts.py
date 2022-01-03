@@ -12,6 +12,8 @@ class lubon_qlan_billing_history(models.Model):
 	related_user_model=fields.Char(help="Name of the user model that relates to this entry, eg office 365, active directory")
 	related_user_id=fields.Integer()	
 	contract_line_id=fields.Many2one('account.analytic.invoice.line')
+	contract_id=fields.Many2one('account.analytic.account')
+
 	date_start=fields.Datetime()
 	date_end=fields.Datetime()
 	description=fields.Char()
@@ -26,8 +28,11 @@ class lubon_qlan_billing_history(models.Model):
 				'related_id': related.id,
 				'description': description,
 				'contract_line_id': contract_line_id.id,
+
 			})
 		current_line.contract_line_id=contract_line_id
+		current_line.contract_id=contract_line_id.analytic_account_id
+
 		if related_user:
 			current_line.related_user_model=str(related_user._model)
 			current_line.related_user_id=related_user.id
@@ -36,7 +41,7 @@ class lubon_qlan_billing_history(models.Model):
 			current_line.related_user_id=None
 			
 
-# 		pdb.set_trace()
+ 	#	pdb.set_trace()
 
 class lubon_qlan_users_o365(models.Model):
 	_inherit = 'lubon_qlan.users_o365'
@@ -155,6 +160,7 @@ class account_analytic_account(models.Model):
 	quantity_hist=fields.Float(string="Historic balance", help="Credit before using odoo contracts")
 	partner_related_ids=fields.Many2many('res.partner')
 	date_cutoff=fields.Date(string="Last renewal date", help="Date to use as a start date for reporting and counting hours.")
+	billing_history_lines_ids=fields.One2many('lubon_qlan.billing_history','contract_id')
 	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:

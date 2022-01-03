@@ -8,357 +8,92 @@ import dns.resolver
 from os.path import expanduser
 import openerp
 
-
 logger = logging.getLogger(__name__)
 
-class lubon_qlan_tenants(models.Model):
-	_name = 'lubon_qlan.tenants'
-	_inherit = 'mail.thread'
-	_description = 'Tenant'
-	_rec_name = 'code'
-	_sql_constraints = [('code_unique','UNIQUE(code)','Code has to be unique')]
-	active=fields.Boolean(default=True)
-	code = fields.Char(oldname='name', required=True, help='Tenant code', index=True )
-	tenant_name = fields.Char(string='Name', required=True, oldname='descript_name', help="Descriptive name of the tenant")
-	qadm_password = fields.Char(help="Password for qadm@upn user")
-	qtest_password = fields.Char()
-	upn = fields.Char()
-	ip = fields.Char(string='DC IP', help='Datacenter IP range')
-	is_telephony=fields.Boolean()
-	is_citrix=fields.Boolean()
-
-	ip_ids=fields.One2many('lubon_qlan.ip','tenant_id')
-	vlan_ids=fields.One2many('lubon_qlan.vlan','tenant_id')
+# class lubon_qlan_adaccounts_import(models.TransientModel):
+# 	_name='lubon_qlan.adaccounts_import'
+# 	importref=fields.Char(help="Reference to the import")
+# 	processed=fields.Boolean(default=False)
+# 	samaccountname=fields.Char(required=True)
+# 	logonname=fields.Char()
+# 	tenant=fields.Char()
+# 	product=fields.Char()
+# 	smspasscode=fields.Char()
+# 	exchange=fields.Char()
+# 	citrix=fields.Char()
+# 	rdp=fields.Char()
+# 	office=fields.Char()
+# 	msofficestd=fields.Char()
+# 	msofficeproplus=fields.Char()
+# 	msexchstd=fields.Char()
+# 	msexchplus=fields.Char()
+# 	enabled=fields.Boolean()
+# 	objectguid=fields.Char()
+# 	def schedule_import(self, cr, user, context={}):
+# 		self.importadaccounts(self)
 	
-	reseller_partner_id=fields.Many2one('res.partner')
-	cmd_endpoint=fields.Many2one('cmd_execute.endpoints')
-	contract_ids=fields.Many2many('account.analytic.account', String="Contracts")
-	account_source_ids=fields.One2many('lubon_qlan.account_source','tenant_id')
-	default_logon_script=fields.Char()
-	default_password_never_expires=fields.Boolean()
-
-	adaccounts_ids=fields.One2many('lubon_qlan.adaccounts', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
-	adusers_ids=fields.One2many('lubon_qlan.adusers', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
-	adgroups_ids=fields.One2many('lubon_qlan.adgroups', 'tenant_id', domain=lambda self: [('account_created', '=', True)],auto_join=True )
-	assets_ids=fields.One2many('lubon_qlan.assets', 'tenant_id')
-	users_o365_ids=fields.One2many('lubon_qlan.users_o365', 'qlan_tenant_id')
-
-	credential_ids=fields.One2many('lubon_credentials.credentials','tenant_id')
-
-	filemaker_site_id=fields.Char(string='Filemaker site')
-	validcustomers_ids=fields.Many2many('res.partner', string="Customers", compute="_getvalidcustomer_ids")
-	main_contact=fields.Many2one('res.partner', string="Main contact", domain="[['type','=','contact'],['is_company','=',False]]")
-#	qlan_adaccounts_import_ids=fields.One2many('lubon_qlan_adaccounts_import','tenant')
-
-	vm_glacier_cleanup=fields.Boolean(help='Cleanup glacier automatically')
-	vm_glacier_month_retention_age=fields.Integer(default=180, string='Retention days month', help="Retention time in days for the monthly backups")
-	vm_glacier_month_retention_num=fields.Integer(default=6,string='Monthly minimum #', help="Minimum number of monthly backups to keep")
-	vm_glacier_week_retention_age=fields.Integer(default=90,string='Retention days week', help="Retention time in days for the weekly backups")
-	vm_glacier_week_retention_num=fields.Integer(default=13,string='Weekly minimum #', help="Minimum number of weekly backups to keep")
-
-	@api.multi
-	def name_get(self):
-		res=[]
-		for line in self:
-			res.append((line.id,line.code + " - " + line.tenant_name))
-		return res
-
-	def _getvalidcustomer_ids(self):
-		for rec in self.contract_ids:
-			self.validcustomers_ids=self.validcustomers_ids + rec.partner_id
-	@api.one
-	def _adaccounts_count(self):
-		self.adaccounts_count=len(self.adaccounts_ids)
-	adaccounts_count=fields.Integer(compute=_adaccounts_count)
-
-	@api.one
-	def _adusers_count(self):
-		self.adusers_count=len(self.adusers_ids)
-	adusers_count=fields.Integer(compute=_adusers_count)
-
-	@api.one
-	def _adgroups_count(self):
-		self.adgroups_count=len(self.adgroups_ids)
-	adgroups_count=fields.Integer(compute=_adgroups_count)
-
-	@api.one
-	def _contracts_count(self):
-		self.contracts_count=len(self.contract_ids)
-	contracts_count=fields.Integer(compute=_contracts_count)
-	
-	@api.multi
-	def set_glacier_for_all_vm(self):
-		for vm in self.assets_ids:
-			if vm.asset_type == 'vm' and not vm.vm_glacier_block:
-				vm.vm_glacier_cleanup=self.vm_glacier_cleanup
-				vm.vm_glacier_week_retention_num=self.vm_glacier_week_retention_num
-				vm.vm_glacier_week_retention_age=self.vm_glacier_week_retention_age
-				vm.vm_glacier_month_retention_num=self.vm_glacier_month_retention_num
-				vm.vm_glacier_month_retention_age=self.vm_glacier_month_retention_age
+# 	@api.multi
+#  	def importadaccounts(self,dummy=None): # , cr=None, uid=None, context=None, arg5=None):
+# 		logger.info('Importing ad accounts')
+# 		table_import=self.env['lubon_qlan.adaccounts_import']
+# 		basepath=expanduser("~")
+# 		basepath +='/odoo-imports/adaccounts'
+# 		destpath=basepath + '/hist'
+# 		p = Path(basepath)
+# 		for f in p.files(pattern='Daily-2*.csv'):
+			
+# 			s=f.stripext().basename().lstrip('Daily-')
+# 			logger.info('Processing file: ' + f.name)
+# 			fi = open(f, 'rb')
+# 			data = fi.read()
+# 			fi.close()
+# 			fo = open(basepath + '/Daily-clean.csv', 'wb')
+# 			fo.write(data.replace('\x00', ''))
+# 			fo.close()
 
 
-class lubon_qlan_adaccounts(models.Model):
-	_name = 'lubon_qlan.adaccounts'
-	_description = "AD Account"
-	_inherit = ['mail.thread','ir.needaction_mixin']
-	_sql_constraints = [('guid_unique','UNIQUE(objectguid)','objectguid has to be unique'),('distinguishedname_unique','UNIQUE(distinguishedname, account_created)','distinguishedname has to be unique')]
-	_rec_name = 'name'
-	_mail_post_access = 'read'
-	_track = {
-        'product': {
-            'lubon_qlan.mt_adaccount_changed': lambda self, cr, uid, obj, ctx=None: True,
-        },
-         'tenant_id': {
-            'lubon_qlan.mt_adaccount_created': lambda self, cr, uid, obj, ctx=None: True,
-        },
-         'ad_enabled': {
-            'lubon_qlan.mt_adaccount_deactivated': lambda self, cr, uid, obj, ctx=None: not obj.ad_enabled,
-            'lubon_qlan.mt_adaccount_activated': lambda self, cr, uid, obj, ctx=None: obj.ad_enabled,
-        },
-
-    }
-
-
-    #qlan fields
-	tenant_id=fields.Many2one('lubon_qlan.tenants',track_visibility='onchange') #, required=True)
-	active=fields.Boolean(default=True)
-	account_created=fields.Boolean(default=True, track_visibility='onchange')
-	account_source_id=fields.Many2one('lubon_qlan.account_source')
-	name=fields.Char()
-	displayname=fields.Char()
-	product=fields.Char(track_visibility='onchange')
-	date_first=fields.Datetime(help="Date of first import")
-	date_last=fields.Datetime(help="Date last seen")
-	person_id=fields.Many2one('res.partner', string="Related person", domain="['&',('type','=','contact'),('parent_id','in', validcustomers_ids[0][2])]")
-	contract_id=fields.Many2one('account.analytic.account', string="Contract" )
-	validcustomers_ids=fields.Many2many('res.partner', compute='_getvalidcustomer_ids',)
-	validcontract_ids=fields.Many2many('account.analytic.account', compute='_getvalidcontract_ids',)
-	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="['&',('name','ilike',product),('analytic_account_id','in', validcontract_ids[0][2])]")	
-	ad_date_created=fields.Datetime(help="Date created in ad")
-
-	#adobject fields
-	distinguishedname=fields.Char(index=True)
-	objectguid=fields.Char(required=True, index=True)
-	memberofstring=fields.Char(help="String used to detect changes in group membership.")
-	memberof=fields.Many2many('lubon_qlan.adaccounts',relation='lubon_qlan_adaccounts_groups',column1="member",column2="container")
-	members=fields.Many2many('lubon_qlan.adaccounts',relation='lubon_qlan_adaccounts_groups', column1="container",column2="member" )
-	membercount=fields.Integer(string="Nr Memb")
-	email_address_ids=fields.One2many('lubon_qlan.email_address','adaccounts_id')
-
-	@api.onchange('tenant_id')
-	@api.one
-	def _getvalidcontract_ids(self):
-		self.validcontract_ids=self.tenant_id.contract_ids
-
-	@api.onchange('tenant_id')
-	@api.one
-	def _getvalidcustomer_ids(self):
-		self.validcustomers_ids=self.tenant_id.validcustomers_ids
-
-	@api.onchange('person_id')
-	@api.one
-	def _getpersonname(self):
-		self.name=self.person_id.name
-	
-	@api.onchange('account_created')
-	@api.one
-	def check_product(self):
-		if not self.account_created:
-			self.contract_line_id=False
-
-	@api.multi
-	def checkmailaddresses(self,addresslist):
-		if addresslist:
-			current_list=self.email_address_ids
-			for address in addresslist:
-				email=self.email_address_ids.search([('email_address','ilike',address)])
-				if not email:
-					email=self.email_address_ids.create({
-						'email_address':address,
-						'adaccounts_id':self.id,
-						})
-				email.email_address=address	
-				email.is_default= 'SMTP' in email.email_address
-				current_list=current_list - email
-			for email in current_list:
-				email.unlink()
+# 			with open (basepath + '/Daily-clean.csv', 'rb') as cleanfile:
+# 				reader = csv.DictReader(cleanfile, delimiter=';')
+# 				for row in reader:
+# 	#					print (s, row['Samaccountname'],row['Displayname'],row['Tenant-01'],row['Qlan Product-9'],row['enabled'])
+# 					table_import.create({'importref':s, 
+# 					'samaccountname':row['Samaccountname'],
+# 					'logonname':row['userprincipalname'],
+# 					'tenant':row['Tenant-01'].upper(),
+# 					'product':row['Qlan Product-9'],
+# 					'smspasscode':row['SMS Passcode-8'],
+# 					'exchange':row['Exchange-10'],
+# 					'citrix':row['Citrix-11'],
+# 					'rdp':row['RDP-12'],
+# 					'office':row['Office-13'],
+# 					'msofficestd':row['MS Office STD'],
+# 					'msofficeproplus':row['MS Office ProPlus'],
+# 					'msexchstd':row['MS Exch Std'],
+# 					'msexchplus':row['MS Exch Plus'],
+# 					'enabled':row['enabled'],
+# 					'objectguid':row['objectguid'],
+# 					}).process_import()
+# 				cleanfile.close()
+# 				q=Path(f)
+# 				q.move(destpath)
 		
+# 	@api.one		
+# 	def process_import(self):
+# 		table_accounts=self.env['lubon_qlan.adaccounts']
+# 		account=table_accounts.search([('objectguid', '=', self.objectguid)])
 
-class lubon_qlan_adusers(models.Model):
-	_name = 'lubon_qlan.adusers'
-	_inherit = ['mail.thread']
-	_inherits = {'lubon_qlan.adaccounts':'account_id'}
-	_description = "AD Users"	#ad user fields
-	_rec_name='name'
-	account_id=fields.Many2one('lubon_qlan.adaccounts', required=True, ondelete='cascade')
-	samaccountname=fields.Char()
-	logonname=fields.Char()
-	last_passwd_change=fields.Datetime(help="Last password change")
-	last_logon=fields.Datetime(help="Last logon date")
-	ad_enabled=fields.Boolean(string="Enabled",default=True,track_visibility='onchange')
-	ad_lockedout=fields.Boolean(string="AD Locked",track_visibility='onchange')
-	exc_mb_size=fields.Float(string="Mailbox size")
-	xasessions_ids=fields.One2many('lubon_qlan.xasessions','adaccount_id')
-	legacyexchangedn=fields.Char()
-	mailnickname=fields.Char()
-	mail=fields.Char()
-	scriptpath=fields.Char()
-	targetaddress=fields.Char()
-	objectclass=fields.Char()
-	first_name=fields.Char()
-	last_name=fields.Char()
-	mobile=fields.Char()
+# 		if not account:
+# 			account=table_accounts.create({'objectguid': self.objectguid,
+# 											'date_first': datetime.datetime.now(),
+# 											})
 
-	@api.multi
-	def refresh(self):
-		self.account_source_id.run_single_sync(self.objectguid)
-
-	@api.multi
-	def disable_user(self):
-		parameters={
-			'identity':self.objectguid,
-		}
-		cmd={'parameters':parameters,
-			'cmd':'disable-adaccount',
-			
-			}	
-		self.tenant_id.cmd_endpoint.execute_json(cmd,debug=False)
-		self.refresh()
-
-	@api.multi
-	def enable_user(self):
-		parameters={
-			'identity':self.objectguid,
-		}
-		cmd={'parameters':parameters,
-			'cmd':'enable-adaccount',
-			
-			}	
-		self.tenant_id.cmd_endpoint.execute_json(cmd,debug=False)
-		self.refresh()
-	@api.multi
-	def update_values(self):
-		# context = self.env.context.copy()
-		# context['cmd_execute_object'] = self.id
-		# action = {
-		# 'name': self.name,
-		# 'view_type': 'form',
-		# 'view_mode': 'form',
-		# 'res_model': 'lubon_qlan.new_aduser',
-		# 'context': context,
-		# 'type': 'ir.actions.act_window',
-		# 'target': 'new',
-		# 'domain': [],
-		# }      
-		# return action
-		cmd=self.env['cmd_execute.command'].browse(self.env.ref('lubon_qlan.cm_update_ad_user').id)
-		action=cmd.run_command(self)
-		return action
-
-
-class lubon_qlan_email_address(models.Model):
-	_name = 'lubon_qlan.email_address'
-	_order = 'is_default DESC, email_address'
-	email_address=fields.Char()
-	is_default=fields.Boolean()
-	adaccounts_id=fields.Many2one('lubon_qlan.adaccounts')
-
-
-class lubon_qlan_groups(models.Model):
-	_name = 'lubon_qlan.adgroups'
-	_inherit = ['mail.thread']
-	_inherits = {'lubon_qlan.adaccounts':'account_id'}
-	_description = "AD Groups"	#ad user fields
-	account_id=fields.Many2one('lubon_qlan.adaccounts', required=True,ondelete='cascade')
-
-
-
-
-
-class lubon_qlan_adaccounts_import(models.TransientModel):
-	_name='lubon_qlan.adaccounts_import'
-	importref=fields.Char(help="Reference to the import")
-	processed=fields.Boolean(default=False)
-	samaccountname=fields.Char(required=True)
-	logonname=fields.Char()
-	tenant=fields.Char()
-	product=fields.Char()
-	smspasscode=fields.Char()
-	exchange=fields.Char()
-	citrix=fields.Char()
-	rdp=fields.Char()
-	office=fields.Char()
-	msofficestd=fields.Char()
-	msofficeproplus=fields.Char()
-	msexchstd=fields.Char()
-	msexchplus=fields.Char()
-	enabled=fields.Boolean()
-	objectguid=fields.Char()
-	def schedule_import(self, cr, user, context={}):
-		self.importadaccounts(self)
-	
-	@api.multi
- 	def importadaccounts(self,dummy=None): # , cr=None, uid=None, context=None, arg5=None):
-		logger.info('Importing ad accounts')
-		table_import=self.env['lubon_qlan.adaccounts_import']
-		basepath=expanduser("~")
-		basepath +='/odoo-imports/adaccounts'
-		destpath=basepath + '/hist'
-		p = Path(basepath)
-		for f in p.files(pattern='Daily-2*.csv'):
-			
-			s=f.stripext().basename().lstrip('Daily-')
-			logger.info('Processing file: ' + f.name)
-			fi = open(f, 'rb')
-			data = fi.read()
-			fi.close()
-			fo = open(basepath + '/Daily-clean.csv', 'wb')
-			fo.write(data.replace('\x00', ''))
-			fo.close()
-
-
-			with open (basepath + '/Daily-clean.csv', 'rb') as cleanfile:
-				reader = csv.DictReader(cleanfile, delimiter=';')
-				for row in reader:
-	#					print (s, row['Samaccountname'],row['Displayname'],row['Tenant-01'],row['Qlan Product-9'],row['enabled'])
-					table_import.create({'importref':s, 
-					'samaccountname':row['Samaccountname'],
-					'logonname':row['userprincipalname'],
-					'tenant':row['Tenant-01'].upper(),
-					'product':row['Qlan Product-9'],
-					'smspasscode':row['SMS Passcode-8'],
-					'exchange':row['Exchange-10'],
-					'citrix':row['Citrix-11'],
-					'rdp':row['RDP-12'],
-					'office':row['Office-13'],
-					'msofficestd':row['MS Office STD'],
-					'msofficeproplus':row['MS Office ProPlus'],
-					'msexchstd':row['MS Exch Std'],
-					'msexchplus':row['MS Exch Plus'],
-					'enabled':row['enabled'],
-					'objectguid':row['objectguid'],
-					}).process_import()
-				cleanfile.close()
-				q=Path(f)
-				q.move(destpath)
-		
-	@api.one		
-	def process_import(self):
-		table_accounts=self.env['lubon_qlan.adaccounts']
-		account=table_accounts.search([('objectguid', '=', self.objectguid)])
-
-		if not account:
-			account=table_accounts.create({'objectguid': self.objectguid,
-											'date_first': datetime.datetime.now(),
-											})
-
-		account.update({'samaccountname': self.samaccountname,
-						'logonname': self.logonname,	
-						'date_last':datetime.datetime.now(),
-						'product': self.product,
-						'tenant_id': self.env['lubon_qlan.tenants'].search([('code','=', self.tenant)]),
-						'ad_enabled': self.enabled,
-						})
+# 		account.update({'samaccountname': self.samaccountname,
+# 						'logonname': self.logonname,	
+# 						'date_last':datetime.datetime.now(),
+# 						'product': self.product,
+# 						'tenant_id': self.env['lubon_qlan.tenants'].search([('code','=', self.tenant)]),
+# 						'ad_enabled': self.enabled,
+# 						})
 
 
 
@@ -388,18 +123,18 @@ class lubon_qlan_vlan(models.Model):
 	def init(self,cr):
 		self._migrate(cr, openerp.SUPERUSER_ID,[],{})
 
-	@api.multi
- 	def _migrate(self):
- 		if 'vlan_tag_str' in self.fields_get():
- 			records=self.search([('vlan_tag_str',"=",False)])._comp_vlan_tag_str()
-
-
 	@api.one
 	@api.onchange('ipv4_net','ipv4_mask')
 	def calculate_ipv4(self):
 		if self.ipv4_net and self.ipv4_mask:
 			self.ipv4=self.ipv4_net + '/' + self.ipv4_mask
-	
+
+
+	@api.multi
+	def _migrate(self):
+ 		if 'vlan_tag_str' in self.fields_get():
+			 records=self.search([('vlan_tag_str',"=",False)])._comp_vlan_tag_str()
+
 	@api.one
 	@api.onchange('vlan_tag')
 	def _comp_vlan_tag_str(self):

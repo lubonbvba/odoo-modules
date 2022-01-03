@@ -217,6 +217,7 @@ class lubon_qlan_domains_o365(models.Model):
 	name=fields.Char()
 	used_for_billing=fields.Boolean()
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365',ondelete='cascade')
+	qlan_tenant_id=fields.Many2one('lubon_qlan.tenants',ondelete='cascade')
 
 	@api.multi
 	def refresh_domains_o365(self,o365_tenant_id):
@@ -233,10 +234,11 @@ class lubon_qlan_domains_o365(models.Model):
 		for domain in result['value']:
 			currentdomain=self.search([('o365_tenant_id','=',o365_tenant_id.id),('name','=',domain['id'])])
 			if not currentdomain:
-				self.create({
+				currentdomain=self.create({
 					'name':domain['id'],
 					'o365_tenant_id': o365_tenant_id.id
 				})
+			currentdomain.qlan_tenant_id=o365_tenant_id.qlan_tenant_id	
 
 
 class lubon_qlan_tenants_o365(models.Model):

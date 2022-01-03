@@ -10,12 +10,14 @@
 					<field name="date_last"/>
 					<field name="name" string="Name, product ..." filter_domain="['|','|',('name','ilike',self),('distinguishedname','ilike',self),('product','ilike',self)]"/>
 					<field name="product" filter_domain="[('product','ilike',self)]"/>
-					<field name="tenant_id" filter_domain="[('tenant_id','ilike',self)]"/>
+					<field name="tenant_id" filter_domain="[('tenant_id','in',self)]"/>
 					<field name="account_source_id" filter_domain="[('account_source_id','ilike',self)]"/>
 					<filter name="notenant" string="No Tenant"
 						domain="[('tenant_id', '=', False)]"/>
 					<filter name="notenant" string="No Product"
 							domain="[('product', '=', False)]"/>
+					<filter name="licensing_manual" string="Licensing manual"
+							domain="[('licensing_manual', '=', True)]"/>							
 					<filter name="account_to_complete" string="To complete win"
 								domain="['|', ('product', '=', False),('tenant_id', '=', False)]"/>            
 					<filter name="contract check" string="Contract not ok"
@@ -57,7 +59,7 @@
 					<field name="ad_enabled"/>
 					<field name="ad_lockedout"/>
 					<field name="validcontract_ids" invisible="True"/>
-					<field name="contract_line_id"/>
+					<field name="licensing_manual"/>
 				</tree>
 			</field>
 		</record>
@@ -74,6 +76,7 @@
 						<button string="Unlock" attrs="{'invisible':[('ad_lockedout','=',False)]}"/>
 						<button name='update_values' type='object' string="Update"/>
 						<button name='refresh' type='object' string="Refresh"/>
+						
 					</header>
 					<sheet>
 						<group>
@@ -112,6 +115,21 @@
 	          			</tree>
 	          		</field>
 	          	</page>
+				<page string="Licensing">
+                  <button name='refresh_licenses_ad' string="Get licenses" type="object"/>
+				  <group>
+				  	<field name="licensing_manual"/>
+				  </group>
+                  <field name="user_licenses_ids">
+                    <tree>
+                        <field name="user_ad_id"/>
+                        <field name="prd_group_id"/>
+						<field name="billingconfig_tenant_ad"/>
+                    </tree>
+                  </field>				
+				</page>
+				<page strinbg="Billing">
+				</page>
 	          	<page string="Session History">
 	          		<field name="xasessions_ids">
 	          			<tree>
