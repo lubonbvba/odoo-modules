@@ -121,7 +121,7 @@ class account_analytic_invoice_line(models.Model):
 		for line in self:
 			text=''
 			if line.name:
-				text=line.name
+				text=line.name.partition('\n')[0]
 			text+=' (' + str(line.analytic_account_id.name) + ')'
 			res.append((line.id,text ))
 		return res 	

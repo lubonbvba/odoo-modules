@@ -1012,7 +1012,7 @@
                             <field name="billingconfig_tenants_ad_ids" context="{'default_qlan_tenant_id':active_id,}">
                                 <tree editable="top">
                                 <field name="valid_contract_ids" invisible="True" />                              
-                                <field name="qlan_tenant_id" zinvisible="True" />
+                                <field name="qlan_tenant_id" invisible="True" />
                                 <field name="ad_groups_licenses_id" />
 <!--                                <field name="domains_o365_id" /> -->
                                 <field name="contract_line_id" />

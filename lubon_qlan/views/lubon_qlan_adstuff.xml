@@ -121,14 +121,15 @@
 				  	<field name="licensing_manual"/>
 				  </group>
                   <field name="user_licenses_ids">
-                    <tree>
+                    <tree editable='top'>  
                         <field name="user_ad_id"/>
+						<field name="qlan_tenant_id"/>
                         <field name="prd_group_id"/>
-						<field name="billingconfig_tenant_ad"/>
+						<field name="billingconfig_tenant_ad" domain="[('qlan_tenant_id','=',qlan_tenant_id)]"/>
                     </tree>
                   </field>				
 				</page>
-				<page strinbg="Billing">
+				<page string="Billing">
 				</page>
 	          	<page string="Session History">
 	          		<field name="xasessions_ids">
@@ -352,8 +353,24 @@
 	    		</form>
 			</field>
 		</record>
-
-
+        <record model="ir.ui.view" id="billingconfig_tenant_ad_tree_view">
+			<field name="name">billingconfig_tenant_ad.tree</field>
+			<field name="model">lubon_qlan.billingconfig_tenant_ad</field>
+			<field name="arch" type="xml">
+				<tree string="Billing config tenant o365" editable="top">
+                                            <field name="qlan_tenant_id"/>
+											<field name="ad_groups_licenses_id"/>
+                                            <field name="manual_exception"/>
+                                            <field name="remark"/>
+				</tree>
+			</field>
+		</record>
+    <record model="ir.actions.act_window" id="qlan_billingconfig_tenant_ad_action">
+      <field name="name">Tenant billing config ad</field>
+      <field name="res_model">lubon_qlan.billingconfig_tenant_ad</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>  
       <act_window id="act_new_aduser"
         name="New AD user"
         src_model="lubon_qlan.tenants"

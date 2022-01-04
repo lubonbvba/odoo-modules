@@ -304,6 +304,13 @@ class lubon_qlan_users_license_ad(models.Model):
     user_ad_id = fields.Many2one('lubon_qlan.adusers')
     billingconfig_tenant_ad=fields.Many2one('lubon_qlan.billingconfig_tenant_ad', oldname='billing_config_tenant_ad')
     prd_group_id=fields.Many2one("lubon_qlan.adaccounts")
+    qlan_tenant_id=fields.Many2one('lubon_qlan.tenants', compute='_calculate_tenant_id')
+
+
+    @api.one
+    @api.depends('user_ad_id')
+    def _calculate_tenant_id(self):
+        self.qlan_tenant_id=self.user_ad_id.tenant_id
 
 
     @api.multi
