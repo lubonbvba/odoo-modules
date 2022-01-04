@@ -133,20 +133,20 @@ class account_analytic_invoice_line(models.Model):
 			record.price_subtotal=record.quantity * record.line_reduced_price
 	@api.multi
 	def new_recurring_line(self,line):
-		invoice_line=self.search(['&', '&',('analytic_account_id',"=",line.order_id.project_id.id ),('product_id',"=",line.product_id.id),('name',"ilike",line.name)])
-		if not invoice_line:
-			self.create({'analytic_account_id': line.order_id.project_id.id,
-				'product_id': line.product_id.id,
-				'price_unit': line.price_unit,	
-				'name': line.name,	
-				'quantity': line.product_uom_qty,	
-				'line_discount_rate': line.discount,	
-				'uom_id': line.product_uom.id,
-				})
-		else:
-			invoice_line.update(
-				{'quantity': invoice_line.quantity + line.product_uom_qty,	
-				})
+#		invoice_line=self.search(['&', '&',('analytic_account_id',"=",line.order_id.project_id.id ),('product_id',"=",line.product_id.id),('name',"ilike",line.name)])
+#		if not invoice_line:
+		self.create({'analytic_account_id': line.order_id.project_id.id,
+			'product_id': line.product_id.id,
+			'price_unit': line.price_unit,	
+			'name': line.name,	
+			'quantity': line.product_uom_qty,	
+			'line_discount_rate': line.discount,	
+			'uom_id': line.product_uom.id,
+			})
+		# else:
+		# 	invoice_line.update(
+		# 		{'quantity': invoice_line.quantity + line.product_uom_qty,	
+		# 		})
 
 
 
