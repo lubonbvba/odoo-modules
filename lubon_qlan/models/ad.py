@@ -15,6 +15,7 @@ class lubon_qlan_tenants(models.Model):
     _description = 'Tenant'
     _rec_name = 'code'
     _sql_constraints = [('code_unique','UNIQUE(code)','Code has to be unique')]
+    _order = 'code' 
     active=fields.Boolean(default=True)
     code = fields.Char(oldname='name', required=True, help='Tenant code', index=True )
     tenant_name = fields.Char(string='Name', required=True, oldname='descript_name', help="Descriptive name of the tenant")
@@ -54,12 +55,12 @@ class lubon_qlan_tenants(models.Model):
     vm_glacier_week_retention_age=fields.Integer(default=90,string='Retention days week', help="Retention time in days for the weekly backups")
     vm_glacier_week_retention_num=fields.Integer(default=13,string='Weekly minimum #', help="Minimum number of weekly backups to keep")
 
-# 	@api.multi
-# 	def name_get(self):
-# 		res=[]
-# 		for line in self:
-# 			res.append((line.id,line.code + " - " + line.tenant_name))
-# 		return res
+    # @api.multi
+    # def name_get(self):
+    #     res=[]
+    #     for line in self:
+    #         res.append((line.id,line.code + " - " + line.tenant_name))
+    #     return res
 	
 # 	@api.model
 # 	def name_search(self, name, args=None, operator='ilike', limit=100):
@@ -301,10 +302,12 @@ class lubon_qlan_groups(models.Model):
 class lubon_qlan_users_license_ad(models.Model):
     _name = 'lubon_qlan.users_licenses_ad'
     _description = 'AD user assigned skus'
-    user_ad_id = fields.Many2one('lubon_qlan.adusers')
-    billingconfig_tenant_ad=fields.Many2one('lubon_qlan.billingconfig_tenant_ad')
+    _sql_constraints=[('user_and_ad_group','UNIQUE(user_ad_id,prd_group_id)','Model lubon_qlan_users_license_ad: Combination user/grp unique')]
+
+    user_ad_id = fields.Many2one('lubon_qlan.adusers',ondelete='cascade')
+    billingconfig_tenant_ad=fields.Many2one('lubon_qlan.billingconfig_tenant_ad', ondelete='cascade')
     prd_group_id=fields.Many2one("lubon_qlan.adaccounts")
-    qlan_tenant_id=fields.Many2one('lubon_qlan.tenants', compute='_calculate_tenant_id')
+    qlan_tenant_id=fields.Many2one('lubon_qlan.tenants', compute='_calculate_tenant_id',ondelete='cascade')
 
 
     @api.one
@@ -317,14 +320,20 @@ class lubon_qlan_users_license_ad(models.Model):
     def refresh(self,user_id):
         if not user_id.licensing_manual:
             for config in user_id.tenant_id.billingconfig_tenants_ad_ids:
-                if not(config.manual_exception) and config.ad_groups_licenses_id in user_id.memberof:
+                if not(config.manual_exception):
                     activelicense = self.search ([('billingconfig_tenant_ad','=',config.id),('user_ad_id','=',user_id.id),('prd_group_id','=',config.ad_groups_licenses_id.id)])
-                    if not activelicense:
-                        activelicense=self.create({
-                            'billingconfig_tenant_ad':config.id,
-                            'user_ad_id':user_id.id,
-                            'prd_group_id': config.ad_groups_licenses_id.id
-                        })
+                    if config.ad_groups_licenses_id in user_id.memberof:
+#                        activelicense = self.search ([('billingconfig_tenant_ad','=',config.id),('user_ad_id','=',user_id.id),('prd_group_id','=',config.ad_groups_licenses_id.id)])
+                        if not activelicense:
+                            activelicense=self.create({
+                                'billingconfig_tenant_ad':config.id,
+                                'user_ad_id':user_id.id,
+                                'prd_group_id': config.ad_groups_licenses_id.id
+                            })
+                    else:
+                        if activelicense:
+                            activelicense.unlink()
+
         for activelicense in user_id.user_licenses_ids:
             self.env['lubon_qlan.billing_history'].verify_billing_history_line(activelicense,1,activelicense.billingconfig_tenant_ad.contract_line_id,"QLAN license: %s" % activelicense.user_ad_id.name,related_user=user_id,owner=user_id.logonname.lower())            
 
@@ -340,13 +349,14 @@ class lubon_qlan_users_license_ad(models.Model):
 class lubon_qlan_billingconfig_tenant_ad(models.Model):
     _name = 'lubon_qlan.billingconfig_tenant_ad'
     _description = 'AD tenant billing config'
+    _sql_constraints=[('contract_line_and_ad_group','UNIQUE(contract_line_id,ad_groups_licenses_id)','Contract and Group unique')]
     contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
     manual_exception=fields.Boolean(help="Manual created entry to set on exceptions")
     remark=fields.Char()
     ad_groups_licenses_id=fields.Many2one('lubon_qlan.adaccounts',string='AD Licensing group')
-	
     qlan_tenant_id=fields.Many2one('lubon_qlan.tenants', ondelete='cascade', required=True)
-
+    users_license_ad_ids=fields.One2many('lubon_qlan.users_licenses_ad','billingconfig_tenant_ad')
+    users_license_ad_ids_count=fields.Integer(compute='_compute_users_license_ad_ids_count', index=True)
 	# valid_domains_o365_ids=fields.Many2many('lubon_qlan.domains_o365', compute='_get_valid_domains_ad_ids')
     valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
 #	valid_ad_groups_ids=fields.Many2many('lubon_qlan.subscribedskus_o365', compute='_get_valid_ad_groups_ids')
@@ -360,6 +370,11 @@ class lubon_qlan_billingconfig_tenant_ad(models.Model):
 	# 		if line.manual_exception:
 	# 			res.append((line.id, "Manual - " + line.subscribedskus_o365_id.friendly_name + " " + line.remark ))	
 	# 	return res
+
+    @api.one
+    @api.depends('users_license_ad_ids')
+    def _compute_users_license_ad_ids_count(self):
+        self.users_license_ad_ids_count=len(self.users_license_ad_ids)
 
     @api.multi
     def name_get(self):

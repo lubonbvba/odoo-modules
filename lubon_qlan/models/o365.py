@@ -24,10 +24,13 @@ class lubon_qlan_skus_o365(models.Model):
 class lubon_qlan_users_licenses_o365(models.Model):
 	_name = 'lubon_qlan.users_licenses_o365'
 	_description = 'MS 365 user assigned skus'	
+	_sql_constraints=[('user_and_ad_group','UNIQUE(user_o365_id,subscribedskus_o365)','Model lubon_qlan_users_license_o365: Combination user/sunscribed sku unique')]
 	user_o365_id = fields.Many2one('lubon_qlan.users_o365', ondelete='cascade')
 	subscribedskus_o365 = fields.Many2one('lubon_qlan.subscribedskus_o365',ondelete='cascade')
-	billingconfig_tenant_o365=fields.Many2one('lubon_qlan.billingconfig_tenant_o365')
-#	billing_history_ids= fields.One2many('lubon_qlan.billing_history','related_user_id')
+	billingconfig_tenant_o365=fields.Many2one('lubon_qlan.billingconfig_tenant_o365',ondelete='cascade')
+
+
+#	billing_history_id= fields.Many2one('lubon_qlan.billing_history' )
 	@api.multi
 	def refresh(self,user_id,graphresult):
 		if not graphresult:
@@ -46,8 +49,8 @@ class lubon_qlan_users_licenses_o365(models.Model):
 
 		for license in assignedLicenses:
 			newsku=self.env['lubon_qlan.subscribedskus_o365'].search([('skuId','=',license['skuId']),('o365_tenant_id','=',user_id.o365_tenant_id.id)])
-			if len(newsku)!=1:
-				logger.error("Newsku !=1 in refresh")
+			if len(newsku)>1:
+				logger.error("Newsku > in refresh")
 			activelicense=self.search([('user_o365_id','=',user_id.id),('subscribedskus_o365','=',newsku.id)])
 			if not activelicense:
 				activelicense=self.create({
@@ -65,6 +68,8 @@ class lubon_qlan_users_licenses_o365(models.Model):
 class lubon_qlan_billingconfig_tenant_o365(models.Model):
 	_name = 'lubon_qlan.billingconfig_tenant_o365'
 	_description = 'Office 365 tenant billing config'
+#	_sql_constraints=[('contract_line_and_ad_group','UNIQUE(contract_line_id,subscribedskus_o365_id)','Contract and subscribed sku unique')]
+
 	subscribedskus_o365_id=fields.Many2one('lubon_qlan.subscribedskus_o365',domain="[('invoicable','=',True),('id','in',valid_subscribedskus_o365_ids[0][2])]", required=True)
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365', ondelete='cascade', required=True)
 	domains_o365_id=fields.Many2one('lubon_qlan.domains_o365', domain="[('id','in',valid_domains_o365_ids[0][2]),('used_for_billing','=',True)]", zrequired=True)
@@ -112,6 +117,7 @@ class lubon_qlan_subscribedskus_o365(models.Model):
 	_description = 'Office 365 subscribed skus'
 	_rec_name= 'friendly_name'
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365', ondelete='cascade')
+	subscribed_users_o365=fields.One2many( 'lubon_qlan.users_licenses_o365','subscribedskus_o365')
 	capabilityStatus=fields.Char()
 	consumedUnits=fields.Integer()
 	o365_id=fields.Char()
@@ -123,6 +129,31 @@ class lubon_qlan_subscribedskus_o365(models.Model):
 	warning=fields.Integer()
 	friendly_name=fields.Char()
 	invoicable=fields.Boolean()
+	billed_count=fields.Integer(compute='_calculate_billed', store=True,Index=True)
+	billed_count_difference=fields.Integer(compute='_calculate_billed_difference', string='Billed vs enabled', store=True, index=True)
+	billed_count_ok=fields.Boolean(compute='_calculate_billed_ok', store=True, index=True)
+
+	@api.one
+	@api.depends('enabled','subscribed_users_o365','consumedUnits','invoicable')
+	def _calculate_billed(self):
+		self.billed_count=len(self.subscribed_users_o365)
+		self.billed_count_difference=self.enabled-self.billed_count
+
+	@api.one
+	@api.depends('billed_count')
+	def _calculate_billed_difference(self):
+		self.billed_count_difference=self.enabled-self.billed_count
+
+	@api.one
+	@api.depends('billed_count_difference', 'enabled','invoicable')
+	def _calculate_billed_ok(self):
+		if self.invoicable and self.billed_count_difference !=0:
+			self.billed_count_ok=False
+		else:
+			self.billed_count_ok=True
+
+
+
      
 	@api.multi
 	def refresh(self,o365_tenant_id):
@@ -139,14 +170,22 @@ class lubon_qlan_subscribedskus_o365(models.Model):
 					'o365_id':sku['id'],
 				})
 			skus=self.env['lubon_qlan.skus_o365'].search([('GUID','=',sku['skuId'])])
-			#pdb.set_trace()
 			if len(skus)>=1:
 				subscribedsku.friendly_name=skus[0].product_display_name
-			subscribedsku.consumedUnits=sku['consumedUnits']
-			subscribedsku.capabilityStatus=sku['capabilityStatus']
-			subscribedsku.enabled=sku['prepaidUnits']['enabled']
-			subscribedsku.warning=sku['prepaidUnits']['warning']
-			subscribedsku.suspended=sku['prepaidUnits']['suspended']
+			#pdb.set_trace()
+			if o365_tenant_id.invoicable:	
+				subscribedsku.consumedUnits=sku['consumedUnits']
+				subscribedsku.capabilityStatus=sku['capabilityStatus']
+				subscribedsku.enabled=sku['prepaidUnits']['enabled']
+				subscribedsku.warning=sku['prepaidUnits']['warning']
+				subscribedsku.suspended=sku['prepaidUnits']['suspended']
+			else:
+				subscribedsku.consumedUnits=0
+				subscribedsku.capabilityStatus=0
+				subscribedsku.enabled=0
+				subscribedsku.warning=0
+				subscribedsku.suspended=0
+
 
 
 
@@ -250,7 +289,9 @@ class lubon_qlan_tenants_o365(models.Model):
 	defaultdomainname=fields.Char()
 	qlan_tenant_id=fields.Many2one('lubon_qlan.tenants')
 	account_source_id=fields.Many2one('lubon_qlan.account_source')
-	get_details=fields.Boolean(default = False)
+	get_details=fields.Boolean(default = False, help='Get full user details of this tenant')
+	invoicable=fields.Boolean(default = True, help='Tenant invoiced by us')
+
 	sku_ids=fields.One2many('lubon_qlan.subscribedskus_o365','o365_tenant_id')
 	users_o365_ids=fields.One2many('lubon_qlan.users_o365','o365_tenant_id')
 	domains_o365_ids=fields.One2many('lubon_qlan.domains_o365','o365_tenant_id')

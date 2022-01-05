@@ -1018,6 +1018,7 @@
                                 <field name="contract_line_id" />
 								<field name="manual_exception" />
 								<field name="remark" />
+								<field name="users_license_ad_ids_count" />
                                 </tree>
                             </field>
 						</page>									

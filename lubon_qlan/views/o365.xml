@@ -11,6 +11,7 @@
 					<field name="tenant_id"/>
 					<field name="qlan_tenant_id"/>
                     <field name="get_details"/>
+                    <field name="invoicable"/>
 				</tree>
 			</field>
 		</record>
@@ -27,6 +28,7 @@
 					<field name="qlan_tenant_id"/>
 					<field name="account_source_id"/>
                     <field name="get_details"/>
+					<field name="invoicable"/>
                     <button name='refresh_thistenant_o365' string="Refresh tenant" type="object"/>
 					</group>
 					<notebook>
@@ -125,20 +127,40 @@
 			<field name="name">subscribedskus_o365.tree</field>
 			<field name="model">lubon_qlan.subscribedskus_o365</field>
 			<field name="arch" type="xml">
-				<tree string="Subscribed SKU's" editable="top">
+				<tree string="Subscribed SKU's" editable="top" colors="red:billed_count_ok!=True" >
                                             <field name="o365_tenant_id"/>
 											<field name="capabilityStatus"/>
                                             <field name="friendly_name"/>
                                             <field name="consumedUnits"/>
 											<field name="enabled"/>
+											<field name="billed_count"/>
+											<field name="billed_count_difference" />
 											<field name="suspended"/>
 											<field name="warning"/>
                                             <field name="skuPartNumber"/>
 											<field name="skuId"/>
 											<field name="invoicable"/>
+											<field name="billed_count_ok"/>
+
 				</tree>
 			</field>
 		</record>
+				<record model="ir.ui.view" id="subscribedskus_o365_search_view">
+						<field name="name">subscribedskus_o365.search</field>
+						<field name="model">lubon_qlan.subscribedskus_o365</field>
+						<field name="arch" type="xml">
+							<search>
+								<field name="o365_tenant_id"/>
+								<field name="friendly_name"/>
+								<filter name="invoiceable" string="Invoicable"	domain="[('invoicable', '=', True)]"/>
+								<filter name="underbilling" string="Underbilling"	domain="[('billed_count_ok', '=', False)]"/>
+								<filter name="invoicable_set" string="Invoiceable OK?"	domain="[('invoicable', '=', False),('billed_count_difference', '>', 0),('billed_count_difference', '&lt;', 90)]"/>
+							</search>
+						</field>
+		</record>  
+
+
+
         <record model="ir.ui.view" id="domains_o365_tree_view">
 			<field name="name">domains_o365.tree</field>
 			<field name="model">lubon_qlan.domains_o365</field>
@@ -209,7 +231,9 @@
           action="qlan_users_o365_action"/>
         <menuitem id="qlan_billingconfig_tenant_o365_menu" name="Billing config" parent="lubon_qlan_tables_menu"
           action="qlan_billingconfig_tenant_o365_action"/>
-    <menuitem id="lubon_qlan_users_licenses_o365_menu" name="O365 User license" parent="lubon_qlan_tables_menu"
-          action="lubon_qlan_users_licenses_o365_action"/>		  
+    <menuitem id="lubon_qlan_users_licenses_o365_menu" name="O365 User licenses" parent="lubon_qlan_tables_menu"
+          action="lubon_qlan_users_licenses_o365_action"/>
+    <menuitem id="qlan_subscribedskus_o365_menu" name="Subscribed SKUS O365" parent="lubon_qlan_tables_menu"
+          action="qlan_subscribedskus_o365_action"/>		  
      </data>
 </openerp>

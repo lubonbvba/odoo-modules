@@ -353,15 +353,36 @@
 	    		</form>
 			</field>
 		</record>
+
+
+
+		<record model="ir.ui.view" id="billingconfig_tenant_ad_tree_search_view">
+				<field name="name">billingconfig_tenant_ad.search</field>
+				<field name="model">lubon_qlan.billingconfig_tenant_ad</field>
+				<field name="arch" type="xml">
+					<search>
+						<field name="qlan_tenant_id"/>
+						<field name="ad_groups_licenses_id"/>
+						<field name="contract_line_id"/>
+						<group string="Group By">
+							<filter name="by_tenant" string="Tenant"
+												context="{'group_by': 'qlan_tenant_id'}"/>
+						</group>												
+					</search>
+				</field>
+		</record>  
+
+
         <record model="ir.ui.view" id="billingconfig_tenant_ad_tree_view">
 			<field name="name">billingconfig_tenant_ad.tree</field>
 			<field name="model">lubon_qlan.billingconfig_tenant_ad</field>
 			<field name="arch" type="xml">
-				<tree string="Billing config tenant o365" editable="top">
-                                            <field name="qlan_tenant_id"/>
-											<field name="ad_groups_licenses_id"/>
-                                            <field name="manual_exception"/>
-                                            <field name="remark"/>
+				<tree string="Billing config tenant o365" zeditable="top">
+					<field name="qlan_tenant_id"/>
+					<field name="ad_groups_licenses_id"/>
+					<field name="users_license_ad_ids_count" sum="Total"/>
+					<field name="manual_exception"/>
+					<field name="remark"/>
 				</tree>
 			</field>
 		</record>
@@ -371,6 +392,34 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>  
+
+
+
+
+        <record model="ir.ui.view" id="lubon_qlan_users_licenses_ad_tree_view">
+			<field name="name">lubon_qlan_users_licenses_ad.tree</field>
+			<field name="model">lubon_qlan.users_licenses_ad</field>
+			<field name="arch" type="xml">
+				<tree string="User licenses ad" editable="top">
+                    <field name="user_ad_id"/>
+                    <field name="prd_group_id"/>
+					<field name="billingconfig_tenant_ad"/>
+				</tree>
+			</field>
+		</record>		
+
+    <record model="ir.actions.act_window" id="lubon_qlan_users_licenses_ad_action">
+      <field name="name">AD user licenses</field>
+      <field name="res_model">lubon_qlan.users_licenses_ad</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="lubon_qlan_users_licenses_ad_menu" name="AD User licenses" parent="lubon_qlan_tables_menu"
+          action="lubon_qlan_users_licenses_ad_action"/>
+    <menuitem id="qlan_billingconfig_tenant_ad_menu" name="AD Billing config" parent="lubon_qlan_tables_menu"
+          action="qlan_billingconfig_tenant_ad_action"/>
+
       <act_window id="act_new_aduser"
         name="New AD user"
         src_model="lubon_qlan.tenants"

@@ -13,11 +13,18 @@ class lubon_qlan_billing_history(models.Model):
 	related_user_id=fields.Integer()	
 	contract_line_id=fields.Many2one('account.analytic.invoice.line')
 	contract_id=fields.Many2one('account.analytic.account')
-
+	active=fields.Boolean(default=True)
 	date_start=fields.Datetime()
 	date_end=fields.Datetime()
 	description=fields.Char()
 	owner=fields.Char(help='User/device that is used to group by')
+
+
+	@api.multi
+	def checkline(self):
+		#check if the referring record still exists.
+		if not self.env[self.related_model].browse(self.related_id).exists():
+			self.unlink()
 
 	@api.multi
 	def verify_billing_history_line(self,related,number,contract_line_id,description,related_user=None,owner=None):
@@ -41,7 +48,8 @@ class lubon_qlan_billing_history(models.Model):
 		else:
 			current_line.related_user_model=None
 			current_line.related_user_id=None
-			
+
+
 
  	#	pdb.set_trace()
 
@@ -177,7 +185,10 @@ class account_analytic_account(models.Model):
 				if not(line.line_ok):
 					item.ready_for_invoice=False
 
-
+	@api.multi
+	def check_billing_lines(self,context):
+		for line in self.billing_history_lines_ids:
+			line.checkline()
 	
 	def _prepare_invoice_line(self, cr, uid, line, fiscal_position, context=None):
 		

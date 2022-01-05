@@ -77,7 +77,7 @@ class lubon_qlan_account_source(models.Model):
   			self.check_obsolete_accounts(ids)
   		#Account source type = O365	
  		if (self.account_source_type_id.id == self.env.ref('lubon_qlan.ast_o365').id):
- 			pdb.set_trace()
+ 			self.env['lubon_qlan.tenants_o365'].refresh_tenants_o365(self)
 
   		self.last_full_run_stop=fields.Datetime.now()
  		logger.info("Run_sync: End Full sync %s" % self.name) 		

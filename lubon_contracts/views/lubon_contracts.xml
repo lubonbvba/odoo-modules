@@ -30,6 +30,9 @@
 			<field name="arch" type="xml">
 				<tree string="Billing lines" zeditable="top">
                                             <field name="contract_id"/>
+                                            <field name="active"/>
+                                            <field name="date_start"/>
+                                            <field name="date_end"/>
                                             <field name="owner"/>
                                             <field name="contract_line_id"/>
                                             <field name="description"/>
@@ -134,6 +137,7 @@
                         <field name="invoiced_lines"/>
                     </page>
                     <page name="Billing" string="Billing">
+                        <button name='check_billing_lines' string="Check" type="object"/>
                         <field name='billing_history_lines_ids'/>
                     </page>
                 </xpath> 
