@@ -359,7 +359,7 @@
 							<field name="name"/>
 							<field name="friendlyname"/>
 							<field name="healthstatus"/>
-							<field name="uniqueid"/>
+							<field name="path"/>
 							<field name="drivetype"/>
 							<field name="drive_size_bytes"/>
 							<field name="drive_size_giga_bytes"/>

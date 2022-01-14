@@ -20,7 +20,7 @@ class lubon_qlan_drives(models.Model):
 	last_changed=fields.Datetime(help='When was the last change')
 	last_updated=fields.Datetime(help='When was the info refreshed')
 	drivetype=fields.Char()
-	uniqueid=fields.Char()
+	path=fields.Char()
 	friendlyname=fields.Char()
 	healthstatus=fields.Char()
 	drive_size_bytes=fields.Float()
@@ -39,11 +39,11 @@ class lubon_qlan_drives(models.Model):
 		if len(asset_id) ==1:
 			for drive in drivedata['drivedata']:
 				if drive['DriveType']=="Fixed":
-					drive_id=self.search([("asset_id","=",asset_id.id),("uniqueid","=",drive['Uniqueid'])])
+					drive_id=self.search([("asset_id","=",asset_id.id),("path","=",drive['Path'])])
 					if not drive_id:
 						drive_id=self.create({
 							'asset_id': asset_id.id,
-							'uniqueid': drive['Uniqueid'],
+							'path': drive['Path'],
 							'drivetype': drive['DriveType']
 						})
 					if drive_id.drive_size_bytes != drive['Size']:
