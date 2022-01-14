@@ -353,12 +353,20 @@
 					</page>
 
 					<page string="Drives" attrs="{'invisible': [('asset_type','!=', 'vm'),('asset_type','!=', 'vc')]}">
-						<button type="object" name="get_vm_drives" string="Get drives"/>
 						<field name="vm_drives_ids">
-							<tree>
+							<tree editable="top">
+							<field name="valid_contract_ids" invisible="True"/>
 							<field name="name"/>
-							<field name="number_snapshots"/>
-							<field name="oldest_snapshot"/>
+							<field name="friendlyname"/>
+							<field name="healthstatus"/>
+							<field name="uniqueid"/>
+							<field name="drivetype"/>
+							<field name="drive_size_bytes"/>
+							<field name="drive_size_giga_bytes"/>
+							<field name="last_changed"/>
+							<field name="last_updated"/>
+							<field name="contract_line_id" />
+						
 						</tree>
 						</field>
 				</page>

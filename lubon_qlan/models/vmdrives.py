@@ -17,8 +17,51 @@ class lubon_qlan_drives(models.Model):
 	_order = 'name'
 	asset_id=fields.Many2one('lubon_qlan.assets')
 	name=fields.Char(string="Drive name")
-	number_snapshots=fields.Integer(string="Number of snapshots")
-	oldest_snapshot=fields.Datetime()
+	last_changed=fields.Datetime(help='When was the last change')
+	last_updated=fields.Datetime(help='When was the info refreshed')
+	drivetype=fields.Char()
+	uniqueid=fields.Char()
+	friendlyname=fields.Char()
+	healthstatus=fields.Char()
+	drive_size_bytes=fields.Float()
+	drive_size_giga_bytes=fields.Float()
+	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]")
+	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
+
+	@api.one
+	def _get_valid_contract_ids(self):
+		self.valid_contract_ids=self.asset_id.tenant_id.contract_ids
+
+	@api.multi
+	def update_drives(self,asset_name,drivedata):
+		logger.info ("Start update drive for: %s" % asset_name)
+		asset_id=self.env['lubon_qlan.assets'].search([('asset_name','=', asset_name)])
+		if len(asset_id) ==1:
+			for drive in drivedata['drivedata']:
+				if drive['DriveType']=="Fixed":
+					drive_id=self.search([("asset_id","=",asset_id.id),("uniqueid","=",drive['Uniqueid'])])
+					if not drive_id:
+						drive_id=self.create({
+							'asset_id': asset_id.id,
+							'uniqueid': drive['Uniqueid'],
+							'drivetype': drive['DriveType']
+						})
+					if drive_id.drive_size_bytes != drive['Size']:
+						drive_id.drive_size_bytes = drive['Size']
+						drive_id.drive_size_giga_bytes = drive['Size'] / (1024*1024*1024)
+						drive_id.last_changed=fields.Datetime.now()
+					drive_id.name=drive['DriveLetter']
+					drive_id.friendlyname=drive['FriendlyName']
+					drive_id.healthstatus=drive['HealthStatus']
+					drive_id.last_updated=fields.Datetime.now()
+
+
+					
+		else:
+			logger.error ("Asset not found, or not unique: %s" % asset_name)
+			
+
+
 
 	@api.multi
 	def read_drives(self,dummy=None):

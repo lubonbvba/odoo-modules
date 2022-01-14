@@ -18,3 +18,28 @@ from openerp import http
 #         return http.request.render('lubon_qlan.object', {
 #             'object': obj
 #         })
+import openerp.http as http
+from openerp.http import request, SUPERUSER_ID
+import logging, pdb
+from datetime import datetime
+_logger = logging.getLogger(__name__)
+
+class MyController(http.Controller):
+
+    # @http.route('/sms/voxbone/receipt', type="http", auth="public")
+    # def sms_voxbone_receipt(self, **kwargs):
+    #     values = {}
+    #     pdb.set_trace()
+	# for field_name, field_value in kwargs.items():
+    #         values[field_name] = field_value
+        
+    #     request.env['esms.voxbone'].sudo().delivery_receipt(values['AccountSid'], values['MessageSid'])
+        
+    #     return "<Response></Response>"
+        
+    @http.route('/qlan/disks/<asset>/', type="json", auth="public")
+    def qlan_disk(self, asset):
+        #pdb.set_trace()
+        request.env['lubon_qlan.drives'].sudo().update_drives(asset,request.jsonrequest)
+        _logger.info("End controller, returning 200")
+        return 200
