@@ -68,42 +68,46 @@ class account_analytic_invoice_line(models.Model):
 	line_reduced_price=fields.Float(string="Sales price",compute="_get_reduced_price")
 	price_subtotal=fields.Float(compute="_get_reduced_price")
 	sequence=fields.Integer()
-	line_ok=fields.Boolean(compute="_set_line_state")
+	line_ok=fields.Boolean(zcompute="_set_line_state")
+	usage_mandatory=fields.Boolean(help="Is usage required, -1 in current usage means not updated ?")
 	adaccount_ids=fields.One2many('lubon_qlan.adaccounts','contract_line_id')
 	billing_history_ids=fields.One2many('lubon_qlan.billing_history','contract_line_id')
-	counted_items=fields.Integer(compute="_count_items", string="Counted (old)", help="This number is the total of items counted in the tenant")
-	used_items=fields.Integer(compute="_count_used", string="Used (old)", help="The number of items used/assigned")
+#	counted_items=fields.Integer(compute="_count_items", string="Counted (old)", help="This number is the total of items counted in the tenant")
+#	used_items=fields.Integer(compute="_count_used", string="Used (old)", help="The number of items used/assigned")
 	billing_history_counted_items=fields.Integer(compute="_billing_history_count_items", string="Counted", help="This number is the total of items counted in the tenant")
+	last_billed_usage=fields.Float(help="Last used counter value")
+	current_usage=fields.Float(help="Current value of the counter", default=-1)
 
 
 
 
 
-	@api.multi
-	@api.depends('adaccount_ids')
-	def _count_items(self):
-		for line in self:
-			#pdb.set_trace()
-			line.counted_items=len(line.adaccount_ids)
-	@api.multi
-	@api.depends('counted_items')
-	def _set_line_state(self):
-		for line in self:
-			line.line_ok=True
-			if line.adaccount_ids:
-				if line.counted_items != line.quantity:
-					line.line_ok=False
-	@api.multi
-	def _count_used(self):
+
+	#@api.multi
+	#@api.depends('adaccount_ids')
+	# def _count_items(self):
+	# 	for line in self:
+	# 		#pdb.set_trace()
+	# 		line.counted_items=len(line.adaccount_ids)
+	# @api.multi
+	# @api.depends('counted_items')
+	# def _set_line_state(self):
+	# 	for line in self:
+	# 		line.line_ok=True
+	# 		if line.adaccount_ids:
+	# 			if line.counted_items != line.quantity:
+	# 				line.line_ok=False
+	# @api.multi
+	# def _count_used(self):
 		
-		for line in self:
-			n=0
-			if line.product_id.reference_model:
-				lines=self.env[line.product_id.reference_model.model].search([('contract_line_id','=',line.id)])
-				if lines:
-					for item in lines:
-						n+=1
-			line.used_items=n
+	# 	for line in self:
+	# 		n=0
+	# 		if line.product_id.reference_model:
+	# 			lines=self.env[line.product_id.reference_model.model].search([('contract_line_id','=',line.id)])
+	# 			if lines:
+	# 				for item in lines:
+	# 					n+=1
+	# 		line.used_items=n
 
 
 	@api.multi

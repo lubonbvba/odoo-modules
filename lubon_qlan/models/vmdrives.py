@@ -50,6 +50,10 @@ class lubon_qlan_drives(models.Model):
 						drive_id.drive_size_bytes = drive['Size']
 						drive_id.drive_size_giga_bytes = drive['Size'] / (1024*1024*1024)
 						drive_id.last_changed=fields.Datetime.now()
+					if drive_id.contract_line_id:
+						if drive_id.contract_line_id.current_usage != drive_id.drive_size_giga_bytes:	
+							drive_id.contract_line_id.current_usage=drive_id.drive_size_giga_bytes
+					
 					drive_id.name=drive['DriveLetter']
 					drive_id.friendlyname=drive['FriendlyName']
 					drive_id.healthstatus=drive['HealthStatus']
