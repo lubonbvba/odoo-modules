@@ -100,10 +100,21 @@ class lubon_qlan_tenants(models.Model):
 	
     @api.multi
     def refresh_licenses_ad(self,context):
+        for a in self.billingconfig_tenants_ad_ids:
+            for b in a.users_license_ad_ids:
+                if (not b.user_ad_id) or b.user_ad_id.active== False:
+                    b.unlink()
         for user in self.adusers_ids:
             user.refresh_licenses_ad(user)
+#        for a in self.billingconfig_tenants_ad_ids:
+#            a._compute_users_license_ad_ids_count()
         # for o365tenant in self.users_o365_ids:
         #     o365tenant.refresh_thistenant_o365(self)
+    @api.multi
+    def refresh_licenses_ad_all(self,context):
+        #pdb.set_trace()
+        for tenant in self.env['lubon_qlan.tenants'].search([('active','=',True)]):
+            tenant.refresh_licenses_ad(None)
 
 
 

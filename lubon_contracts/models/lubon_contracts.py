@@ -74,41 +74,21 @@ class account_analytic_invoice_line(models.Model):
 	billing_history_ids=fields.One2many('lubon_qlan.billing_history','contract_line_id')
 #	counted_items=fields.Integer(compute="_count_items", string="Counted (old)", help="This number is the total of items counted in the tenant")
 #	used_items=fields.Integer(compute="_count_used", string="Used (old)", help="The number of items used/assigned")
-	billing_history_counted_items=fields.Integer(compute="_billing_history_count_items", string="Counted", help="This number is the total of items counted in the tenant")
+	billing_history_counted_items=fields.Integer(compute="_billing_history_count_items", string="Counted", store=True, help="This number is the total of items counted in the tenant", index=True)
 	last_billed_usage=fields.Float(help="Last used counter value")
 	current_usage=fields.Float(help="Current value of the counter", default=-1)
+	billing_check=fields.Boolean(compute="_calculate_billing_check", string="Billing check", store=True, index=True)
 
 
 
-
-
-
-	#@api.multi
-	#@api.depends('adaccount_ids')
-	# def _count_items(self):
-	# 	for line in self:
-	# 		#pdb.set_trace()
-	# 		line.counted_items=len(line.adaccount_ids)
-	# @api.multi
-	# @api.depends('counted_items')
-	# def _set_line_state(self):
-	# 	for line in self:
-	# 		line.line_ok=True
-	# 		if line.adaccount_ids:
-	# 			if line.counted_items != line.quantity:
-	# 				line.line_ok=False
-	# @api.multi
-	# def _count_used(self):
-		
-	# 	for line in self:
-	# 		n=0
-	# 		if line.product_id.reference_model:
-	# 			lines=self.env[line.product_id.reference_model.model].search([('contract_line_id','=',line.id)])
-	# 			if lines:
-	# 				for item in lines:
-	# 					n+=1
-	# 		line.used_items=n
-
+	@api.multi
+	@api.depends('billing_history_counted_items','quantity')
+	def _calculate_billing_check(self):
+			for line in self:
+				if line.billing_history_counted_items <>0 and line.billing_history_counted_items <> line.quantity:
+					line.billing_check=True
+				else:
+					line.billing_check=False
 
 	@api.multi
 	@api.depends('billing_history_ids')
@@ -201,7 +181,9 @@ class account_analytic_account(models.Model):
 		res.update({'account_analytic_id': line.invoice_analytic_account_id.id})
 		res.update({'discount': line.line_discount_rate})
 		res.update({'sequence': line.sequence})
+
 		#pdb.set_trace()
+		line.last_billed_usage=line.quantity
 		if line.add_to_prepaid:
 			line.analytic_account_id.quantity_max += line.quantity
 		return res

@@ -963,6 +963,7 @@
 							<header>
 								<button name="new_user" type="object" string="New User"/>
 								<button name='refresh_licenses_ad' type='object' string="Refresh licenses ad"/>
+								<button name='refresh_licenses_ad_all' type='object' string="Refresh licenses ad all"/>
 							</header>
 							<sheet>
 								<div class="oe_right oe_button_box" name="buttons">
@@ -1483,7 +1484,8 @@
 					action="qlan_events_action"/>
 				<menuitem id="lubon_qlan_ccount_move_lines_menu" name="Account move lines" parent="lubon_qlan_tables_menu"
 					action="qlan_account_move_lines_action"/>          
-
+				<menuitem id="account_analytic_invoice_line_menu" name="Contract Invoice lines" parent="lubon_qlan_tables_menu"
+					action="lubon_contracts.account_analytic_invoice_line_action"/> 
 
 					 </data>
 				 </openerp>

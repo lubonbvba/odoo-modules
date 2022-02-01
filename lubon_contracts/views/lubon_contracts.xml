@@ -161,13 +161,51 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="account_analytic_invoice_line_tree">
+			<field name="name">account.analytic.invoice.line.tree</field>
+			<field name="model">account.analytic.invoice.line</field>
+			<field name="arch" type="xml">
+				<tree string="Invoice" editable="top">
+                                            <field name="analytic_account_id"/>
+                                            <field name="product_id"/>
+                                            <field name="quantity"/>
+                                            <field name="billing_history_counted_items"/>
+                                            <field name="current_usage"/>
+                                            <field name="last_billed_usage"/>
+                                            <field name="billing_check"/>
+                                            <field name="usage_mandatory"/>
+				</tree>
+			</field>
+		</record> 
+				<record model="ir.ui.view" id="account_analytic_invoice_line_search">
+						<field name="name">account.analytic.invoice.line.search</field>
+						<field name="model">account.analytic.invoice.line</field>
+						<field name="arch" type="xml">
+							<search>
+								<field name="analytic_account_id"/>
+                                <filter name="Check1" string="Check quantity"	domain="[('billing_check', '=', True)]"/>
+					<group string="Group By">
+						<filter name="by_account" string="Contract" context="{'group_by': 'analytic_account_id'}"/>
+					</group>                                
+							</search>
+						</field>
+		</record>
+
+    <record model="ir.actions.act_window" id="lubon_contracts.account_analytic_invoice_line_action">
+      <field name="name">Contract Invoice lines</field>
+      <field name="res_model">account.analytic.invoice.line</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>  
 
     <record model="ir.actions.act_window" id="billing_history_tree_view_action">
       <field name="name">Billing history lines</field>
       <field name="res_model">lubon_qlan.billing_history</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
-    </record>        
+    </record>     
+
+    				   
     </data>
 </openerp>
 
