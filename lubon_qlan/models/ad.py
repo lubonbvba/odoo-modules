@@ -350,7 +350,7 @@ class lubon_qlan_users_license_ad(models.Model):
 
         
         #pdb.set_trace()
-
+#test remark
 
 
 
