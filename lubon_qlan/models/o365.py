@@ -5,7 +5,8 @@ from datetime import datetime,timedelta
 from passgen import passgen
 import re
 import pdb,logging
-#from path import path
+import yaml
+import os,requests
 logger = logging.getLogger(__name__)
 
 
@@ -204,6 +205,8 @@ class lubon_qlan_users_o365(models.Model):
 	person_id=fields.Many2one('res.partner', string="Related person", domain="[('type','=','contact')]")
 	user_licenses_ids=fields.One2many('lubon_qlan.users_licenses_o365','user_o365_id')
 	o365_domains_id=fields.Many2one('lubon_qlan.domains_o365')
+	mail_rules=fields.Char()
+	mail_rules_nr=fields.Integer()
 
 	@api.multi
 	def refresh(self,o365_tenant_id):
@@ -244,11 +247,23 @@ class lubon_qlan_users_o365(models.Model):
 			user_o365.o365_domains_id=self.env['lubon_qlan.domains_o365'].search([('o365_tenant_id','=',o365_tenant_id.id),('name','=',(user['userPrincipalName'][user['userPrincipalName'].index('@') + 1 : ]).lower())])
 			user_o365.qlan_tenant_id=o365_tenant_id.qlan_tenant_id
 			user_o365.refresh_licenses(None,user)
+			user_o365.refresh_mail_rules()
 
 
 	@api.multi
 	def refresh_licenses(self,o365_id,graphresult=None):
-		self.env['lubon_qlan.users_licenses_o365'].refresh(self,graphresult)		
+		self.env['lubon_qlan.users_licenses_o365'].refresh(self,graphresult)	
+
+	@api.multi
+	def refresh_mail_rules(self):
+		endpoint='https://graph.microsoft.com/v1.0/users/'+ self.o365_id + '/mailFolders/inbox/messageRules'
+#		while endpoint:
+		result=self.o365_tenant_id.account_source_id.endpoints_id.execute(endpoint,url='https://login.microsoftonline.com/' + self.o365_tenant_id.defaultdomainname)
+		if 'value' in result.keys():
+			self.mail_rules_nr=len(result['value'])
+			self.mail_rules=result['value']
+
+
 
 class lubon_qlan_domains_o365(models.Model):
 	_name = 'lubon_qlan.domains_o365'
@@ -286,11 +301,13 @@ class lubon_qlan_tenants_o365(models.Model):
 	_rec_name = 'defaultdomainname'
 	name=fields.Char()
 	tenant_id=fields.Char()
+	arrow_ref=fields.Char(help='Arrow reference, XSP + Value found in Acronym')
 	defaultdomainname=fields.Char()
 	qlan_tenant_id=fields.Many2one('lubon_qlan.tenants')
 	account_source_id=fields.Many2one('lubon_qlan.account_source')
 	get_details=fields.Boolean(default = False, help='Get full user details of this tenant')
 	invoicable=fields.Boolean(default = True, help='Tenant invoiced by us')
+	arrow_services_o365_ids=fields.One2many('lubon_qlan.arrowservices_o365','o365_tenant_id')
 
 	sku_ids=fields.One2many('lubon_qlan.subscribedskus_o365','o365_tenant_id')
 	users_o365_ids=fields.One2many('lubon_qlan.users_o365','o365_tenant_id')
@@ -340,7 +357,9 @@ class lubon_qlan_tenants_o365(models.Model):
 				self.refresh_users_o365(None)		
 
 
-
+	@api.multi
+	def get_arrow_services(self):
+		self.env['lubon_qlan.arrowservices_o365'].get_services(self)
 
 	@api.multi
 	def refresh_subscribed_skus_o365(self,o365_tenant_id):
@@ -352,3 +371,42 @@ class lubon_qlan_tenants_o365(models.Model):
 	def refresh_domains_o365(self,o365_tenant_id):
 		self.env['lubon_qlan.domains_o365'].refresh_domains_o365(self)
 
+class lubon_qlan_arrowservices_o365(models.Model):
+	_name = 'lubon_qlan.arrowservices_o365'
+	_description = 'Arrow services'
+	name=fields.Char()
+	o365_tenant_id=fields.Char()
+	arrow_license_id=fields.Char()
+	arrow_name=fields.Char()
+	arrow_number=fields.Integer()
+	arrow_friendly_name=fields.Char()
+	arrow_vendor_sku=fields.Char()
+	arrow_expiry_datetime=fields.Char()
+
+
+
+
+	@api.multi
+	def get_services(self,o365_tenant_id):
+		with open(os.path.expanduser('~/.odoosettings/arrow.yaml')) as file:
+			settings = yaml.load(file)
+		url=settings['baseurl'] + '/customers/' + o365_tenant_id.arrow_ref + '/licenses'
+		arrow_data = requests.get(  
+            url,
+            headers={'apikey': settings['key']} )
+		for license in arrow_data.json()['data']['licenses']:
+			service_id=self.search([('arrow_license_id',"ilike",license['license_id'])])
+			if not service_id:
+				service_id= self.create({
+					'o365_tenant_id': o365_tenant_id.id,
+					'arrow_license_id': license['license_id']
+				})
+			service_id.update({
+				'arrow_name': license['name'],
+				'arrow_number': license['seats'],
+				'arrow_friendly_name': license['friendlyName'],
+				'arrow_vendor_sku': license['sku'],
+				'arrow_expiry_datetime': license['expiry_datetime'],
+
+			})	
+		#	pdb.set_trace()

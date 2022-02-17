@@ -29,9 +29,24 @@
 					<field name="account_source_id"/>
                     <field name="get_details"/>
 					<field name="invoicable"/>
+					<field name="arrow_ref"/>
                     <button name='refresh_thistenant_o365' string="Refresh tenant" type="object"/>
 					</group>
 					<notebook>
+                        <page string='Arrow'>
+                            <button name='get_arrow_services' string="Get services" type="object"/>
+                            <field name="arrow_services_o365_ids">
+								<tree>
+									<field name='arrow_license_id'/>
+									<field name='arrow_name'/>
+									<field name='arrow_number'/>
+									<field name='arrow_friendly_name'/>
+									<field name='arrow_vendor_sku'/>
+									<field name='arrow_expiry_datetime'/>
+									
+								</tree>
+                            </field>
+						</page>					
 						<page string='Subscribed SKUS'>
                             <button name='refresh_subscribed_skus_o365' string="Get subscribed skus" type="object"/>
                             <field name="sku_ids">
@@ -84,6 +99,8 @@
 											<field name="firstname"/>
                                             <field name="o365_domains_id"/>
              								<field name="qlan_tenant_id"/>
+             								<field name="mail_rules_nr"/>
+
 				</tree>
 			</field>
 		</record>
@@ -100,6 +117,9 @@
                             	<field name="principalname" readonly="1"/>
 								<field name="o365_tenant_id" readonly="1"/>
                                 <field name="qlan_tenant_id" readonly="1"/>
+                                <field name="mail_rules_nr" readonly="1"/>
+                                <field name="mail_rules" readonly="1"/>
+
 							</group>
 						</group>
                   
