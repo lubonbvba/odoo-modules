@@ -78,9 +78,16 @@ class lubon_qlan_billingconfig_tenant_o365(models.Model):
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
 	manual_exception=fields.Boolean(help="Manual created entry to set on exceptions")
 	remark=fields.Char()
+	users_licenses_o365_ids=fields.One2many('lubon_qlan.users_licenses_o365', 'billingconfig_tenant_o365')
+	users_licenses_o365_count=fields.Integer(string='Count', compute ='_get_users_licenses_o365_count')
 	valid_domains_o365_ids=fields.Many2many('lubon_qlan.domains_o365', compute='_get_valid_domains_o365_ids')
 	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
 	valid_subscribedskus_o365_ids=fields.Many2many('lubon_qlan.subscribedskus_o365', compute='_get_valid_subscribedskus_o365_ids')
+
+	@api.depends('users_licenses_o365_ids')
+	@api.one
+	def _get_users_licenses_o365_count(self):
+		self.users_licenses_o365_count=len(self.users_licenses_o365_ids)
 
 	@api.multi
 	def name_get(self):
@@ -375,14 +382,22 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	_name = 'lubon_qlan.arrowservices_o365'
 	_description = 'Arrow services'
 	name=fields.Char()
-	o365_tenant_id=fields.Char()
+	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365')
 	arrow_license_id=fields.Char()
 	arrow_name=fields.Char()
 	arrow_number=fields.Integer()
 	arrow_friendly_name=fields.Char()
 	arrow_vendor_sku=fields.Char()
+	arrow_state=fields.Char()
 	arrow_expiry_datetime=fields.Char()
+	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
+	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
 
+	@api.onchange('o365_tenant_id')
+	@api.one
+	def _get_valid_contract_ids(self):
+		self.valid_contract_ids=self.o365_tenant_id.qlan_tenant_id.contract_ids
+		#pdb.set_trace()
 
 
 
@@ -406,7 +421,8 @@ class lubon_qlan_arrowservices_o365(models.Model):
 				'arrow_number': license['seats'],
 				'arrow_friendly_name': license['friendlyName'],
 				'arrow_vendor_sku': license['sku'],
+				'arrow_state': license['state'],
 				'arrow_expiry_datetime': license['expiry_datetime'],
 
 			})	
-		#	pdb.set_trace()
+			#pdb.set_trace()

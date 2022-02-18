@@ -36,13 +36,16 @@
                         <page string='Arrow'>
                             <button name='get_arrow_services' string="Get services" type="object"/>
                             <field name="arrow_services_o365_ids">
-								<tree>
+								<tree editable="top">
+                                	<field name="valid_contract_ids" invisible="True" />  
 									<field name='arrow_license_id'/>
 									<field name='arrow_name'/>
 									<field name='arrow_number'/>
 									<field name='arrow_friendly_name'/>
+									<field name='contract_line_id'/>
 									<field name='arrow_vendor_sku'/>
 									<field name='arrow_expiry_datetime'/>
+									<field name='arrow_state'/>
 									
 								</tree>
                             </field>
@@ -63,7 +66,7 @@
                             <field name="users_o365_ids">
                             </field>
 						</page>
-                        <page string='Billing config'>
+                        <page string='Reporting config'>
                             <button name='load_billing_combinations_o365' string="Load combinations" type="object"/>
                             <field name="billingconfig_tenants_o365_ids" context="{'default_o365_tenant_id':id,'default_qlan_tenant_id':qlan_tenant_id,}">
                                 <tree editable="top">
@@ -75,6 +78,7 @@
                                 <field name="subscribedskus_o365_id" />
                                 <field name="domains_o365_id" />
                                 <field name="contract_line_id" />
+                                <field name="users_licenses_o365_count" />
 								<field name="manual_exception" />
 								<field name="remark" />
                                 </tree>
@@ -205,6 +209,23 @@
 				</tree>
 			</field>
 		</record>
+        <record model="ir.ui.view" id="lubon_qlan_arrowservices_o365_tree_view">
+			<field name="name">lubon_qlan_arrowservices_o365.tree</field>
+			<field name="model">lubon_qlan.arrowservices_o365</field>
+			<field name="arch" type="xml">
+				<tree string="Arrow services o365" editable="top">
+									<field name='o365_tenant_id'/>
+									<field name='arrow_license_id'/>
+									<field name='arrow_name'/>
+									<field name='arrow_number'/>
+									<field name='arrow_friendly_name'/>
+									<field name='contract_line_id'/>
+									<field name='arrow_vendor_sku'/>
+									<field name='arrow_expiry_datetime'/>
+									<field name='arrow_state'/>
+				</tree>
+			</field>
+		</record>		
         <record model="ir.ui.view" id="lubon_qlan_users_licenses_o365_tree_view">
 			<field name="name">lubon_qlan_users_licenses_o365.tree</field>
 			<field name="model">lubon_qlan.users_licenses_o365</field>
@@ -216,6 +237,15 @@
 				</tree>
 			</field>
 		</record>		
+
+
+
+    <record model="ir.actions.act_window" id="lubon_qlan_arrowservices_o365_action">
+      <field name="name">O365 user licenses</field>
+      <field name="res_model">lubon_qlan.arrowservices_o365</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
 
     <record model="ir.actions.act_window" id="lubon_qlan_users_licenses_o365_action">
       <field name="name">O365 user licenses</field>
@@ -254,6 +284,12 @@
     <menuitem id="lubon_qlan_users_licenses_o365_menu" name="O365 User licenses" parent="lubon_qlan_tables_menu"
           action="lubon_qlan_users_licenses_o365_action"/>
     <menuitem id="qlan_subscribedskus_o365_menu" name="Subscribed SKUS O365" parent="lubon_qlan_tables_menu"
-          action="qlan_subscribedskus_o365_action"/>		  
+          action="qlan_subscribedskus_o365_action"/>
+	<menuitem id="lubon_qlan_arrowservices_o365" name="Arrow services O365" parent="lubon_qlan_tables_menu"
+          action="lubon_qlan_arrowservices_o365_action"/>		  
+
+
+
+
      </data>
 </openerp>
