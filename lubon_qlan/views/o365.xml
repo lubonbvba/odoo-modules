@@ -31,6 +31,8 @@
 					<field name="invoicable"/>
 					<field name="arrow_ref"/>
                     <button name='refresh_thistenant_o365' string="Refresh tenant" type="object"/>
+                    <button name='refresh_arrow_services' string="Refresh all arrow" type="object"/>
+
 					</group>
 					<notebook>
                         <page string='Arrow'>
