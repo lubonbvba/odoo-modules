@@ -216,10 +216,13 @@
 			<field name="model">lubon_qlan.arrowservices_o365</field>
 			<field name="arch" type="xml">
 				<tree string="Arrow services o365" editable="top">
+                                	<field name="valid_contract_ids" invisible="True" />  
 									<field name='o365_tenant_id'/>
 									<field name='arrow_license_id'/>
 									<field name='arrow_name'/>
 									<field name='arrow_number'/>
+									<field name='billed'/>
+									<button name='update_billing' string="Upd" type="object"/>
 									<field name='arrow_friendly_name'/>
 									<field name='contract_line_id'/>
 									<field name='arrow_vendor_sku'/>
@@ -227,7 +230,30 @@
 									<field name='arrow_state'/>
 				</tree>
 			</field>
-		</record>		
+		</record>
+		<record model="ir.ui.view" id="lubon_qlan_arrowservices_o365_search_view">
+				<field name="name">lubon_qlan_arrowservices_o365.search</field>
+				<field name="model">lubon_qlan.arrowservices_o365</field>
+				<field name="arch" type="xml">
+					<search>
+						<field name="o365_tenant_id"/>
+						<field name="arrow_state"/>
+						<field name="arrow_vendor_sku"/>
+						<field name="arrow_name"/>
+						<filter string="Active" name="filter_active" domain="[('arrow_state','ilike','active')]"/>
+						<filter string="No contract" name="filter_no_contract" domain="[('contract_line_id','=', False)]"/>
+
+					<group string="Group By">
+						<filter name="by_o365_tenant_id" string="O365 Tenant" context="{'group_by': 'o365_tenant_id'}"/>
+						<filter name="by_arrow_name" string="By product name" context="{'group_by': 'arrow_name'}"/>
+						<filter name="by_arrow_vendor_sku" string="By vendor sku" context="{'group_by': 'arrow_vendor_sku'}"/>
+
+
+					</group>
+
+					</search>
+				</field>
+		</record>  				
         <record model="ir.ui.view" id="lubon_qlan_users_licenses_o365_tree_view">
 			<field name="name">lubon_qlan_users_licenses_o365.tree</field>
 			<field name="model">lubon_qlan.users_licenses_o365</field>
