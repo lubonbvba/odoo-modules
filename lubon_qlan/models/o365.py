@@ -315,7 +315,7 @@ class lubon_qlan_tenants_o365(models.Model):
 	get_details=fields.Boolean(default = False, help='Get full user details of this tenant')
 	invoicable=fields.Boolean(default = True, help='Tenant invoiced by us')
 	arrow_services_o365_ids=fields.One2many('lubon_qlan.arrowservices_o365','o365_tenant_id')
-
+	show_hidden=fields.Boolean()
 	sku_ids=fields.One2many('lubon_qlan.subscribedskus_o365','o365_tenant_id')
 	users_o365_ids=fields.One2many('lubon_qlan.users_o365','o365_tenant_id')
 	domains_o365_ids=fields.One2many('lubon_qlan.domains_o365','o365_tenant_id')
@@ -392,6 +392,8 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	arrow_expiry_datetime=fields.Char()
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
 	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
+	billed=fields.Integer(compute='_compute_billed')
+	hidden=fields.Boolean()
 
 	@api.onchange('o365_tenant_id')
 	@api.one
@@ -399,7 +401,18 @@ class lubon_qlan_arrowservices_o365(models.Model):
 		self.valid_contract_ids=self.o365_tenant_id.qlan_tenant_id.contract_ids
 		#pdb.set_trace()
 
+	@api.onchange('contract_line_id')
+	@api.one
+	def _compute_billed(self):	
+		if self.contract_line_id:
+			self.billed=self.contract_line_id.quantity
+		else:
+			self.billed=0
 
+	@api.multi
+	def update_billing(self):
+		if self.contract_line_id:
+			self.contract_line_id.quantity=self.arrow_number
 
 	@api.multi
 	def get_services(self,o365_tenant_id):

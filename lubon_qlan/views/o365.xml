@@ -35,18 +35,20 @@
 					<notebook>
                         <page string='Arrow'>
                             <button name='get_arrow_services' string="Get services" type="object"/>
-                            <field name="arrow_services_o365_ids">
-								<tree editable="top">
+                            <field name="arrow_services_o365_ids" filter="[('hidden','=',True)]">
+								<tree editable="top" >
                                 	<field name="valid_contract_ids" invisible="True" />  
 									<field name='arrow_license_id'/>
 									<field name='arrow_name'/>
 									<field name='arrow_number'/>
+									<field name='billed'/>
+									<button name='update_billing' string="Upd" type="object"/>
 									<field name='arrow_friendly_name'/>
 									<field name='contract_line_id'/>
 									<field name='arrow_vendor_sku'/>
 									<field name='arrow_expiry_datetime'/>
 									<field name='arrow_state'/>
-									
+						
 								</tree>
                             </field>
 						</page>					
