@@ -366,8 +366,9 @@ class lubon_qlan_tenants_o365(models.Model):
 	@api.multi
 	def refresh_arrow_services(self):
 		tenants=self.env['lubon_qlan.tenants_o365'].search([('arrow_ref','ilike','XSP')])
-		pdb.set_trace()
+		logger.info("Getting arrow services for %d tenants." % len(tenants))
 		for tenant in tenants:
+			logger.info("Getting arrow services %s" % tenant.defaultdomainname)
 			self.env['lubon_qlan.arrowservices_o365'].get_services(tenant)
 
 
