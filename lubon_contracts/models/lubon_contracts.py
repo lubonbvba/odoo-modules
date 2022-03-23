@@ -155,6 +155,7 @@ class account_analytic_account(models.Model):
 	partner_related_ids=fields.Many2many('res.partner')
 	date_cutoff=fields.Date(string="Last renewal date", help="Date to use as a start date for reporting and counting hours.")
 	billing_history_lines_ids=fields.One2many('lubon_qlan.billing_history','contract_id')
+	
 	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:

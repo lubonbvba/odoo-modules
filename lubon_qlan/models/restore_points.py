@@ -66,13 +66,22 @@ class lubon_qlan_restore_points_stats(models.Model):
 			targetdate=self.date
 		if not targetdate:
 			targetdate=fields.Date.today()
-
+	
 		stats_id=self.search([('date',"=",targetdate)])	
 		if not stats_id:
 			stats_id=self.create({'date': targetdate})
 		vms=self.env['lubon_qlan.assets'].search([("vm_check_backup","=",True),("asset_type","=",'vm')])
 		for vm in vms:
-			self.env['lubon_qlan.restorepoints_instances'].generate_restorepoints_instance(stats_id,vm)
+			validdays=[]
+			if vm.vm_backup_req_mo:	validdays.append(0)
+			if vm.vm_backup_req_tu:	validdays.append(1)
+			if vm.vm_backup_req_we:	validdays.append(2)
+			if vm.vm_backup_req_th:	validdays.append(3)
+			if vm.vm_backup_req_fr:	validdays.append(4)
+			if vm.vm_backup_req_sa:	validdays.append(5)
+			if vm.vm_backup_req_su:	validdays.append(6)
+			if datetime.strptime(self.date, "%Y-%m-%d").weekday() in validdays:
+				self.env['lubon_qlan.restorepoints_instances'].generate_restorepoints_instance(stats_id,vm)
 		stats_id.number_target=len(vms)
 		return stats_id
 

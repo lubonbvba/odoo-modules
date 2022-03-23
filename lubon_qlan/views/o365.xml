@@ -230,6 +230,8 @@
 									<field name='arrow_vendor_sku'/>
 									<field name='arrow_expiry_datetime'/>
 									<field name='arrow_state'/>
+									<!-- field name='check_billing'/-->
+
 				</tree>
 			</field>
 		</record>
@@ -243,6 +245,7 @@
 						<field name="arrow_vendor_sku"/>
 						<field name="arrow_name"/>
 						<filter string="Active" name="filter_active" domain="[('arrow_state','ilike','active')]"/>
+						<filter string="Check" name="filter_check" domain="['&amp;',('arrow_state','ilike','active'),('check_billing','=', True)]"/>
 						<filter string="No contract" name="filter_no_contract" domain="[('contract_line_id','=', False)]"/>
 
 					<group string="Group By">

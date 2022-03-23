@@ -86,6 +86,15 @@ class lubon_qlan_assets(models.Model):
 	vm_backup_req_restorepoints=fields.Integer(help="Min restorepoints required", string="Min req restore points" )
 	vm_backup_req_veeam_replicas=fields.Integer(help="Min veeam replicas required", string="Min req veeam replicas")
 	vm_backup_req_vsphere_replicas=fields.Integer(help="Min vsphere replicas required", string="Min req vsphere replicas")
+	vm_backup_req_mo=fields.Boolean(string="Monday", default=True)
+	vm_backup_req_tu=fields.Boolean(string="Tuesday", default=True)
+	vm_backup_req_we=fields.Boolean(string="Wednesday", default=True)
+	vm_backup_req_th=fields.Boolean(string="Thursday", default=True)
+	vm_backup_req_fr=fields.Boolean(string="Friday", default=True)
+	vm_backup_req_sa=fields.Boolean(string="Saturday", default=True)
+	vm_backup_req_su=fields.Boolean(string="Sunday", default=True)
+
+
 	#vcenter fields
 	vc_dns=fields.Char(string="vcenter dns")
 	vc_port=fields.Integer(string="vcenter tcp port", default=443)

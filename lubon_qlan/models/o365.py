@@ -402,6 +402,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
 	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
 	billed=fields.Integer(compute='_compute_billed')
+#	check_billing=fields.Boolean(compute='_compute_check', index=True, store=True )
 	hidden=fields.Boolean()
 
 	@api.onchange('o365_tenant_id')
@@ -409,6 +410,15 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	def _get_valid_contract_ids(self):
 		self.valid_contract_ids=self.o365_tenant_id.qlan_tenant_id.contract_ids
 		#pdb.set_trace()
+
+	# @api.one
+	# @api.depends('arrow_number','contract_line_id.quantity')
+	# def _compute_check(self):
+	# 	if self.arrow_number == self.contract_line_id.quantity:
+	# 		self.check_billing=False
+	# 	else:
+	# 		self.check_billing=True
+	# 	pdb.set_trace()
 
 	@api.onchange('contract_line_id')
 	@api.one
@@ -422,6 +432,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	def update_billing(self):
 		if self.contract_line_id:
 			self.contract_line_id.quantity=self.arrow_number
+			self.env.cr.commit()
 
 	@api.multi
 	def get_services(self,o365_tenant_id):
@@ -445,6 +456,9 @@ class lubon_qlan_arrowservices_o365(models.Model):
 				'arrow_vendor_sku': license['sku'],
 				'arrow_state': license['state'],
 				'arrow_expiry_datetime': license['expiry_datetime'],
-
 			})	
+			if service_id.contract_line_id:
+				service_id.contract_line_id.current_usage=license['seats']
+
+
 			#pdb.set_trace()

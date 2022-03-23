@@ -292,11 +292,23 @@
 					</group>
 
 					<group string="Backup info">
-						<field name="vm_check_backup"/>
-						<field name="vm_latest_restore_point"/>
-						<field name="vm_backup_req_restorepoints"/>
-						<field name="vm_backup_req_veeam_replicas"/>
-						<field name="vm_backup_req_vsphere_replicas"/>
+						<group>
+							<field name="vm_check_backup"/>
+							<field name="vm_latest_restore_point"/>
+							<field name="vm_backup_req_restorepoints"/>
+							<field name="vm_backup_req_veeam_replicas"/>
+							<field name="vm_backup_req_vsphere_replicas"/>
+						</group>
+						<group>	
+							<field name="vm_backup_req_mo"/>
+							<field name="vm_backup_req_tu"/>
+							<field name="vm_backup_req_we"/>
+							<field name="vm_backup_req_th"/>
+							<field name="vm_backup_req_fr"/>
+							<field name="vm_backup_req_sa"/>
+							<field name="vm_backup_req_su"/>
+
+						</group>
 					</group>
 				</group>
 				</page>
