@@ -80,7 +80,8 @@ class lubon_qlan_restore_points_stats(models.Model):
 			if vm.vm_backup_req_fr:	validdays.append(4)
 			if vm.vm_backup_req_sa:	validdays.append(5)
 			if vm.vm_backup_req_su:	validdays.append(6)
-			if datetime.strptime(self.date, "%Y-%m-%d").weekday() in validdays:
+			#pdb.set_trace()
+			if datetime.strptime(targetdate, "%Y-%m-%d").weekday() in validdays:
 				self.env['lubon_qlan.restorepoints_instances'].generate_restorepoints_instance(stats_id,vm)
 		stats_id.number_target=len(vms)
 		return stats_id

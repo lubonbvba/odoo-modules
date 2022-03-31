@@ -399,6 +399,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	arrow_vendor_sku=fields.Char()
 	arrow_state=fields.Char()
 	arrow_expiry_datetime=fields.Char()
+	arrow_last_update=fields.Datetime()
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
 	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
 	billed=fields.Integer(compute='_compute_billed')
@@ -456,6 +457,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 				'arrow_vendor_sku': license['sku'],
 				'arrow_state': license['state'],
 				'arrow_expiry_datetime': license['expiry_datetime'],
+				'arrow_last_update':fields.Datetime.now(),
 			})	
 			if service_id.contract_line_id:
 				service_id.contract_line_id.current_usage=license['seats']

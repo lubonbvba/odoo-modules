@@ -49,6 +49,7 @@
 									<field name='contract_line_id'/>
 									<field name='arrow_vendor_sku'/>
 									<field name='arrow_expiry_datetime'/>
+									<field name='arrow_last_update'/>
 									<field name='arrow_state'/>
 						
 								</tree>
@@ -230,6 +231,8 @@
 									<field name='arrow_vendor_sku'/>
 									<field name='arrow_expiry_datetime'/>
 									<field name='arrow_state'/>
+									<field name='arrow_last_update'/>
+
 									<!-- field name='check_billing'/-->
 
 				</tree>
