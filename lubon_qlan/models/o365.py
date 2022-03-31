@@ -126,6 +126,7 @@ class lubon_qlan_subscribedskus_o365(models.Model):
 	_rec_name= 'friendly_name'
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365', ondelete='cascade')
 	subscribed_users_o365=fields.One2many( 'lubon_qlan.users_licenses_o365','subscribedskus_o365')
+	arrow_services_ids=fields.One2many('lubon_qlan.arrowservices_o365','sku_id')
 	capabilityStatus=fields.Char()
 	consumedUnits=fields.Integer()
 	o365_id=fields.Char()
@@ -137,28 +138,59 @@ class lubon_qlan_subscribedskus_o365(models.Model):
 	warning=fields.Integer()
 	friendly_name=fields.Char()
 	invoicable=fields.Boolean()
-	billed_count=fields.Integer(compute='_calculate_billed', store=True,Index=True)
-	billed_count_difference=fields.Integer(compute='_calculate_billed_difference', string='Billed vs enabled', store=True, index=True)
-	billed_count_ok=fields.Boolean(compute='_calculate_billed_ok', store=True, index=True)
+	purchased_count=fields.Integer(compute='_recalculate_computed', store=True, Index=True)
+	billed_count=fields.Integer(compute='_recalculate_computed', store=True,Index=True)
+	billed_count_difference=fields.Integer(compute='_recalculate_computed', string='Billed vs enabled', store=True, index=True)
+	billed_count_ok=fields.Boolean(compute='_recalculate_computed', store=True)#, index=True)
+
 
 	@api.one
-	@api.depends('enabled','subscribed_users_o365','consumedUnits','invoicable')
-	def _calculate_billed(self):
-		self.billed_count=len(self.subscribed_users_o365)
+	@api.depends('enabled','subscribed_users_o365','consumedUnits','invoicable','arrow_services_ids','purchased_count')
+	def _recalculate_computed(self):
+		nPurchased=0
+		nBilled=0
+		for line in self.arrow_services_ids:
+			nPurchased+=line.arrow_number
+			nBilled+=line.billed
+		self.purchased_count=nPurchased
+		self.billed_count=nBilled
 		self.billed_count_difference=self.enabled-self.billed_count
-
-	@api.one
-	@api.depends('billed_count')
-	def _calculate_billed_difference(self):
-		self.billed_count_difference=self.enabled-self.billed_count
-
-	@api.one
-	@api.depends('billed_count_difference', 'enabled','invoicable')
-	def _calculate_billed_ok(self):
 		if self.invoicable and self.billed_count_difference !=0:
 			self.billed_count_ok=False
 		else:
 			self.billed_count_ok=True
+
+
+	# @api.one
+	# @api.onchange('arrow_services_ids')
+	# def _calculate_purchased_count(self):
+	# 	n=0
+	# 	for line in self.arrow_services_ids:
+	# 		n+=line.arrow_number
+	# 	self.purchased_count=n
+	# 	self._calculate_billed_difference()
+	# #	pdb.set_trace()	
+
+
+	# @api.one
+	# @api.depends('enabled','subscribed_users_o365','consumedUnits','invoicable')
+	# def _calculate_billed(self):
+
+	# 	self.billed_count=len(self.subscribed_users_o365)
+	# 	self.billed_count_difference=self.enabled-self.billed_count
+
+	# @api.one
+	# @api.depends('billed_count','purchased_count')
+	# def _calculate_billed_difference(self):
+	# 	self.billed_count_difference=self.enabled-self.purchased_count
+
+	# @api.one
+	# @api.depends('billed_count_difference', 'enabled','purchased_count','invoicable', )
+	# def _calculate_billed_ok(self):
+	# 	if self.invoicable and self.billed_count_difference !=0:
+	# 		self.billed_count_ok=False
+	# 	else:
+	# 		self.billed_count_ok=True
 
 
 
@@ -322,6 +354,12 @@ class lubon_qlan_tenants_o365(models.Model):
 	billingconfig_tenants_o365_ids=fields.One2many('lubon_qlan.billingconfig_tenant_o365','o365_tenant_id')
 
 	@api.multi
+	def process_changes(self):
+		#pdb.set_trace()
+		for sku in self.sku_ids:
+			sku.calculate_purchased_count()
+
+	@api.multi
 	def refresh_tenants_o365(self,account_source_id):
 		logger.info("Calling https://graph.microsoft.com/beta/contracts")
 		result=account_source_id.endpoints_id.execute('https://graph.microsoft.com/beta/contracts','')
@@ -361,7 +399,8 @@ class lubon_qlan_tenants_o365(models.Model):
 		if self.qlan_tenant_id:  
 			self.refresh_subscribed_skus_o365(None)
 			if self.get_details:
-				self.refresh_users_o365(None)		
+				self.refresh_users_o365(None)
+		self.sku_ids._recalculate_computed()				
 
 	@api.multi
 	def refresh_arrow_services(self):
@@ -391,7 +430,9 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	_name = 'lubon_qlan.arrowservices_o365'
 	_description = 'Arrow services'
 	name=fields.Char()
+	active=fields.Boolean(default=True)
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365')
+	sku_id=fields.Many2one('lubon_qlan.subscribedskus_o365',domain="[('o365_tenant_id','=',o365_tenant_id)]", string='Linked sku in tenant' )
 	arrow_license_id=fields.Char()
 	arrow_name=fields.Char()
 	arrow_number=fields.Integer()
@@ -405,6 +446,11 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	billed=fields.Integer(compute='_compute_billed')
 #	check_billing=fields.Boolean(compute='_compute_check', index=True, store=True )
 	hidden=fields.Boolean()
+
+	@api.depends('sku_id')
+	@api.one
+	def _process_sku_id_change(self):
+		self.sku_id.o365_tenant_id.process_changes()
 
 	@api.onchange('o365_tenant_id')
 	@api.one
@@ -461,6 +507,9 @@ class lubon_qlan_arrowservices_o365(models.Model):
 			})	
 			if service_id.contract_line_id:
 				service_id.contract_line_id.current_usage=license['seats']
-
+			if license['state'] in ['suspended','expired trial']:
+				service_id.active=False
+			else:
+				service_id.active=True
 
 			#pdb.set_trace()

@@ -40,12 +40,15 @@
                             <field name="arrow_services_o365_ids" filter="[('hidden','=',True)]">
 								<tree editable="top" >
                                 	<field name="valid_contract_ids" invisible="True" />  
+                                	<field name="o365_tenant_id" invisible="True" />  
+									<field name='active'/>
 									<field name='arrow_license_id'/>
 									<field name='arrow_name'/>
 									<field name='arrow_number'/>
 									<field name='billed'/>
 									<button name='update_billing' string="Upd" type="object"/>
 									<field name='arrow_friendly_name'/>
+									<field name='sku_id'/>
 									<field name='contract_line_id'/>
 									<field name='arrow_vendor_sku'/>
 									<field name='arrow_expiry_datetime'/>
@@ -162,10 +165,11 @@
                                             <field name="friendly_name"/>
                                             <field name="consumedUnits"/>
 											<field name="enabled"/>
+											<field name="purchased_count"/>
 											<field name="billed_count"/>
 											<field name="billed_count_difference" />
-											<field name="suspended"/>
-											<field name="warning"/>
+											<!-- field name="suspended"/>
+											<field name="warning"/ -->
                                             <field name="skuPartNumber"/>
 											<field name="skuId"/>
 											<field name="invoicable"/>
@@ -182,7 +186,7 @@
 								<field name="o365_tenant_id"/>
 								<field name="friendly_name"/>
 								<filter name="invoiceable" string="Invoicable"	domain="[('invoicable', '=', True)]"/>
-								<filter name="underbilling" string="Underbilling"	domain="[('billed_count_ok', '=', False)]"/>
+								<filter name="underbilling" string="Check billing"	domain="[('billed_count_ok', '=', False)]"/>
 								<filter name="invoicable_set" string="Invoiceable OK?"	domain="[('invoicable', '=', False),('billed_count_difference', '>', 0),('billed_count_difference', '&lt;', 90)]"/>
 							</search>
 						</field>
