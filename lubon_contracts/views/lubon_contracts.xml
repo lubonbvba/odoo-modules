@@ -167,8 +167,8 @@
 			<field name="model">account.analytic.invoice.line</field>
 			<field name="arch" type="xml">
 				<tree string="Invoice" editable="top">
-                                            <field name="analytic_account_id"/>
-                                            <field name="product_id"/>
+                                            <field name="analytic_account_id" readonly="True"/>
+                                            <field name="name" readonly="True"/>
                                             <field name="quantity"/>
                                             <button name="update_quantity" string="V" type="object" help="Update quantitiy from usage"/>
                                             <field name="current_usage"/>
