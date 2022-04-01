@@ -78,7 +78,7 @@ class account_analytic_invoice_line(models.Model):
 	last_billed_usage=fields.Float(help="Last billed number")
 	current_usage=fields.Float(help="Current value of the counter, after billing it is set to -1", default=-1)
 	billing_check=fields.Boolean(compute="_calculate_billing_check", string="Billing check", store=True, index=True)
-	next_report_date=fields.Datetime(help="Due date for the next reporting/invoicing")
+	next_report_date=fields.Datetime(compute="_calculate_billing_check", help="Due date for the next reporting/invoicing", store=True)
 
 
 
@@ -90,6 +90,7 @@ class account_analytic_invoice_line(models.Model):
 					line.billing_check=True
 				else:
 					line.billing_check=False
+				line.next_report_date=line.analytic_account_id.recurring_next_date	
 
 	@api.multi
 	@api.depends('billing_history_ids')

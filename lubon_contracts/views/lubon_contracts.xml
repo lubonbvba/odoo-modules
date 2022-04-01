@@ -187,6 +187,7 @@
 							<search>
 								<field name="analytic_account_id"/>
                                 <field name="product_id"/>
+                                <field name="next_report_date"/>
                                 <filter name="Check1" string="Check quantity"	domain="[('billing_check', '=', True)]"/>
                                 <filter name="usage_mandatory" string="Usage mandatory"	domain="[('usage_mandatory', '=', True)]"/>
 					<group string="Group By">
