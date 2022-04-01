@@ -106,6 +106,8 @@ class lubon_qlan_tenants(models.Model):
                     b.unlink()
         for user in self.adusers_ids:
             user.refresh_licenses_ad(user)
+        self.billingconfig_tenants_ad_ids.report_usage()    
+
 #        for a in self.billingconfig_tenants_ad_ids:
 #            a._compute_users_license_ad_ids_count()
         # for o365tenant in self.users_o365_ids:
@@ -246,6 +248,7 @@ class lubon_qlan_adusers(models.Model):
     @api.multi
     def refresh_licenses_ad(self,context=None):
         self.env['lubon_qlan.users_licenses_ad'].refresh(self)
+    
 
 
     @api.multi
@@ -407,3 +410,6 @@ class lubon_qlan_billingconfig_tenant_ad(models.Model):
 #	@api.one
 #	def _get_valid_adgroups_ids(self):
 #		self.valid_ad_groups_ids=self.qlan_tenant_id.ad_groups_licenses_ids
+    @api.one
+    def report_usage(self):
+        self.contract_line_id.current_usage=self.users_license_ad_ids_count

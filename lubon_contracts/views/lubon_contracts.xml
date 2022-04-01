@@ -124,6 +124,7 @@
                     <field name="billing_history_counted_items"/>
                     <field name="last_billed_usage"/>
                     <field name="current_usage"/>
+                    <field name="billing_check"/>
                     <field name="line_ok"/>
                 </xpath>
                 <xpath expr='//field[@name="price_subtotal"]' position="replace">
@@ -169,11 +170,13 @@
                                             <field name="analytic_account_id"/>
                                             <field name="product_id"/>
                                             <field name="quantity"/>
-                                            <field name="billing_history_counted_items"/>
+                                            <button name="update_quantity" string="V" type="object" help="Update quantitiy from usage"/>
                                             <field name="current_usage"/>
                                             <field name="last_billed_usage"/>
                                             <field name="billing_check"/>
                                             <field name="usage_mandatory"/>
+                                            <field name="next_report_date"/>
+                                            <field name="billing_history_counted_items"/>
 				</tree>
 			</field>
 		</record> 
@@ -183,7 +186,9 @@
 						<field name="arch" type="xml">
 							<search>
 								<field name="analytic_account_id"/>
+                                <field name="product_id"/>
                                 <filter name="Check1" string="Check quantity"	domain="[('billing_check', '=', True)]"/>
+                                <filter name="usage_mandatory" string="Usage mandatory"	domain="[('usage_mandatory', '=', True)]"/>
 					<group string="Group By">
 						<filter name="by_account" string="Contract" context="{'group_by': 'analytic_account_id'}"/>
 					</group>                                

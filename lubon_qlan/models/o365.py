@@ -286,7 +286,7 @@ class lubon_qlan_users_o365(models.Model):
 			user_o365.o365_domains_id=self.env['lubon_qlan.domains_o365'].search([('o365_tenant_id','=',o365_tenant_id.id),('name','=',(user['userPrincipalName'][user['userPrincipalName'].index('@') + 1 : ]).lower())])
 			user_o365.qlan_tenant_id=o365_tenant_id.qlan_tenant_id
 			user_o365.refresh_licenses(None,user)
-			user_o365.refresh_mail_rules()
+#			user_o365.refresh_mail_rules()
 
 
 	@api.multi

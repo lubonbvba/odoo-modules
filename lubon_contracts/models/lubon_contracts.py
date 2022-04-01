@@ -75,17 +75,18 @@ class account_analytic_invoice_line(models.Model):
 #	counted_items=fields.Integer(compute="_count_items", string="Counted (old)", help="This number is the total of items counted in the tenant")
 #	used_items=fields.Integer(compute="_count_used", string="Used (old)", help="The number of items used/assigned")
 	billing_history_counted_items=fields.Integer(compute="_billing_history_count_items", string="Counted", store=True, help="This number is the total of items counted in the tenant", index=True)
-	last_billed_usage=fields.Float(help="Last used counter value")
-	current_usage=fields.Float(help="Current value of the counter", default=-1)
+	last_billed_usage=fields.Float(help="Last billed number")
+	current_usage=fields.Float(help="Current value of the counter, after billing it is set to -1", default=-1)
 	billing_check=fields.Boolean(compute="_calculate_billing_check", string="Billing check", store=True, index=True)
+	next_report_date=fields.Datetime(help="Due date for the next reporting/invoicing")
 
 
 
 	@api.multi
-	@api.depends('billing_history_counted_items','quantity')
+	@api.depends('quantity','last_billed_usage', 'current_usage','usage_mandatory')
 	def _calculate_billing_check(self):
 			for line in self:
-				if line.billing_history_counted_items <>0 and line.billing_history_counted_items <> line.quantity:
+				if (line.usage_mandatory and line.current_usage <> line.quantity):
 					line.billing_check=True
 				else:
 					line.billing_check=False
@@ -139,7 +140,9 @@ class account_analytic_invoice_line(models.Model):
 		# 	invoice_line.update(
 		# 		{'quantity': invoice_line.quantity + line.product_uom_qty,	
 		# 		})
-
+	@api.multi
+	def update_quantity(self):
+		self.quantity=self.current_usage
 
 
 
@@ -156,6 +159,13 @@ class account_analytic_account(models.Model):
 	date_cutoff=fields.Date(string="Last renewal date", help="Date to use as a start date for reporting and counting hours.")
 	billing_history_lines_ids=fields.One2many('lubon_qlan.billing_history','contract_id')
 	
+	# @api.depends('recurring_next_date')
+	# @api.one
+	# def set_reporting_dates(self):
+	# 	pdb.set_trace()
+
+
+
 	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:
@@ -184,16 +194,31 @@ class account_analytic_account(models.Model):
 		res.update({'sequence': line.sequence})
 
 		#pdb.set_trace()
-		line.last_billed_usage=line.quantity
+		line.last_billed_usage=line.current_usage
+		if line.usage_mandatory:
+			#set current usage to -1 if usage reporting is mandatory
+			line.current_usage=-1
+
 		if line.add_to_prepaid:
 			line.analytic_account_id.quantity_max += line.quantity
+		#line.next_report_date=self.recurring_next_date
+		
+
 		return res
 	def _prepare_invoice_data(self, cr, uid, contract, context=None):
 		res=super(account_analytic_account, self)._prepare_invoice_data( cr, uid, contract)
 		res.update({'comment': contract.description})
 		res.update({'origin': contract.name})
+		
 		return res
     
+
+
+
+    
+
+
+
 	@api.multi
 	def make_quote_from_contract(self):
 		self.env['sale.order'].new_quote_from_contract(self)
