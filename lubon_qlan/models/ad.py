@@ -246,6 +246,16 @@ class lubon_qlan_adusers(models.Model):
     licensing_manual=fields.Boolean()
 
     @api.multi
+    def name_get(self):
+        res=[]
+        for line in self:
+            res.append((line.id, line.logonname))	
+        return res
+
+
+
+
+    @api.multi
     def refresh_licenses_ad(self,context=None):
         self.env['lubon_qlan.users_licenses_ad'].refresh(self)
     
@@ -321,7 +331,7 @@ class lubon_qlan_users_license_ad(models.Model):
     user_ad_id = fields.Many2one('lubon_qlan.adusers',ondelete='cascade')
     billingconfig_tenant_ad=fields.Many2one('lubon_qlan.billingconfig_tenant_ad', ondelete='cascade')
     prd_group_id=fields.Many2one("lubon_qlan.adaccounts")
-    qlan_tenant_id=fields.Many2one('lubon_qlan.tenants', compute='_calculate_tenant_id',ondelete='cascade')
+    qlan_tenant_id=fields.Many2one('lubon_qlan.tenants', compute='_calculate_tenant_id',ondelete='cascade', store=True)
 
 
     @api.one

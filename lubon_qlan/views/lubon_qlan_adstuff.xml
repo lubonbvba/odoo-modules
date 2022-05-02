@@ -393,7 +393,20 @@
       <field name="view_mode">tree,form</field>
     </record>  
 
+		<record model="ir.ui.view" id="lubon_qlan_users_licenses_ad_search_view">
+				<field name="name">lubon_qlan_users_licenses_ad.tree.search</field>
+				<field name="model">lubon_qlan.users_licenses_ad</field>
+				<field name="arch" type="xml">
+					<search>
+						<field name="qlan_tenant_id"/>
+						<group string="Group By">
+							<filter name="by_tenant" string="Tenant" context="{'group_by': 'qlan_tenant_id'}"/>
+							<filter name="by_tenant" string="Product" context="{'group_by': 'prd_group_id'}"/>
 
+						</group>
+					</search>
+				</field>
+		</record>  
 
 
         <record model="ir.ui.view" id="lubon_qlan_users_licenses_ad_tree_view">
@@ -401,6 +414,7 @@
 			<field name="model">lubon_qlan.users_licenses_ad</field>
 			<field name="arch" type="xml">
 				<tree string="User licenses ad" editable="top">
+					<field name="qlan_tenant_id"/>
                     <field name="user_ad_id"/>
                     <field name="prd_group_id"/>
 					<field name="billingconfig_tenant_ad"/>
