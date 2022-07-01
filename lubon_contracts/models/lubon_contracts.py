@@ -165,7 +165,9 @@ class account_analytic_account(models.Model):
 	# def set_reporting_dates(self):
 	# 	pdb.set_trace()
 
-
+	@api.multi
+	def calculate_reporting_fields(self):
+		self.recurring_invoice_line_ids._calculate_billing_check()
 
 	@api.multi
 	def add_line_from_quote(self,line):

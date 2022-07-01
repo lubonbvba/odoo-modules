@@ -236,6 +236,7 @@
 									<field name='arrow_expiry_datetime'/>
 									<field name='arrow_state'/>
 									<field name='arrow_last_update'/>
+									<field name='create_date'/>
 
 									<!-- field name='check_billing'/-->
 

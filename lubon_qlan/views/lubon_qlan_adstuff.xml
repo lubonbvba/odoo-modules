@@ -52,7 +52,7 @@
 					<field name="displayname"/>
 					<field name="name"/>
 					<field name="ad_date_created"/>
-					<field name="product"/>
+					<!-- field name="product" /-->
 					<!--field name="ad_enabled"/-->
 					<field name="account_created"/>
 					<field name="last_logon"/>
