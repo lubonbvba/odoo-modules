@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
+		<record model="ir.ui.view" id="tenants_o365_search_view">
+			<field name="name">tenants_o365.search</field>
+			<field name="model">lubon_qlan.tenants_o365</field>
+			<field name="arch" type="xml">
+					<search>
+						<field name="tenant_id"/>
+						<field name="defaultdomainname"/>
+						<filter name="no_get_signin" string="Get signin inactive"	domain="[('get_signins', '!=', True)]"/>
+					</search>
+			</field>
+		</record>	
 		<record model="ir.ui.view" id="tenants_o365_tree_view">
 			<field name="name">tenants_o365.tree</field>
 			<field name="model">lubon_qlan.tenants_o365</field>
@@ -11,6 +22,7 @@
 					<field name="tenant_id"/>
 					<field name="qlan_tenant_id"/>
                     <field name="get_details"/>
+					<field name="get_signins"/>
                     <field name="invoicable"/>
 				</tree>
 			</field>
