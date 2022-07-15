@@ -21,18 +21,24 @@
 			<field name="arch" type="xml">
 				<form string="Tenants O365 Form" default_order="name">
 					<sheet>
-						<group>
-					<field name="name"/>
-					<field name="defaultdomainname"/>
-					<field name="tenant_id"/>
-					<field name="qlan_tenant_id"/>
-					<field name="account_source_id"/>
-                    <field name="get_details"/>
-					<field name="invoicable"/>
-					<field name="arrow_ref"/>
-                    <button name='refresh_thistenant_o365' string="Refresh tenant" type="object"/>
-                    <button name='refresh_arrow_services' string="Refresh all arrow" type="object"/>
-
+		  				<div class="oe_right oe_button_box" name="buttons">
+						<button type="action" class="oe_stat_button" string='Sign ins' name="%(qlan_signin_azure_action)d" icon="fa-lock" context="{'search_default_o365_tenant_id': active_id, 'default_o365_tenant_id': active_id}">
+							<!-- field zname="assets_count" string="Signins " widget="statinfo"/ -->
+							
+						</button>
+					</div>	
+					<group>
+						<field name="name"/>
+						<field name="defaultdomainname"/>
+						<field name="tenant_id"/>
+						<field name="qlan_tenant_id"/>
+						<field name="account_source_id"/>
+        	            <field name="get_details"/>
+        	            <field name="get_signins"/>
+						<field name="invoicable"/>
+						<field name="arrow_ref"/>
+                    	<button name='refresh_thistenant_o365' string="Refresh tenant" type="object"/>
+	                    <button name='refresh_arrow_services' string="Refresh all arrow" type="object"/>
 					</group>
 					<notebook>
                         <page string='Arrow'>
@@ -92,27 +98,75 @@
                                 </tree>
                             </field>
 						</page>
-
+						<page string="Events">
+							<button name='get_signin_logs_o365' string="Get signin logs" type="object"/>
+							<button name='purge_signin_logs_o365' string="Purge signin logs" type="object"/>
+							<group>
+	                            <field name="last_error_signins"/>
+							</group>
+   	                        <field name="signin_azure_ids">
+                            </field>					
+						</page>
 					</notebook>
+
 					</sheet>
 				</form>
 			</field>
+		</record>
+        <record model="ir.ui.view" id="signin_azure_tree_view">
+			<field name="name">signin_azure.tree</field>
+			<field name="model">lubon_qlan.signin_azure</field>
+			<field name="arch" type="xml">
+				<tree string="Azure AD signins" zeditable="top">
+                                            <field name="user_id"/>
+											<field name="createdDateTime"/>
+											<field name="isbasicauth"/>
+											<field name="clientAppUsed"/>
+											<field name="appDisplayName"/>
+											<field name="ipAddress"/>
+											<field name="status"/>
+
+							
+
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="signin_azure_search_view">
+				<field name="name">signin_azure.search</field>
+				<field name="model">lubon_qlan.signin_azure</field>
+				<field name="arch" type="xml">
+					<search>
+						<field name="o365_tenant_id"/>
+						<field name="user_id"/>
+						<field name="clientAppUsed"/>
+						<field name="ipAddress"/>
+						<field name="appDisplayName"/>
+
+						<filter name="exchangeonline" string="Office 365 Exchange Online"	domain="[('appDisplayName', '=', 'Office 365 Exchange Online')]"/>
+						<group string="Group By">
+							<filter name="by_clientAppUsed" string="clientAppUsed" context="{'group_by': 'clientAppUsed'}"/>
+							<filter name="by_appDisplayName" string="appDisplayName" context="{'group_by': 'appDisplayName'}"/>
+							<filter name="by_tenant" string="Tenant" context="{'group_by': 'o365_tenant_id'}"/>
+							<filter name="by_user_id" string="User" context="{'group_by': 'user_id'}"/>
+							<filter name="by_ipAddress" string="IP Address" context="{'group_by': 'ipAddress'}"/>
+						</group>
+					</search>
+				</field>
 		</record>
         <record model="ir.ui.view" id="users_o365_tree_view">
 			<field name="name">users_o365.tree</field>
 			<field name="model">lubon_qlan.users_o365</field>
 			<field name="arch" type="xml">
 				<tree string="O365 users Tree" zeditable="top">
-                                            <field name="o365_id"/>
-											<field name="mail"/>
-                                            <field name="principalname"/>
-                                            <field name="name"/>
-											<field name="lastname"/>
-											<field name="firstname"/>
-                                            <field name="o365_domains_id"/>
-             								<field name="qlan_tenant_id"/>
-             								<field name="mail_rules_nr"/>
-
+					<field name="o365_id"/>
+					<field name="mail"/>
+					<field name="principalname"/>
+					<field name="name"/>
+					<field name="lastname"/>
+					<field name="firstname"/>
+					<field name="o365_domains_id"/>
+					<field name="qlan_tenant_id"/>
+					<field name="mail_rules_nr"/>
 				</tree>
 			</field>
 		</record>
@@ -317,7 +371,17 @@
       <field name="res_model">lubon_qlan.billingconfig_tenant_o365</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
-    </record>           
+    </record> 
+    <record model="ir.actions.act_window" id="qlan_signin_azure_action">
+      <field name="name">Azure AD Signin</field>
+      <field name="res_model">lubon_qlan.signin_azure</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record> 
+
+
+
+	         
         <menuitem id="lubon_qlan_users_o365_menu" name="O365 Users" parent="lubon_qlan_tables_menu"
           action="qlan_users_o365_action"/>
         <menuitem id="qlan_billingconfig_tenant_o365_menu" name="Billing config" parent="lubon_qlan_tables_menu"
@@ -326,9 +390,10 @@
           action="lubon_qlan_users_licenses_o365_action"/>
     <menuitem id="qlan_subscribedskus_o365_menu" name="Subscribed SKUS O365" parent="lubon_qlan_tables_menu"
           action="qlan_subscribedskus_o365_action"/>
-	<menuitem id="lubon_qlan_arrowservices_o365" name="Arrow services O365" parent="lubon_qlan_tables_menu"
+	<menuitem id="lubon_qlan_arrowservices_o365_menu" name="Arrow services O365" parent="lubon_qlan_tables_menu"
           action="lubon_qlan_arrowservices_o365_action"/>		  
-
+	<menuitem id="qlan_signin_azure_menu" name="Azure AD Signin log" parent="lubon_qlan_tables_menu"
+          action="qlan_signin_azure_action"/>	
 
 
 

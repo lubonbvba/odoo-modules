@@ -333,6 +333,107 @@ class lubon_qlan_domains_o365(models.Model):
 				})
 			currentdomain.qlan_tenant_id=o365_tenant_id.qlan_tenant_id	
 
+class lubon_qlan_signin_azure(models.Model):
+	_name = 'lubon_qlan.signin_azure'
+	_description = 'Azure AD signin log'
+	_sql_constraints=[('azure_ad_unique','UNIQUE(azure_id)','Azure id unique')]
+	_order='createdDateTime DESC'
+	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365',ondelete='cascade')
+	user_id=fields.Many2one('lubon_qlan.users_o365')
+	isbasicauth=fields.Boolean()
+	appliedConditionalAccessPolicies=fields.Char()
+	resourceId=fields.Char()
+	riskEventTypes_v2=fields.Char()
+	userPrincipalName=fields.Char()
+	azure_id=fields.Char(index=True)
+	correlationId=fields.Char()
+	userDisplayName=fields.Char()
+	deviceDetail=fields.Char()
+	location=fields.Char()
+	status=fields.Char()
+	riskLevelDuringSignIn=fields.Char()
+	conditionalAccessStatus=fields.Char()
+	clientAppUsed=fields.Char()
+	resourceDisplayName=fields.Char()
+	userId=fields.Char()
+	riskDetail=fields.Char()
+	appId=fields.Char()
+	riskLevelAggregated=fields.Char()
+	createdDateTime=fields.Datetime()
+	appDisplayName=fields.Char()
+	isInteractive=fields.Char()
+	riskEventTypes=fields.Char()
+	riskState=fields.Char()
+	ipAddress=fields.Char()
+	authenticationContextClassReferences=fields.Char()
+	authenticationDetails=fields.Char()
+	authenticationMethodsUsed=fields.Char()
+	authenticationProcessingDetails=fields.Char()
+	authenticationProtocol=fields.Char()
+	authenticationRequirement=fields.Char()
+	authenticationRequirementPolicies=fields.Char()
+	autonomousSystemNumber=fields.Char()
+	clientCredentialType=fields.Char()
+	crossTenantAccessType=fields.Char()
+	federatedCredentialId=fields.Char()
+	flaggedForReview=fields.Char()
+	homeTenantId=fields.Char()
+	homeTenantName=fields.Char()
+	incomingTokenType=fields.Char()
+	ipAddressFromResourceProvider=fields.Char()
+	isTenantRestricted=fields.Char()
+	mfaDetail=fields.Char()
+	networkLocationDetails=fields.Char()
+	originalRequestId=fields.Char()
+	privateLinkDetails=fields.Char()
+	processingTimeInMilliseconds=fields.Char()
+	resourceServicePrincipalId=fields.Char()
+	resourceTenantId=fields.Char()
+	servicePrincipalCredentialKeyId=fields.Char()
+	servicePrincipalCredentialThumbprint=fields.Char()
+	servicePrincipalId=fields.Char()
+	servicePrincipalName=fields.Char()
+	sessionLifetimePolicies=fields.Char()
+	signInEventTypes=fields.Char()
+	signInIdentifier=fields.Char()
+	signInIdentifierType=fields.Char()
+	tokenIssuerName=fields.Char()
+	tokenIssuerType=fields.Char()
+	uniqueTokenIdentifier=fields.Char()
+	userAgent=fields.Char()
+	userType=fields.Char()	
+
+	@api.multi
+	def new_signin(self,o365_tenant_id,record):
+		if not self.search([('azure_id','=',record['id'])]):
+			newrec=self.create({
+				'o365_tenant_id': o365_tenant_id.id,
+				'azure_id': record['id'],
+				'createdDateTime': record['createdDateTime'],
+			})
+			value={}
+			for field in record.keys():
+				if field not in ['id','createdDateTime']:
+					if field in newrec._fields:
+						value[field]=record[field]
+					else:
+						logger.warning('Field %s does not exist in lubon_qlan.signin_azure ', field  )	
+			newrec.write(value)
+			newrec.user_id=self.env['lubon_qlan.users_o365'].search([('o365_id','=', record['userId'])])
+	@api.multi
+	
+	def get_signins_cron(self, xyz=None):
+		logger.info("Start get_signins_cron")
+		tenants=self.env['lubon_qlan.tenants_o365'].search([('get_signins','=',True)])
+		#pdb.set_trace()
+		for tenant in tenants:
+			if tenant.get_details:
+				logger.info("Processing users for: %s, %s", tenant.name, tenant.defaultdomainname)
+				tenant.refresh_users_o365(None)
+			logger.info("Processing signins for: %s, %s", tenant.name, tenant.defaultdomainname)
+			tenant.get_signin_logs_o365()
+		logger.info("End get_signins_cron")
+			
 
 class lubon_qlan_tenants_o365(models.Model):
 	_name = 'lubon_qlan.tenants_o365'
@@ -345,6 +446,7 @@ class lubon_qlan_tenants_o365(models.Model):
 	qlan_tenant_id=fields.Many2one('lubon_qlan.tenants')
 	account_source_id=fields.Many2one('lubon_qlan.account_source')
 	get_details=fields.Boolean(default = False, help='Get full user details of this tenant')
+	get_signins=fields.Boolean(default = False, help='Get Sign in\'s for this tenant')
 	invoicable=fields.Boolean(default = True, help='Tenant invoiced by us')
 	arrow_services_o365_ids=fields.One2many('lubon_qlan.arrowservices_o365','o365_tenant_id')
 	show_hidden=fields.Boolean()
@@ -352,7 +454,9 @@ class lubon_qlan_tenants_o365(models.Model):
 	users_o365_ids=fields.One2many('lubon_qlan.users_o365','o365_tenant_id')
 	domains_o365_ids=fields.One2many('lubon_qlan.domains_o365','o365_tenant_id')
 	billingconfig_tenants_o365_ids=fields.One2many('lubon_qlan.billingconfig_tenant_o365','o365_tenant_id')
-
+	signin_azure_ids=fields.One2many('lubon_qlan.signin_azure','o365_tenant_id')
+	last_error_signins=fields.Char()
+	
 	@api.multi
 	def process_changes(self):
 		#pdb.set_trace()
@@ -391,7 +495,39 @@ class lubon_qlan_tenants_o365(models.Model):
 								'subscribedskus_o365_id': sku.id,
 								'domains_o365_id': domain.id
 							})		
-						
+
+	@api.multi
+	def get_signin_logs_o365(self): #, o365_tenant_id):		
+		endpoint='https://graph.microsoft.com/beta/auditLogs/signIns'
+		filter = ""
+		if self.signin_azure_ids:
+			last_rec=self.signin_azure_ids.sorted(key=lambda x: x.createdDateTime, reverse=True)[0]
+			max_date=last_rec.createdDateTime.replace (' ', 'T')+'z'
+			filter=("?$filter=createdDateTime gt %s and id ne '%s'" % (max_date, last_rec['azure_id']) )
+		if filter:
+			endpoint=endpoint + filter + "&order by createdDateTime asc"
+		else:	
+			endpoint=endpoint + "?order by createdDateTime asc"
+
+		nIterations=0
+		while endpoint and nIterations <= 25:
+			logger.info(endpoint)
+			nIterations+=1
+			result=self.account_source_id.endpoints_id.execute(cmd_line=endpoint,url='https://login.microsoftonline.com/'+ self.defaultdomainname)	
+			if 'error' in result.keys():
+				logger.exception("Error message: %s", result['error']['message'])
+				self.last_error_signins=result['error']['message']
+				endpoint=None
+			else:
+				for record in result['value']:
+					self.env['lubon_qlan.signin_azure'].new_signin(self,record)
+				if '@odata.nextLink' in result.keys():
+					endpoint=result['@odata.nextLink']
+				else:
+					endpoint=None
+	@api.multi
+	def purge_signin_logs_o365(self):	
+		self.signin_azure_ids.unlink()
 	
 	@api.multi
 	def refresh_thistenant_o365(self,o365_tenant_id):
