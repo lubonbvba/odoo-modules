@@ -229,7 +229,7 @@
 			<field name="name">subscribedskus_o365.tree</field>
 			<field name="model">lubon_qlan.subscribedskus_o365</field>
 			<field name="arch" type="xml">
-				<tree string="Subscribed SKU's" editable="top" colors="red:billed_count_ok!=True" >
+				<tree string="Subscribed SKU's" editable="top" colors="red:((billed_count_difference > 0) and (invoicable == True));blue:billed_count_difference &lt; 0" >
                                             <field name="o365_tenant_id"/>
 											<field name="capabilityStatus"/>
                                             <field name="friendly_name"/>
@@ -292,7 +292,7 @@
 			<field name="name">lubon_qlan_arrowservices_o365.tree</field>
 			<field name="model">lubon_qlan.arrowservices_o365</field>
 			<field name="arch" type="xml">
-				<tree string="Arrow services o365" editable="top">
+				<tree string="Arrow services o365" editable="top" order="arrow_name">
                                 	<field name="valid_contract_ids" invisible="True" />  
 									<field name='o365_tenant_id'/>
 									<field name='new_checked'/>
@@ -300,7 +300,7 @@
 									<field name='arrow_name'/>
 									<field name='arrow_number'/>
 									<field name='billed'/>
-									<button name='update_billing' string="Upd" type="object"/>
+									<button name='update_billing' string="Upd" type="object" help="Updates the contract quantity with the currecnt usage number. In case there are more arrow services assigned to this contract line, the total is taken into account"/>
 									<field name='arrow_friendly_name'/>
 									<field name='contract_line_id'/>
 									<field name='arrow_vendor_sku'/>

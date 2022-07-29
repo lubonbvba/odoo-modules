@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from sys import settrace
 from openerp.osv import osv
 from openerp import models, fields, api,exceptions, _
 from datetime import datetime,timedelta
@@ -71,7 +72,7 @@ class lubon_qlan_billingconfig_tenant_o365(models.Model):
 	_description = 'Office 365 tenant billing config'
 #	_sql_constraints=[('contract_line_and_ad_group','UNIQUE(contract_line_id,subscribedskus_o365_id)','Contract and subscribed sku unique')]
 
-	subscribedskus_o365_id=fields.Many2one('lubon_qlan.subscribedskus_o365',domain="[('invoicable','=',True),('id','in',valid_subscribedskus_o365_ids[0][2])]", required=True)
+	subscribedskus_o365_id=fields.Many2one('lubon_qlan.subscribedskus_o365',domain="[('invoicable','=',True),('id','in',valid_subscribedskus_o365_ids[0][2])]", zrequired=True)
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365', ondelete='cascade', required=True)
 	domains_o365_id=fields.Many2one('lubon_qlan.domains_o365', domain="[('id','in',valid_domains_o365_ids[0][2]),('used_for_billing','=',True)]", zrequired=True)
 	qlan_tenant_id=fields.Many2one('lubon_qlan.tenants', ondelete='cascade', required=True)
@@ -138,69 +139,45 @@ class lubon_qlan_subscribedskus_o365(models.Model):
 	warning=fields.Integer()
 	friendly_name=fields.Char()
 	invoicable=fields.Boolean()
-	purchased_count=fields.Integer(compute='_recalculate_computed', store=True, Index=True)
-	billed_count=fields.Integer(compute='_recalculate_computed', store=True,Index=True)
-	billed_count_difference=fields.Integer(compute='_recalculate_computed', string='Billed vs enabled', store=True, index=True)
-	billed_count_ok=fields.Boolean(compute='_recalculate_computed', store=True)#, index=True)
-
-
-	@api.one
-	@api.depends('enabled','subscribed_users_o365','consumedUnits','invoicable','arrow_services_ids','purchased_count')
-	def _recalculate_computed(self):
-		nPurchased=0
-		nBilled=0
-		for line in self.arrow_services_ids:
-			nPurchased+=line.arrow_number
-			nBilled+=line.billed
-		self.purchased_count=nPurchased
-		self.billed_count=nBilled
-		self.billed_count_difference=self.enabled-self.billed_count
-		if self.invoicable and self.billed_count_difference !=0:
-			self.billed_count_ok=False
-		else:
-			self.billed_count_ok=True
+	purchased_count=fields.Integer(zcompute='_recalculate_computed', zstore=True, Index=True)
+	billed_count=fields.Integer(zcompute='_recalculate_computed', zstore=True,Index=True)
+	billed_count_difference=fields.Integer(zcompute='_recalculate_computed', string='Billed vs enabled', zstore=True, index=True)
+	billed_count_ok=fields.Boolean(zcompute='_recalculate_computed', zstore=True)#, index=True)
 
 
 	# @api.one
-	# @api.onchange('arrow_services_ids')
-	# def _calculate_purchased_count(self):
-	# 	n=0
+	# @api.depends('enabled','subscribed_users_o365','consumedUnits','invoicable','arrow_services_ids','purchased_count')
+	# def _recalculate_computed(self):
+	# 	nPurchased=0
+	# 	nBilled=0
+	# 	contract_lines_ids=[]
 	# 	for line in self.arrow_services_ids:
-	# 		n+=line.arrow_number
-	# 	self.purchased_count=n
-	# 	self._calculate_billed_difference()
-	# #	pdb.set_trace()	
+	# 		nPurchased+=line.arrow_number
+	# 		if not line.contract_line_id.id in contract_lines_ids:
+	# 			nBilled+=line.billed
+	# 		contract_lines_ids.append(line.contract_line_id.id)	
+	# 	self.purchased_count=nPurchased
+	# 	self.billed_count=nBilled
 
-
-	# @api.one
-	# @api.depends('enabled','subscribed_users_o365','consumedUnits','invoicable')
-	# def _calculate_billed(self):
-
-	# 	self.billed_count=len(self.subscribed_users_o365)
 	# 	self.billed_count_difference=self.enabled-self.billed_count
-
-	# @api.one
-	# @api.depends('billed_count','purchased_count')
-	# def _calculate_billed_difference(self):
-	# 	self.billed_count_difference=self.enabled-self.purchased_count
-
-	# @api.one
-	# @api.depends('billed_count_difference', 'enabled','purchased_count','invoicable', )
-	# def _calculate_billed_ok(self):
 	# 	if self.invoicable and self.billed_count_difference !=0:
 	# 		self.billed_count_ok=False
 	# 	else:
 	# 		self.billed_count_ok=True
-
-
 
      
 	@api.multi
 	def refresh(self,o365_tenant_id):
 		logger.info("Getting subscribed skus for %s" % o365_tenant_id.defaultdomainname)
 		result=o365_tenant_id.account_source_id.endpoints_id.execute('https://graph.microsoft.com/beta/subscribedskus',url='https://login.microsoftonline.com/' + o365_tenant_id.defaultdomainname)
+		asku=[]
 		for sku in result['value']:
+			nPurchased=0
+			nBilled=0
+			contract_lines_ids=[]
+
 			#pdb.set_trace()
+			asku.append(sku['skuId'])
 			subscribedsku=self.search([('o365_tenant_id','=',o365_tenant_id.id),('skuId','=',sku['skuId'])])
 			if not subscribedsku:
 				subscribedsku=self.create ({
@@ -225,6 +202,29 @@ class lubon_qlan_subscribedskus_o365(models.Model):
 				subscribedsku.enabled=0
 				subscribedsku.warning=0
 				subscribedsku.suspended=0
+
+			for line in subscribedsku.arrow_services_ids:
+				nPurchased+=line.arrow_number
+				if not line.contract_line_id.id in contract_lines_ids:
+					nBilled+=line.billed
+				contract_lines_ids.append(line.contract_line_id.id)	
+				subscribedsku.purchased_count=nPurchased
+				subscribedsku.billed_count=nBilled
+
+			subscribedsku.billed_count_difference=subscribedsku.enabled-subscribedsku.billed_count
+			if subscribedsku.invoicable and subscribedsku.billed_count_difference !=0:
+				subscribedsku.billed_count_ok=False
+			else:
+				subscribedsku.billed_count_ok=True
+
+		if len(asku)>0:
+			#remove sku from odoo if the don't exist on azure
+			for existingsku in self.search([('o365_tenant_id','=',o365_tenant_id.id)]):
+				if existingsku.skuId not in asku:
+					#pdb.set_trace()
+					# for s in existingsku.subscribed_users_o365:
+					# 	s.
+					existingsku.unlink()
 
 
 
@@ -536,7 +536,7 @@ class lubon_qlan_tenants_o365(models.Model):
 			self.refresh_subscribed_skus_o365(None)
 			if self.get_details:
 				self.refresh_users_o365(None)
-		self.sku_ids._recalculate_computed()				
+#		self.sku_ids._recalculate_computed()				
 
 	@api.multi
 	def refresh_arrow_services(self):
@@ -565,6 +565,7 @@ class lubon_qlan_tenants_o365(models.Model):
 class lubon_qlan_arrowservices_o365(models.Model):
 	_name = 'lubon_qlan.arrowservices_o365'
 	_description = 'Arrow services'
+	_order='arrow_name'
 	name=fields.Char()
 	active=fields.Boolean(default=True)
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365')
@@ -615,7 +616,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	@api.multi
 	def update_billing(self):
 		if self.contract_line_id:
-			self.contract_line_id.quantity=self.arrow_number
+			self.contract_line_id.quantity=self.contract_line_id.current_usage
 			self.env.cr.commit()
 
 	@api.multi
@@ -653,6 +654,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 			if service_id and license['state'] in ['suspended','expired trial','canceled']:
 				service_id.active=False
 				service_id.contract_line_id=False
+				service_id.new_checked
 			else:
 				service_id.active=True
 
