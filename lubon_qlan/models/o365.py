@@ -580,6 +580,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
 	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
 	billed=fields.Integer(compute='_compute_billed')
+	new_checked=fields.Boolean(help='New services are not ticked to verify them. If there is a contract line, this is ticked.')
 #	check_billing=fields.Boolean(compute='_compute_check', index=True, store=True )
 	hidden=fields.Boolean()
 
@@ -642,10 +643,21 @@ class lubon_qlan_arrowservices_o365(models.Model):
 				'arrow_last_update':fields.Datetime.now(),
 			})	
 			if service_id.contract_line_id:
-				service_id.contract_line_id.current_usage=license['seats']
-			if license['state'] in ['suspended','expired trial']:
+				service_id.new_checked=True
+				nLicenses=0
+				for service in service_id.contract_line_id.arrow_services_ids:
+					nLicenses += service.arrow_number
+				#service_id.contract_line_id.current_usage=license['seats']
+				service_id.contract_line_id.current_usage=nLicenses
+
+			if service_id and license['state'] in ['suspended','expired trial','canceled']:
 				service_id.active=False
+				service_id.contract_line_id=False
 			else:
 				service_id.active=True
 
 			#pdb.set_trace()
+
+class account_analytic_invoice_line(models.Model):
+	_inherit = 'account.analytic.invoice.line'
+	arrow_services_ids=fields.One2many('lubon_qlan.arrowservices_o365','contract_line_id')

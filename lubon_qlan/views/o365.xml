@@ -60,6 +60,7 @@
                                 	<field name="valid_contract_ids" invisible="True" />  
                                 	<field name="o365_tenant_id" invisible="True" />  
 									<field name='active'/>
+									<field name='new_checked'/>
 									<field name='arrow_license_id'/>
 									<field name='arrow_name'/>
 									<field name='arrow_number'/>
@@ -294,6 +295,7 @@
 				<tree string="Arrow services o365" editable="top">
                                 	<field name="valid_contract_ids" invisible="True" />  
 									<field name='o365_tenant_id'/>
+									<field name='new_checked'/>
 									<field name='arrow_license_id'/>
 									<field name='arrow_name'/>
 									<field name='arrow_number'/>
@@ -321,6 +323,7 @@
 						<field name="arrow_state"/>
 						<field name="arrow_vendor_sku"/>
 						<field name="arrow_name"/>
+						<filter string="new" name="new_checked" domain="[('new_checked','=',False)]"/>
 						<filter string="Active" name="filter_active" domain="[('arrow_state','ilike','active')]"/>
 						<filter string="Check" name="filter_check" domain="['&amp;',('arrow_state','ilike','active'),('check_billing','=', True)]"/>
 						<filter string="No contract" name="filter_no_contract" domain="[('contract_line_id','=', False)]"/>
