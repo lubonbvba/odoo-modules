@@ -153,8 +153,11 @@
 						<field name="clientAppUsed"/>
 						<field name="ipAddress"/>
 						<field name="appDisplayName"/>
-
 						<filter name="exchangeonline" string="Office 365 Exchange Online"	domain="[('appDisplayName', '=', 'Office 365 Exchange Online')]"/>
+						<filter name="succeeded" string="Succes"	domain='[("status", "ilike", ": 0")]'/>
+						<filter name="failed" string="Failed"	domain='[("status", "not ilike", ": 0")]'/>
+						<filter name="clientAssertion" string="Legacy?"	domain='[("clientCredentialType", "ilike", "clientAssertion")]'/>
+						
 						<group string="Group By">
 							<filter name="by_clientAppUsed" string="clientAppUsed" context="{'group_by': 'clientAppUsed'}"/>
 							<filter name="by_appDisplayName" string="appDisplayName" context="{'group_by': 'appDisplayName'}"/>
