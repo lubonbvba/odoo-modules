@@ -427,9 +427,9 @@ class lubon_qlan_signin_azure(models.Model):
 		tenants=self.env['lubon_qlan.tenants_o365'].search([('get_signins','=',True)])
 		#pdb.set_trace()
 		for tenant in tenants:
-			if tenant.get_details:
-				logger.info("Processing users for: %s, %s", tenant.name, tenant.defaultdomainname)
-				tenant.refresh_users_o365(None)
+			# if tenant.get_details:
+			# 	logger.info("Processing users for: %s, %s", tenant.name, tenant.defaultdomainname)
+			# 	tenant.refresh_users_o365(None)
 			logger.info("Processing signins for: %s, %s", tenant.name, tenant.defaultdomainname)
 			tenant.get_signin_logs_o365()
 		logger.info("End get_signins_cron")
