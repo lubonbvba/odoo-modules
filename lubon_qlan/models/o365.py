@@ -338,6 +338,8 @@ class lubon_qlan_signin_azure(models.Model):
 	_description = 'Azure AD signin log'
 	_sql_constraints=[('azure_ad_unique','UNIQUE(azure_id)','Azure id unique')]
 	_order='createdDateTime DESC'
+#	_order='id'
+
 	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365',ondelete='cascade')
 	user_id=fields.Many2one('lubon_qlan.users_o365')
 	isbasicauth=fields.Boolean()
@@ -359,7 +361,7 @@ class lubon_qlan_signin_azure(models.Model):
 	riskDetail=fields.Char()
 	appId=fields.Char()
 	riskLevelAggregated=fields.Char()
-	createdDateTime=fields.Datetime()
+	createdDateTime=fields.Datetime(index = True)
 	appDisplayName=fields.Char()
 	isInteractive=fields.Char()
 	riskEventTypes=fields.Char()
@@ -420,10 +422,24 @@ class lubon_qlan_signin_azure(models.Model):
 						logger.warning('Field %s does not exist in lubon_qlan.signin_azure ', field  )	
 			newrec.write(value)
 			newrec.user_id=self.env['lubon_qlan.users_o365'].search([('o365_id','=', record['userId'])])
+			
+
 	@api.multi
-	
 	def get_signins_cron(self, xyz=None):
 		logger.info("Start get_signins_cron")
+		#delete all older then 30 days
+		logger.info("Delete all older then 30 days")
+		cleandate=fields.Date.to_string(fields.Date.from_string(fields.Date.context_today(self)) - timedelta(days=30))
+		obsolete=self.search([('createdDateTime','<',cleandate)])
+		obsolete.unlink()
+		self.env.cr.commit()
+	    #delete appDisplayName Microsoft Azure Active Directory Connect
+		logger.info("appDisplayName Microsoft Azure Active Directory Connect and older then 5 days")
+		cleandate=fields.Date.to_string(fields.Date.from_string(fields.Date.context_today(self)) - timedelta(days=5))
+		obsolete=self.search([('createdDateTime','<',cleandate),('appDisplayName','=','Microsoft Azure Active Directory Connect')])
+		obsolete.unlink()
+		self.env.cr.commit()
+		logger.info("Start processing tenants")
 		tenants=self.env['lubon_qlan.tenants_o365'].search([('get_signins','=',True)])
 		#pdb.set_trace()
 		for tenant in tenants:
@@ -432,6 +448,7 @@ class lubon_qlan_signin_azure(models.Model):
 			# 	tenant.refresh_users_o365(None)
 			logger.info("Processing signins for: %s, %s", tenant.name, tenant.defaultdomainname)
 			tenant.get_signin_logs_o365()
+			self.env.cr.commit()
 		logger.info("End get_signins_cron")
 			
 
@@ -496,8 +513,10 @@ class lubon_qlan_tenants_o365(models.Model):
 								'domains_o365_id': domain.id
 							})		
 
+
+
 	@api.multi
-	def get_signin_logs_o365(self): #, o365_tenant_id):		
+	def get_signin_logs_o365(self): #, o365_tenant_id):	
 		endpoint='https://graph.microsoft.com/beta/auditLogs/signIns'
 		filter = ""
 		if self.signin_azure_ids:
@@ -525,8 +544,10 @@ class lubon_qlan_tenants_o365(models.Model):
 					endpoint=result['@odata.nextLink']
 				else:
 					endpoint=None
+		
 	@api.multi
-	def purge_signin_logs_o365(self):	
+	def purge_signin_logs_o365(self):
+			
 		self.signin_azure_ids.unlink()
 	
 	@api.multi

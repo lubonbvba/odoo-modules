@@ -158,6 +158,8 @@
 						<filter name="succeeded" string="Succes"	domain='[("status", "ilike", ": 0")]'/>
 						<filter name="failed" string="Failed"	domain='[("status", "not ilike", ": 0")]'/>
 						<filter name="clientAssertion" string="Legacy?"	domain='[("clientCredentialType", "ilike", "clientAssertion")]'/>
+						<filter string="Today" domain="[('createdDateTime', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),('createdDateTime', '&lt;=',datetime.datetime.now().strftime('%Y-%m-%d 23:23:59'))]"/>
+<!--						<filter string="Last 7 days" domain="[('createdDateTime', '&gt;=', ((context_today()+datetime.timedelta(days=-7)).strftime('%Y-%m-%d') ).strftime('%Y-%m-%d 00:00:00')),('createdDateTime', '&lt;=',datetime.datetime.now().strftime('%Y-%m-%d 23:23:59'))]"/> -->
 						
 						<group string="Group By">
 							<filter name="by_clientAppUsed" string="clientAppUsed" context="{'group_by': 'clientAppUsed'}"/>

@@ -109,5 +109,5 @@
             <field name="args">['']</field>
             <field name="active" eval="False"/>
         </record>
-    </data>    
+    </data>
 </openerp>
