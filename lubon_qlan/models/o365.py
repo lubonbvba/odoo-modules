@@ -318,20 +318,23 @@ class lubon_qlan_domains_o365(models.Model):
 		result=o365_tenant_id.account_source_id.endpoints_id.execute('https://graph.microsoft.com/beta/domains',url='https://login.microsoftonline.com/' + o365_tenant_id.defaultdomainname)		
 		for existingdomain in o365_tenant_id.domains_o365_ids:
 			domainfound = False
-			for domain in result['value']:
-				if existingdomain.name==domain['id']:
-					domainfound=True
-			if not domainfound:
-				existingdomain.unlink()		
+			if not 'value' in result.keys():
+				existingdomain.unlink()
+			else:	
+				for domain in result['value']:
+					if existingdomain.name==domain['id']:
+						domainfound=True
+				if not domainfound:
+					existingdomain.unlink()		
 
-		for domain in result['value']:
-			currentdomain=self.search([('o365_tenant_id','=',o365_tenant_id.id),('name','=',domain['id'])])
-			if not currentdomain:
-				currentdomain=self.create({
-					'name':domain['id'],
-					'o365_tenant_id': o365_tenant_id.id
-				})
-			currentdomain.qlan_tenant_id=o365_tenant_id.qlan_tenant_id	
+				for domain in result['value']:
+					currentdomain=self.search([('o365_tenant_id','=',o365_tenant_id.id),('name','=',domain['id'])])
+				if not currentdomain:
+					currentdomain=self.create({
+						'name':domain['id'],
+						'o365_tenant_id': o365_tenant_id.id
+					})
+				currentdomain.qlan_tenant_id=o365_tenant_id.qlan_tenant_id	
 
 class lubon_qlan_signin_azure(models.Model):
 	_name = 'lubon_qlan.signin_azure'
