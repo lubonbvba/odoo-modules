@@ -170,6 +170,11 @@ class account_analytic_account(models.Model):
 		self.recurring_invoice_line_ids._calculate_billing_check()
 
 	@api.multi
+	def delete_recurring_lines(self):
+		for line in self.recurring_invoice_line_ids:
+			line.unlink()
+
+	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:
 			self.env['account.analytic.invoice.line'].new_recurring_line(line)

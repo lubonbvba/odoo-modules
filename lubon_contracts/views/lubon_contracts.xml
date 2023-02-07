@@ -108,6 +108,7 @@
                     <!--field name="check_before_invoice"/-->
                     <!--field name="ready_for_invoice"/-->
                     <button string="Make quote" name="make_quote_from_contract" type="object"/>
+                    <button string="Delete lines" name="delete_recurring_lines" type="object"  attrzs="{'invisible': [('state','not in',['close', 'pending','cancelled','draft'])]}"/>
                     <button string="Calc fields" name="calculate_reporting_fields" type="object"/>
                 </xpath> 
                 <xpath expr='//field[@name="product_id"]' position="attributes">
