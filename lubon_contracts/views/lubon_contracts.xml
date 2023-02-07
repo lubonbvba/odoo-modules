@@ -170,6 +170,7 @@
 				<tree string="Invoice" editable="top">
                                             <field name="analytic_account_id" readonly="True"/>
                                             <field name="name" readonly="True"/>
+                                            <field name="product_id"/>
                                             <field name="quantity"/>
                                             <button name="update_quantity" string="V" type="object" help="Update quantitiy from usage"/>
                                             <field name="current_usage"/>
@@ -187,13 +188,14 @@
 						<field name="model">account.analytic.invoice.line</field>
 						<field name="arch" type="xml">
 							<search>
-								<field name="analytic_account_id"/>
                                 <field name="product_id"/>
+								<field name="analytic_account_id"/>
                                 <field name="next_report_date"/>
                                 <filter name="billing_check" string="Check quantity"	domain="[('billing_check', '=', True)]"/>
                                 <filter name="usage_mandatory" string="Usage mandatory"	domain="[('usage_mandatory', '=', True)]"/>
 					<group string="Group By">
 						<filter name="by_account" string="Contract" context="{'group_by': 'analytic_account_id'}"/>
+						<filter name="by_product" string="Product" context="{'group_by': 'product_id'}"/>
 					</group>                                
 							</search>
 						</field>
