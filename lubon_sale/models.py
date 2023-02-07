@@ -64,6 +64,8 @@ class sale_order(models.Model):
 				'order_id': order_id.id,
 				'product_id': line.product_id.id,
 				'product_uom_qty': line.quantity,
+				'name': line.name,
+				'discount': line.line_discount_rate,
 			})
 
 
