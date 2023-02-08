@@ -145,7 +145,14 @@ class account_analytic_invoice_line(models.Model):
 	def update_quantity(self):
 		self.quantity=self.current_usage
 
-
+	@api.multi
+	def lookup_prices(self):
+		for line in self:
+			pricelist=line.analytic_account_id.partner_id.property_product_pricelist
+			product_id=line.product_id
+			price_unit=pricelist.price_get(product_id.id,line.quantity)
+			line.price_unit=price_unit[pricelist.id]
+			#pdb.set_trace()
 
 
 class account_analytic_account(models.Model):

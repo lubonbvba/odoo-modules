@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
+        <record model="ir.actions.act_window" id="lubon_contracts.recurring_lines_tree_view_action">
+            <field name="name">Recurring invoice lines</field>
+            <field name="res_model">account.analytic.invoice.line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>     
 
 
 		<record model="ir.ui.view" id="billing_history_search_view">
@@ -147,6 +153,7 @@
                 </xpath> 
                 <xpath expr="//div[@name=&quot;buttons&quot;]" position="inside">
                     <button class="oe_stat_button" type="action" name="%(billing_history_tree_view_action)d" icon="fa-shopping-cart" string="Billing info" widget="statinfo" context="{'search_default_contract_id': active_id}"/>
+                    <button class="oe_stat_button" type="action" name="%(recurring_lines_tree_view_action)d" icon="fa-shopping-cart" string="Recurring lines" widget="statinfo" context="{'search_default_analytic_account_id': active_id}"/>
                 </xpath>
                 <!-- xpath expr="//field[@name='recurring_invoice_line_ids']/tree" position="attributes">
                     <attribute name="colors">red:line_ok==False</attribute> 
@@ -217,7 +224,22 @@
       <field name="view_mode">tree,form</field>
     </record>     
 
-    				   
+        <record id="lub_contracts_lookup_prices" model="ir.actions.server">
+
+            <field name="name">Lookup current prices</field>
+
+            <field name="model_id" ref="model_account_analytic_invoice_line"/>
+            <field name="state">code</field>
+            <field name="code">self.lookup_prices(cr, uid, context.get('active_ids', []), context=context)</field>
+            <!-- field name="code">action = self.encrypt(cr, uid, context.get('active_ids', []), context=context)</field-->
+        </record>
+        <record id="lub_contracts_lookup_prices_item" model="ir.values">
+            <field eval="'client_action_multi'" name="key2"/>
+            <field eval="'account.analytic.invoice.line'" name="model"/>
+            <field name="name">Lookup current pricest Item</field>
+            <field eval="'ir.actions.server,%d'%lub_contracts_lookup_prices" name="value"/>
+        </record>
+
     </data>
 </openerp>
 
