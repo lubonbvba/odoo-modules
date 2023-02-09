@@ -56,17 +56,16 @@
                 <field name="user_id" position="after">
                     <field name="id"/>
                 </field> 
+
             </field>
         </record>
-
 <record model="ir.ui.view" id="lubon_contracts_lubon_contracts_search">
             <field name="name">lubon_contracts_search</field>
             <field name="model">account.analytic.account</field>
             <field name="inherit_id" ref="account.view_account_analytic_account_list"/>
             <field name="arch" type="xml">
-                <!--field name="date" position="after">
-                    <field name="ready_for_invoice"/>
-                </field--> 
+                <field name="toinvoice_total" position="replace"/>
+                <field name="remaining_hours" position="replace"/>
                 <field name="state" position="replace">
                     <field name="state"/>
                 </field> 
