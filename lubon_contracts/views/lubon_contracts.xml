@@ -65,11 +65,9 @@
             <field name="inherit_id" ref="account.view_account_analytic_account_list"/>
             <field name="arch" type="xml">
                 <field name="toinvoice_total" position="replace"/>
-                <field name="remaining_hours" position="replace"/>
-                <field name="state" position="replace">
-                    <field name="state"/>
-                </field> 
-
+                <field name="remaining_hours" position="replace">
+                <!-- field name="total_recurring"/-->
+                </field>
             </field>
         </record>
 
@@ -128,7 +126,7 @@
                 </xpath>
                 <xpath expr='//field[@name="uom_id"]' position="before">
                     <field name="usage_mandatory"/>
-                    <field name="billing_history_counted_items"/>
+                    <!-- field name="billing_history_counted_items"/-->
                     <field name="last_billed_usage"/>
                     <field name="current_usage"/>
                     <field name="billing_check"/>
@@ -186,7 +184,6 @@
                                             <field name="usage_mandatory"/>
                                             <field name="price_unit"/>
                                             <field name="next_report_date"/>
-                                            <field name="billing_history_counted_items"/>
 				</tree>
 			</field>
 		</record> 
