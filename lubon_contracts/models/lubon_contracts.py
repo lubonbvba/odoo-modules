@@ -249,8 +249,8 @@ class sale_order(models.Model):
 				'pricelist_id': quote.pricelist_id.id,
 				'description': quote.note
 				})
-			for oldline in quote.project_id.recurring_invoice_line_ids:
-				oldline.unlink()		
+			#for oldline in quote.project_id.recurring_invoice_line_ids:
+			#	oldline.unlink()		
 			for line in quote.order_line.sorted(key=lambda r: r.sequence):
 				quote.project_id.add_line_from_quote(line)
 			quote.state='done'
