@@ -182,6 +182,11 @@ class account_analytic_account(models.Model):
 			line.unlink()
 
 	@api.multi
+	def calculate_current_prices(self):
+		for line in self.recurring_invoice_line_ids:
+			line.lookup_prices()
+
+	@api.multi
 	def add_line_from_quote(self,line):
 		for l in line:
 			self.env['account.analytic.invoice.line'].new_recurring_line(line)
