@@ -28,6 +28,8 @@
         'views/lubon_contracts.xml',
         'views/contracts_state_wizard.xml',
         'reports/lubon_contracts_state.xml',
+        'reports/lubon_contracts_table.xml',
+
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -79,7 +79,7 @@ class account_analytic_invoice_line(models.Model):
 	current_usage=fields.Float(help="Current value of the counter, after billing it is set to -1", default=-1)
 	billing_check=fields.Boolean(compute="_calculate_billing_check", string="Billing check", store=True, index=True)
 	next_report_date=fields.Datetime(compute="_calculate_billing_check", help="Due date for the next reporting/invoicing", store=True)
-
+	source=fields.Char(help="Asset/product/user waar dit betrekking op heeft")
 
 
 	@api.multi
@@ -141,6 +141,12 @@ class account_analytic_invoice_line(models.Model):
 		# 	invoice_line.update(
 		# 		{'quantity': invoice_line.quantity + line.product_uom_qty,	
 		# 		})
+	@api.multi
+	def copy_desc(self):
+		self.name = self.product_id.display_name
+		if self.source:
+			self.name+= ": " + self.source
+
 	@api.multi
 	def update_quantity(self):
 		self.quantity=self.current_usage
