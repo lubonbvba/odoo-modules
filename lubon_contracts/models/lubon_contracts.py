@@ -69,7 +69,7 @@ class account_analytic_invoice_line(models.Model):
 	price_subtotal=fields.Float(compute="_get_reduced_price")
 	sequence=fields.Integer()
 	line_ok=fields.Boolean(zcompute="_set_line_state")
-	usage_mandatory=fields.Boolean(help="Is usage required, -1 in current usage means not updated ?")
+	usage_mandatory=fields.Boolean(default=True, help="Is usage required, -1 in current usage means not updated ?")
 	adaccount_ids=fields.One2many('lubon_qlan.adaccounts','contract_line_id')
 	billing_history_ids=fields.One2many('lubon_qlan.billing_history','contract_line_id')
 #	counted_items=fields.Integer(compute="_count_items", string="Counted (old)", help="This number is the total of items counted in the tenant")

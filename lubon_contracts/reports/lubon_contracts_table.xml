@@ -95,6 +95,8 @@
 									</tr>
 								</tbody>
 							</table>
+                            <p>Generated at: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+                            </p>
 							<p t-field="o.description"/>
 						</div>
 					</p>
