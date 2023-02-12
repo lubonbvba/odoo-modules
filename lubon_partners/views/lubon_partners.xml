@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
+        <record model="ir.ui.view" id="partner_tree_view">
+            <field name="name">lubon_partner.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <field name="phone" position="before">
+                    <field name="ref"/>
+                </field>
+        </field>
+        </record>    
+        <record model="ir.ui.view" id="partner_search_view">
+            <field name="name">lubon_partner.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="before">
+                    <field name="ref"/>
+                </field>
+        </field>
+        </record>    
+
         <!-- Add instructor field to existing view -->
         <record model="ir.ui.view" id="partner_instructor_form_view">
             <field name="name">lubon_partner.partner</field>
