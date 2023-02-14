@@ -422,4 +422,5 @@ class lubon_qlan_billingconfig_tenant_ad(models.Model):
 #		self.valid_ad_groups_ids=self.qlan_tenant_id.ad_groups_licenses_ids
     @api.one
     def report_usage(self):
-        self.contract_line_id.current_usage=self.users_license_ad_ids_count
+        if self.contract_line_id:
+            self.contract_line_id.current_usage=self.users_license_ad_ids_count
