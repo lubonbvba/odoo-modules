@@ -107,6 +107,9 @@
                <xpath expr='//field[@name="quantity_max"]' position="after">
                     <field name="quantity_hist"/>
                 </xpath>
+                <xpath expr='//field[@name="description"]' position="after">
+                    <field name="table_description"/>
+                </xpath>
                 <xpath expr='//field[@name="recurring_next_date"]' position="after">
                     <!--field name="check_before_invoice"/-->
                     <!--field name="ready_for_invoice"/-->

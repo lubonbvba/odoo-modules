@@ -602,6 +602,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	arrow_state=fields.Char()
 	arrow_expiry_datetime=fields.Char()
 	arrow_last_update=fields.Datetime()
+	arrow_autorenew=fields.Boolean()
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
 	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
 	billed=fields.Integer(compute='_compute_billed')
@@ -651,6 +652,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 		arrow_data = requests.get(  
             url,
             headers={'apikey': settings['key']} )
+	
 		for license in arrow_data.json()['data']['licenses']:
 			service_id=self.search([('arrow_license_id',"ilike",license['license_id'])])
 			if not service_id:
