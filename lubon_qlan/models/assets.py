@@ -267,9 +267,9 @@ class lubon_qlan_assets(models.Model):
 
 		while True:
 			event_res = eMgrRef.QueryEvents(filter_spec)
-			if len(event_res) ==1:
-				break
 			logger.info("vc_get_events: Number of events: %d" % len(event_res))
+			if len(event_res) <=1:
+				break
 			for e in event_res:
 				#pdb.set_trace()
 				if not self.env['lubon_qlan.events'].search([('asset_id','=',self.id),('external_id',"=",e.key)]):
