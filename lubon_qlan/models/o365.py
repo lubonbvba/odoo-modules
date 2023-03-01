@@ -601,6 +601,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	arrow_vendor_sku=fields.Char()
 	arrow_state=fields.Char()
 	arrow_expiry_datetime=fields.Char()
+	arrow_vendor_license_id=fields.Char()
 	arrow_last_update=fields.Datetime()
 	arrow_autorenew=fields.Boolean()
 	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
@@ -665,6 +666,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 				'arrow_number': license['seats'],
 				'arrow_friendly_name': license['friendlyName'],
 				'arrow_vendor_sku': license['sku'],
+				'arrow_vendor_license_id': license['vendor_license_id'],
 				'arrow_state': license['state'],
 				'arrow_expiry_datetime': license['expiry_datetime'],
 				'arrow_last_update':fields.Datetime.now(),
