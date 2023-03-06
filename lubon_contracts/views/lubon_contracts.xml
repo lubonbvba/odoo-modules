@@ -9,7 +9,7 @@
         </record>     
 
 
-		<record model="ir.ui.view" id="billing_history_search_view">
+<!-- 		<record model="ir.ui.view" id="billing_history_search_view">
 			<field name="name">billing_history.search</field>
 			<field name="model">lubon_qlan.billing_history</field>
 			<field name="arch" type="xml">
@@ -27,9 +27,9 @@
 					</field>
 				</record>
 
+ -->
 
-
-
+<!-- 
         <record model="ir.ui.view" id="billing_history_tree_view">
 			<field name="name">billing_history.tree</field>
 			<field name="model">lubon_qlan.billing_history</field>
@@ -48,7 +48,8 @@
 			</field>
 		</record> 
 
-<record model="ir.ui.view" id="lubon_contracts_lubon_contracts_tree">
+ -->
+    <record model="ir.ui.view" id="lubon_contracts_lubon_contracts_tree">
             <field name="name">lubon_contracts_tree</field>
             <field name="model">account.analytic.account</field>
             <field name="inherit_id" ref="account.view_account_analytic_account_search"/>
@@ -69,7 +70,7 @@
                 <field name="remaining_hours" position="replace"/>
             </field>
         </record>
-
+<!-- 
        <record model="ir.ui.view" id="lubon_contracts_users_o365_form">
 			<field name="name">lubon_contracts_users_o365.form</field>
 			<field name="model">lubon_qlan.users_o365</field>
@@ -86,7 +87,7 @@
                 </xpath>
             </field>
         </record>
-
+ -->
 
 
         <record model="ir.ui.view" id="lubon_contracts_lubon_contracts">
@@ -152,16 +153,10 @@
                     </page>
                     <page name="Billing" string="Billing">
                         <button name='check_billing_lines' string="Check" type="object"/>
-                        <field name='billing_history_lines_ids'/>
-                    </page>
+<!--                         <field name='billing_history_lines_ids'/>
+ -->                    </page>
                 </xpath> 
-                <xpath expr="//div[@name=&quot;buttons&quot;]" position="inside">
-                    <button class="oe_stat_button" type="action" name="%(billing_history_tree_view_action)d" icon="fa-shopping-cart" string="Billing info" widget="statinfo" context="{'search_default_contract_id': active_id}"/>
-                    <button class="oe_stat_button" type="action" name="%(recurring_lines_tree_view_action)d" icon="fa-shopping-cart" string="Recurring lines" widget="statinfo" context="{'search_default_analytic_account_id': active_id}"/>
-                </xpath>
-                <!-- xpath expr="//field[@name='recurring_invoice_line_ids']/tree" position="attributes">
-                    <attribute name="colors">red:line_ok==False</attribute> 
-                </xpath-->   
+
             </field>
         </record>
         <record model="ir.ui.view" id="lubon_contracts_lubon__sale_contract">
@@ -219,14 +214,14 @@
       <field name="view_mode">tree,form</field>
       <field name="context">{'search_default_billing_check':1 }</field>
     </record>  
-
+<!-- 
     <record model="ir.actions.act_window" id="billing_history_tree_view_action">
       <field name="name">Billing history lines</field>
       <field name="res_model">lubon_qlan.billing_history</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>     
-
+ -->
         <record id="lub_contracts_lookup_prices" model="ir.actions.server">
 
             <field name="name">Lookup current prices</field>
