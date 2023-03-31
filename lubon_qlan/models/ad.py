@@ -215,7 +215,12 @@ class lubon_qlan_adaccounts(models.Model):
 				email.is_default= 'SMTP' in email.email_address
 				current_list=current_list - email
 			for email in current_list:
-				email.unlink()
+				#logger.info("Deleting: %s", email.email_address)
+				try:
+					email.unlink()
+				except:
+					logger.info("Problem deleting: %s", email.email_address)
+
 		
 
 class lubon_qlan_adusers(models.Model):

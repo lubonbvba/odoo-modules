@@ -8,8 +8,8 @@ import pdb,logging
 from datetime import datetime,timedelta
 
 logger = logging.getLogger(__name__)
-api_url = 'https://q02mon003.q.lan:9398/api'
-username = "q\\admlbonjean"
+api_url = 'https://q02mon004.q.lan:9398/api'
+username = "odoo"
 
 session = False
 
