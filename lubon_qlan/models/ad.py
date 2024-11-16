@@ -363,8 +363,8 @@ class lubon_qlan_users_license_ad(models.Model):
                         if activelicense:
                             activelicense.unlink()
 
-        for activelicense in user_id.user_licenses_ids:
-            self.env['lubon_qlan.billing_history'].verify_billing_history_line(activelicense,1,activelicense.billingconfig_tenant_ad.contract_line_id,"QLAN license: %s" % activelicense.user_ad_id.name,related_user=user_id,owner=user_id.logonname.lower())            
+#        for activelicense in user_id.user_licenses_ids:
+#            self.env['lubon_qlan.billing_history'].verify_billing_history_line(activelicense,1,activelicense.billingconfig_tenant_ad.contract_line_id,"QLAN license: %s" % activelicense.user_ad_id.name,related_user=user_id,owner=user_id.logonname.lower())            
 
         
         #pdb.set_trace()

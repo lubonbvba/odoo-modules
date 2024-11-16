@@ -10,8 +10,6 @@
                 <notebook position="inside">
                     <page string="Sites">
                        <field name="site_responsible" />
-                            <field name="partner_id_reminder"/>
-                            <field name="formal_communication"/>
                     </page>
                 </notebook>
             </field>
