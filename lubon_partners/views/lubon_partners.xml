@@ -40,7 +40,7 @@
                             <field name="formal_communication"/>
                         </group>
                         <group>
-                            <field name="mail_invoice"/>
+                            <!-- field name="mail_invoice"/ -->
                             <field name="mail_reminder"/>
                         </group>
 
