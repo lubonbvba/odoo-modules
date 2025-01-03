@@ -117,6 +117,8 @@
                     <!-- button string="Delete lines" name="delete_recurring_lines" type="object"  attrzs="{'invisible': [('state','not in',['close', 'pending','cancelled','draft'])]}"/ -->
                     <button string="Calc fields" name="calculate_reporting_fields" type="object"/>
                     <button string="Update prices" name="calculate_current_prices" type="object" help="Updates to the current pricing"/>
+                    <button string="Sort" name="sort_lines_by_code" type="object" help="Sort lines on product code"/>
+
                 </xpath> 
                 <xpath expr='//field[@name="product_id"]' position="attributes">
                     <attribute name="domain">[('sale_ok','=',True)]</attribute>

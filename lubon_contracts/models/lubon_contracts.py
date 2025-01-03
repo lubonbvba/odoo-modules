@@ -86,7 +86,7 @@ class account_analytic_invoice_line(models.Model):
 	@api.depends('quantity','last_billed_usage', 'current_usage','usage_mandatory')
 	def _calculate_billing_check(self):
 			for line in self:
-				if (line.usage_mandatory and line.current_usage <> line.quantity):
+				if (line.usage_mandatory and line.current_usage != line.quantity):
 					line.billing_check=True
 				else:
 					line.billing_check=False
@@ -196,6 +196,17 @@ class account_analytic_account(models.Model):
 	def calculate_current_prices(self):
 		for line in self.recurring_invoice_line_ids:
 			line.lookup_prices()
+				
+	@api.multi
+	def sort_lines_by_code(self):
+		lines=self.recurring_invoice_line_ids.sorted(key=lambda r: r.product_id.default_code)
+		n=0
+		for line in lines:
+			line.sequence=n
+			n=n+10
+
+
+
 
 	@api.multi
 	def add_line_from_quote(self,line):
