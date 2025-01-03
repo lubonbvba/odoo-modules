@@ -337,13 +337,17 @@ class lubon_qlan_users_license_ad(models.Model):
     billingconfig_tenant_ad=fields.Many2one('lubon_qlan.billingconfig_tenant_ad', ondelete='cascade')
     prd_group_id=fields.Many2one("lubon_qlan.adaccounts")
     qlan_tenant_id=fields.Many2one('lubon_qlan.tenants', compute='_calculate_tenant_id',ondelete='cascade', store=True)
-
+    last_logon=fields.Datetime (compute='_calculate_last_logon') 
 
     @api.one
     @api.depends('user_ad_id')
     def _calculate_tenant_id(self):
         self.qlan_tenant_id=self.user_ad_id.tenant_id
 
+
+    @api.one
+    def _calculate_last_logon(self):
+         self.last_logon=self.user_ad_id.last_logon
 
     @api.multi
     def refresh(self,user_id):

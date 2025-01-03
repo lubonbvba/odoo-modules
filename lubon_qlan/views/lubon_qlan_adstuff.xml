@@ -418,6 +418,8 @@
                     <field name="user_ad_id"/>
                     <field name="prd_group_id"/>
 					<field name="billingconfig_tenant_ad"/>
+					<field name="last_logon"/>
+
 				</tree>
 			</field>
 		</record>		
