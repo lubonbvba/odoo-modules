@@ -50,51 +50,46 @@ class lubon_qlan_account_source(models.Model):
 			self.name += self.account_source_type_id.name or " "
 
 	@api.multi
- 	def cron_scheduler(self,dummy=None):
- 		sources=self.search([('include_in_schedule',"=",True)])
- 		for source in sources:
- 			source.run_sync()
- 			
-
- 	@api.multi
- 	def run_sync(self):
+	def cron_scheduler(self,dummy=None):
+		sources=self.search([('include_in_schedule',"=",True)])
+		for source in sources:
+			source.run_sync()
+	@api.multi
+	def run_sync(self):
 # 		cmd=self.command_id.ps_command_line
 #		if self.command_options:
 # 			cmd += " " + self.command_options
 		logger.info("Run_sync: Start Full sync %s" % self.name)
- 		self.last_full_run_start=fields.Datetime.now()
+		self.last_full_run_start=fields.Datetime.now()
  		#Account source type = Windows
- 		if (self.account_source_type_id.id == self.env.ref('lubon_qlan.ast_windows').id):
+		if (self.account_source_type_id.id == self.env.ref('lubon_qlan.ast_windows').id):
 			logger.info("Run_sync: Retrieving groups")
- 			result=self.endpoints_id.execute(ad_allgroups_command + ad_output_modifier)
- 			logger.info("Run_sync: Processing groups")
- 			ids=(self.sync_object_level(result,'group',self.env['lubon_qlan.adgroups']))
+			result=self.endpoints_id.execute(ad_allgroups_command + ad_output_modifier)
+			logger.info("Run_sync: Processing groups")
+			ids=(self.sync_object_level(result,'group',self.env['lubon_qlan.adgroups']))
 			logger.info("Run_sync: Retrieving users")
- 			result=self.endpoints_id.execute(ad_allusers_command + ad_output_modifier)
- 			logger.info("Run_sync: Processing users")
- 			ids += self.sync_object_level(result,'user',self.env['lubon_qlan.adusers'])
- 			logger.info("Run_sync: Processing obsoletes")
-  			self.check_obsolete_accounts(ids)
-  		#Account source type = O365	
- 		if (self.account_source_type_id.id == self.env.ref('lubon_qlan.ast_o365').id):
+			result=self.endpoints_id.execute(ad_allusers_command + ad_output_modifier)
+			logger.info("Run_sync: Processing users")
+			ids += self.sync_object_level(result,'user',self.env['lubon_qlan.adusers'])
+			logger.info("Run_sync: Processing obsoletes")
+			self.check_obsolete_accounts(ids)
+		if (self.account_source_type_id.id == self.env.ref('lubon_qlan.ast_o365').id):
  			self.env['lubon_qlan.tenants_o365'].refresh_tenants_o365(self)
+		self.last_full_run_stop=fields.Datetime.now()
+		logger.info("Run_sync: End Full sync %s" % self.name) 		
 
-  		self.last_full_run_stop=fields.Datetime.now()
- 		logger.info("Run_sync: End Full sync %s" % self.name) 		
-
- 	@api.multi
- 	def run_single_sync(self,identity):
+	@api.multi
+	def run_single_sync(self,identity):
  		command=ad_singleuser_command + identity + ad_output_modifier
- 		result=self.endpoints_id.execute(command)
- 		#pdb.set_trace()
- 		self.sync_object_level([result],'user',self.env['lubon_qlan.adusers'])
+		result=self.endpoints_id.execute(command)
+		self.sync_object_level([result],'user',self.env['lubon_qlan.adusers'])
 
 
 
- 	@api.multi
- 	def sync_object_level(self,objects,objtype,obj):
+	@api.multi
+	def sync_object_level(self,objects,objtype,obj):
  		ids=[]
- 		groups2update=self.env['lubon_qlan.adaccounts']
+		groups2update=self.env['lubon_qlan.adaccounts']
   		for items in objects:
  			item={}
  			for keys in items:
@@ -139,12 +134,14 @@ class lubon_qlan_account_source(models.Model):
 	 			adaccount.scriptpath=self.returnkeyvalue(item,'scriptpath')	
 	 			adaccount.samaccountname=item['samaccountname']	
 	 			adaccount.ad_enabled=item['enabled']
-	 			adaccount.ad_lockedout=item['lockedout']
+				if 'lockedout' in item.keys():
+	 				adaccount.ad_lockedout=item['lockedout']
 	 			adaccount.logonname=item['userprincipalname']
-	 			adaccount.ad_date_created=self._calcwin32epoch(item['createtimestamp'])
+				if 'createtimestamp' in item.keys():
+					 adaccount.ad_date_created=self._calcwin32epoch(item['createtimestamp'])
 
-				#if 'LastLogonDate' in item.keys():
-					#adaccount.last_logon=self._calcwin32epoch(item['LastLogonDate'])
+#				if 'LastLogonDate' in item.keys():
+#					#adaccount.last_logon=self._calcwin32epoch(item['LastLogonDate'])
 				#pdb.set_trace()
 				if 'lastlogon' in item.keys():
 					#adaccount.last_logon=fields.Datetime.to_string(datetime(1601,1,1) + timedelta(seconds=item['lastLogon']/1e7))
