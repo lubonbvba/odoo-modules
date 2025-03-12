@@ -6,8 +6,8 @@
 			<field name="model">lubon_qlan.tenants_o365</field>
 			<field name="arch" type="xml">
 					<search>
-						<field name="tenant_id"/>
 						<field name="defaultdomainname"/>
+						<field name="entra_tenant_id"/>
 						<filter name="no_get_signin" string="Get signin inactive"	domain="[('get_signins', '!=', True)]"/>
 					</search>
 			</field>
@@ -19,7 +19,7 @@
 				<tree string="Tenants O365 Tree" default_order="name">
 					<field name="name"/>
 					<field name="defaultdomainname"/>
-					<field name="tenant_id"/>
+					<field name="consent_ok"/>
 					<field name="qlan_tenant_id"/>
                     <field name="get_details"/>
 					<field name="get_signins"/>
@@ -38,21 +38,49 @@
 							<!-- field zname="assets_count" string="Signins " widget="statinfo"/ -->
 							
 						</button>
+						<button type="action" class="oe_stat_button" string='Counterdefs' name="%(lubon_qlan_counterdefs_action)d" icon="fa-calculator" context="{'search_default_o365_tenant_id': active_id, 'default_o365_tenant_id': active_id}"/>
+
 					</div>	
 					<group>
 						<field name="name"/>
 						<field name="defaultdomainname"/>
 						<field name="tenant_id"/>
+						<field name="entra_tenant_id"/>
 						<field name="qlan_tenant_id"/>
 						<field name="account_source_id"/>
+						<field name="consent_ok"/>
         	            <field name="get_details"/>
         	            <field name="get_signins"/>
 						<field name="invoicable"/>
 						<field name="arrow_ref"/>
                     	<button name='refresh_thistenant_o365' string="Refresh tenant" type="object"/>
 	                    <button name='refresh_arrow_services' string="Refresh all arrow" type="object"/>
+						<button name='refresh_counterdefs' string="Refresh all counterdefs" type="object"/>
+
+
 					</group>
 					<notebook>
+						<page string='Counters'>
+							<button name='get_counterdefs' string="Refresh counter defs" type="object"/>
+							<field name="qlan_counterdefs_ids" filter="[('hidden','=',True)]">
+								<tree editable="top" >
+									<field name="valid_contract_ids" invisible="True" />  
+									<field name="o365_tenant_id" invisible="True" />
+									<field name='active'/>
+									<field name='new_checked'/>
+									<field name='contract_line_id'/>
+									<field name='productcode'/>
+									<field name='current_counter_value'/>
+									<field name='counter_offset'/>
+									<field name='counter_to_bill'/>
+									<field name='current_quantity'/>									
+									<field name='counter_last_billed'/>
+									<field name='counterdef_id'/>
+									<field name='ExternalRef1'/>
+									<field name='ExternalRef2'/>
+								</tree>
+							</field>
+						</page>					
                         <page string='Arrow'>
                             <button name='get_arrow_services' string="Get services" type="object"/>
                             <field name="arrow_services_o365_ids" filter="[('hidden','=',True)]">
@@ -77,7 +105,9 @@
 						
 								</tree>
                             </field>
-						</page>					
+						</page>		
+
+									
 						<page string='Subscribed SKUS'>
                             <button name='refresh_subscribed_skus_o365' string="Get subscribed skus" type="object"/>
                             <field name="sku_ids">
@@ -291,11 +321,58 @@
 				</tree>
 			</field>
 		</record>
+        <record model="ir.ui.view" id="lubon_qlan_counterdefs_tree_view">
+			<field name="name">lubon_qlan_counterdefs.tree</field>
+			<field name="model">lubon_qlan.counterdefs</field>
+			<field name="arch" type="xml">
+				<tree string="Counterdefs" zeditable="top" order="productcode">
+									<field name="valid_contract_ids" invisible="True" />  
+									<field name="o365_tenant_id" invisible="True" />
+									<field name='active'/>
+									<field name='new_checked'/>
+									<field name='contract_line_id'/>
+									<button name='update_counterdef' string="Upd" type="object"/>
+									<!-- button name='del_counterdef' string="X" type="object" attrs="{'invisible': [('contract_line_id','!=', False)]}"/-->
+									<field name='productcode'/>
+									<field name='current_counter_value'/>
+									<field name='counter_offset'/>
+									<field name='counter_to_bill'/>
+									<field name='current_quantity'/>
+									<field name='counter_last_billed'/>									
+									<field name='counterdef_id'/>
+									<field name='ExternalRef1'/>
+									<field name='ExternalRef2'/>
+
+									<!-- field name='check_billing'/-->
+
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="lubon_qlan_counterdefs_search_view">
+				<field name="name">lubon_qlan_counterdefs.search</field>
+				<field name="model">lubon_qlan.counterdefs</field>
+				<field name="arch" type="xml">
+					<search>
+						<field name="o365_tenant_id"/>
+						<field name="productcode"/>
+						<filter string="new" name="new_checked" domain="[('new_checked','=',False)]"/>
+						<filter string="No contract" name="filter_no_contract" domain="[('contract_line_id','=', False)]"/>
+
+					<group string="Group By">
+						<filter name="by_o365_tenant_id" string="O365 Tenant" context="{'group_by': 'o365_tenant_id'}"/>
+						<filter name="by_productcode" string="By product code" context="{'group_by': 'productcode'}"/>
+
+
+					</group>
+
+					</search>
+				</field>
+		</record> 
         <record model="ir.ui.view" id="lubon_qlan_arrowservices_o365_tree_view">
 			<field name="name">lubon_qlan_arrowservices_o365.tree</field>
 			<field name="model">lubon_qlan.arrowservices_o365</field>
 			<field name="arch" type="xml">
-				<tree string="Arrow services o365" editable="top" order="arrow_name">
+				<tree string="Counterdefs" editable="top" order="arrow_name">
                                 	<field name="valid_contract_ids" invisible="True" />  
 									<field name='o365_tenant_id'/>
 									<field name='new_checked'/>
@@ -303,7 +380,7 @@
 									<field name='arrow_name'/>
 									<field name='arrow_number'/>
 									<field name='billed'/>
-									<button name='update_billing' string="Upd" type="object" help="Updates the contract quantity with the currecnt usage number. In case there are more arrow services assigned to this contract line, the total is taken into account"/>
+									<!-- button name='update_billing' string="Upd" type="object" help="Updates the contract quantity with the currecnt usage number. In case there are more arrow services assigned to this contract line, the total is taken into account"/ -->
 									<field name='arrow_friendly_name'/>
 									<field name='contract_line_id'/>
 									<field name='arrow_vendor_sku'/>
@@ -356,9 +433,14 @@
 		</record>		
 
 
-
+    <record model="ir.actions.act_window" id="lubon_qlan_counterdefs_action">
+      <field name="name">Counterdefs</field>
+      <field name="res_model">lubon_qlan.counterdefs</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
     <record model="ir.actions.act_window" id="lubon_qlan_arrowservices_o365_action">
-      <field name="name">O365 user licenses</field>
+      <field name="name">Arrow services</field>
       <field name="res_model">lubon_qlan.arrowservices_o365</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
@@ -413,7 +495,9 @@
     <menuitem id="qlan_subscribedskus_o365_menu" name="Subscribed SKUS O365" parent="lubon_qlan_tables_menu"
           action="qlan_subscribedskus_o365_action"/>
 	<menuitem id="lubon_qlan_arrowservices_o365_menu" name="Arrow services O365" parent="lubon_qlan_tables_menu"
-          action="lubon_qlan_arrowservices_o365_action"/>		  
+          action="lubon_qlan_arrowservices_o365_action"/>	
+	<menuitem id="lubon_qlan_counterdefs_menu" name="Counterdefs" parent="lubon_qlan_tables_menu"
+          action="lubon_qlan_counterdefs_action"/>		  	  
 	<menuitem id="qlan_signin_azure_menu" name="Azure AD Signin log" parent="lubon_qlan_tables_menu"
           action="qlan_signin_azure_action"/>	
 

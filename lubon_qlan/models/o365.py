@@ -171,6 +171,7 @@ class lubon_qlan_subscribedskus_o365(models.Model):
 		logger.info("Getting subscribed skus for %s" % o365_tenant_id.defaultdomainname)
 		result=o365_tenant_id.account_source_id.endpoints_id.execute('https://graph.microsoft.com/beta/subscribedskus',url='https://login.microsoftonline.com/' + o365_tenant_id.defaultdomainname)
 		asku=[]
+			#pdb.set_trace
 		for sku in result['value']:
 			nPurchased=0
 			nBilled=0
@@ -421,8 +422,8 @@ class lubon_qlan_signin_azure(models.Model):
 				if field not in ['id','createdDateTime']:
 					if field in newrec._fields:
 						value[field]=record[field]
-					else:
-						logger.warning('Field %s does not exist in lubon_qlan.signin_azure ', field  )	
+#					else:
+#						logger.warning('Field %s does not exist in lubon_qlan.signin_azure ', field  )	
 			newrec.write(value)
 			newrec.user_id=self.env['lubon_qlan.users_o365'].search([('o365_id','=', record['userId'])])
 			
@@ -460,7 +461,9 @@ class lubon_qlan_tenants_o365(models.Model):
 	_description = 'Office 365 tenants'
 	_rec_name = 'defaultdomainname'
 	name=fields.Char()
-	tenant_id=fields.Char()
+	tenant_id=fields.Char(string = 'Contract ID')
+	entra_tenant_id=fields.Char(string="Entra Tenant ID" )
+	consent_ok= fields.Boolean(help='Consent given to App in tenant?')
 	arrow_ref=fields.Char(help='Arrow reference, XSP + Value found in Acronym')
 	defaultdomainname=fields.Char()
 	qlan_tenant_id=fields.Many2one('lubon_qlan.tenants')
@@ -469,6 +472,8 @@ class lubon_qlan_tenants_o365(models.Model):
 	get_signins=fields.Boolean(default = False, help='Get Sign in\'s for this tenant')
 	invoicable=fields.Boolean(default = True, help='Tenant invoiced by us')
 	arrow_services_o365_ids=fields.One2many('lubon_qlan.arrowservices_o365','o365_tenant_id')
+	qlan_counterdefs_ids=fields.One2many('lubon_qlan.counterdefs','o365_tenant_id')
+	
 	show_hidden=fields.Boolean()
 	sku_ids=fields.One2many('lubon_qlan.subscribedskus_o365','o365_tenant_id')
 	users_o365_ids=fields.One2many('lubon_qlan.users_o365','o365_tenant_id')
@@ -484,10 +489,23 @@ class lubon_qlan_tenants_o365(models.Model):
 			sku.calculate_purchased_count()
 
 	@api.multi
+	def check_consent(self):
+		logger.info("Calling https://graph.microsoft.com/beta/organization")
+		endpoint='https://graph.microsoft.com/beta/organization'
+		result=self.account_source_id.endpoints_id.execute(endpoint,url='https://login.microsoftonline.com/' + self.defaultdomainname)
+		if 'error' in result.keys():
+			self.consent_ok=False
+		else:
+			self.consent_ok=True
+
+
+	@api.multi
 	def refresh_tenants_o365(self,account_source_id):
 		logger.info("Calling https://graph.microsoft.com/beta/contracts")
 		result=account_source_id.endpoints_id.execute('https://graph.microsoft.com/beta/contracts','')
+		logging.info("Tenants found: %d", len(result['value']))
 		for tenant in result['value']:
+			logging.info("Processing: %s", tenant['displayName'])
 			tenant_id=self.search([('tenant_id','=',tenant['id'])])
 			if not tenant_id:
 				tenant_id=self.create({
@@ -496,8 +514,10 @@ class lubon_qlan_tenants_o365(models.Model):
 			if tenant_id:
 				tenant_id.name=tenant['displayName']
 				tenant_id.defaultdomainname=tenant['defaultDomainName']
+				tenant_id.entra_tenant_id=tenant['customerId']
 				tenant_id.account_source_id=account_source_id.id
-				tenant_id.refresh_thistenant_o365(None)
+				pdb.set_trace()
+				#tenant_id.refresh_thistenant_o365(None)
 			else:
 				pdb.set_trace()
 	@api.multi
@@ -555,12 +575,13 @@ class lubon_qlan_tenants_o365(models.Model):
 	
 	@api.multi
 	def refresh_thistenant_o365(self,o365_tenant_id):
-		self.refresh_domains_o365(None)
-		if self.qlan_tenant_id:  
-			self.refresh_subscribed_skus_o365(None)
-			if self.get_details:
-				self.refresh_users_o365(None)
-#		self.sku_ids._recalculate_computed()				
+		self.check_consent()
+		if self.consent_ok:
+			self.refresh_domains_o365(None)
+			if self.qlan_tenant_id:  
+				self.refresh_subscribed_skus_o365(None)
+				if self.get_details:
+					self.refresh_users_o365(None)
 
 	@api.multi
 	def refresh_arrow_services(self):
@@ -570,7 +591,18 @@ class lubon_qlan_tenants_o365(models.Model):
 			logger.info("Getting arrow services %s" % tenant.defaultdomainname)
 			self.env['lubon_qlan.arrowservices_o365'].get_services(tenant)
 
+	@api.multi
+	def refresh_counterdefs(self):
+		tenants=self.env['lubon_qlan.tenants_o365'].search([('entra_tenant_id','!=',False)])
+		logger.info("Getting counterdefs for %d tenants." % len(tenants))
+		for tenant in tenants:
+			logger.info("Getting counterdefs %s" % tenant.defaultdomainname)
+			self.env['lubon_qlan.counterdefs'].get_counterdefs(tenant)
 
+
+	@api.multi
+	def get_counterdefs(self):
+		self.env['lubon_qlan.counterdefs'].get_counterdefs(self)
 
 	@api.multi
 	def get_arrow_services(self):
@@ -578,13 +610,149 @@ class lubon_qlan_tenants_o365(models.Model):
 
 	@api.multi
 	def refresh_subscribed_skus_o365(self,o365_tenant_id):
-		self.env['lubon_qlan.subscribedskus_o365'].refresh(self)
+		if self.consent_ok:
+			self.env['lubon_qlan.subscribedskus_o365'].refresh(self)
 	@api.multi
 	def refresh_users_o365(self,o365_tenant_id):
-		self.env['lubon_qlan.users_o365'].refresh(self)
+		if self.consent_ok:
+			self.env['lubon_qlan.users_o365'].refresh(self)
 	@api.multi
 	def refresh_domains_o365(self,o365_tenant_id):
-		self.env['lubon_qlan.domains_o365'].refresh_domains_o365(self)
+		if self.consent_ok:
+			self.env['lubon_qlan.domains_o365'].refresh_domains_o365(self)
+
+class lubon_qlan_counterdefs(models.Model):
+	_name = 'lubon_qlan.counterdefs'
+	_description = 'Qlan Counter definitions'
+	name=fields.Char()
+	o365_tenant_id=fields.Many2one('lubon_qlan.tenants_o365')
+	contract_line_id=fields.Many2one('account.analytic.invoice.line', domain="[('analytic_account_id','in', valid_contract_ids[0][2])]", zrequired=True)
+	valid_contract_ids=fields.Many2many('account.analytic.account', compute='_get_valid_contract_ids')
+	new_checked=fields.Boolean(help='New services are not ticked to verify them. If there is a contract line, this is ticked.')
+	active=fields.Boolean(default=True)
+	productcode=fields.Char()
+	ExternalRef1=fields.Char()
+	ExternalRef2=fields.Char()
+	current_counter_value=fields.Float(string="Counted Value", help="Current reported value of the counter")
+	counter_offset=fields.Float(string="Offset", help="Offset to apply")
+	counter_to_bill=fields.Float(string="Bill value", compute="_calc_bill_value")
+	counter_last_billed=fields.Float(string="Last billed", compute="_calc_counter_last_billed")
+	current_quantity=fields.Float(help="Current quantitiy on the billing line",compute="_calc_current_quantity")
+
+	counterdef_id=fields.Char(help="PartitionKey")
+	entra_tenant_id=fields.Char(help="Rowkey")
+	
+	@api.one
+	def unlink(self):
+		self.del_counterdef()
+		return super(lubon_qlan_counterdefs, self).unlink()
+
+
+	@api.onchange('o365_tenant_id')
+	@api.one
+	def _get_valid_contract_ids(self):
+		self.valid_contract_ids=self.o365_tenant_id.qlan_tenant_id.contract_ids	
+
+	@api.onchange('counter_offset','current_counter_value')
+	@api.one
+	def _calc_bill_value(self):
+		self.counter_to_bill=self.current_counter_value+ self.counter_offset
+
+	@api.one
+	def _calc_counter_last_billed(self):
+		self.counter_last_billed=self.contract_line_id.last_billed_usage
+
+	@api.one
+	def _calc_current_quantity(self):
+		self.current_quantity=self.contract_line_id.quantity
+
+	@api.onchange('contract_line_id')
+	@api.one
+	def _change_counterdef(self):	
+		self.update_counterdef()
+#		self.get_counterdefs(self.o365_tenant_id)
+
+
+
+	@api.multi
+	def update_counterdef(self):
+		with open(os.path.expanduser('~/.odoosettings/qlanbilling.yaml')) as file:
+			settings = yaml.load(file)
+		url=settings['baseurl'] + '/counterdef-update/' + self.counterdef_id + '/' + str(self.contract_line_id.id) 
+#		pdb.set_trace()
+		counterdef = requests.get(  
+            url,
+            headers={'x-functions-key': settings['key']} )
+		logging.info("url: %s, status: %d", url,counterdef.status_code)
+
+	@api.multi
+	def del_counterdef(self):
+		with open(os.path.expanduser('~/.odoosettings/qlanbilling.yaml')) as file:
+			settings = yaml.load(file)
+
+		
+		
+		url=settings['baseurl'] + '/counterdef-delete/' + self.counterdef_id 
+#		pdb.set_trace()
+		counterdef = requests.get(  
+            url,
+            headers={'x-functions-key': settings['key']} )
+		logging.info("url: %s, status: %d", url,counterdef.status_code)
+#		if counterdef.status_code == 200:
+#			self.unlink()
+
+		
+
+
+
+
+	def get_counterdefs(self,o365_tenant_id):
+		with open(os.path.expanduser('~/.odoosettings/qlanbilling.yaml')) as file:
+			settings = yaml.load(file)
+		url=settings['baseurl'] + '/counterdefs/' + o365_tenant_id.entra_tenant_id #+ "?code=" + settings['key']
+		counterdefs = requests.get(  
+            url,
+            headers={'x-functions-key': settings['key']} )
+		if counterdefs.json() != None:
+			if 	type(counterdefs.json())==dict:
+				counterdefs=[counterdefs.json()]
+			else:
+				counterdefs=counterdefs.json()
+#			pdb.set_trace()
+
+			for counterdef in counterdefs:
+				counter=self.search([('counterdef_id',"ilike",counterdef['PartitionKey'])])
+				if not counter:
+					counter=self.create(
+						{
+						'o365_tenant_id': o365_tenant_id.id,
+						'counterdef_id': counterdef['PartitionKey'],	
+						'contract_line_id':int(counterdef['OdooContractLineId'])					
+						}
+					)
+				counter.update(
+					{
+						'productcode': counterdef['LubonProductCode'],
+						'contract_line_id':int(counterdef['OdooContractLineId'])
+					})
+				if 'ExternalRef1' in counterdef.keys():
+					counter.update(
+					{
+						'ExternalRef1': counterdef['ExternalRef1']
+					})
+				if 'ExternalRef2' in counterdef.keys():
+					counter.update(
+					{
+						'ExternalRef2': counterdef['ExternalRef2']
+					})
+				if 'CurrentCounterValue' in counterdef.keys():
+					counter.update(
+					{
+						'current_counter_value': counterdef['CurrentCounterValue']
+					})
+
+
+
 
 class lubon_qlan_arrowservices_o365(models.Model):
 	_name = 'lubon_qlan.arrowservices_o365'
@@ -611,6 +779,8 @@ class lubon_qlan_arrowservices_o365(models.Model):
 #	check_billing=fields.Boolean(compute='_compute_check', index=True, store=True )
 	hidden=fields.Boolean()
 
+
+
 	@api.depends('sku_id')
 	@api.one
 	def _process_sku_id_change(self):
@@ -620,16 +790,7 @@ class lubon_qlan_arrowservices_o365(models.Model):
 	@api.one
 	def _get_valid_contract_ids(self):
 		self.valid_contract_ids=self.o365_tenant_id.qlan_tenant_id.contract_ids
-		#pdb.set_trace()
-
-	# @api.one
-	# @api.depends('arrow_number','contract_line_id.quantity')
-	# def _compute_check(self):
-	# 	if self.arrow_number == self.contract_line_id.quantity:
-	# 		self.check_billing=False
-	# 	else:
-	# 		self.check_billing=True
-	# 	pdb.set_trace()
+#		pdb.set_trace()
 
 	@api.onchange('contract_line_id')
 	@api.one
@@ -688,6 +849,12 @@ class lubon_qlan_arrowservices_o365(models.Model):
 
 			#pdb.set_trace()
 
+
+
+
+
+
 class account_analytic_invoice_line(models.Model):
 	_inherit = 'account.analytic.invoice.line'
 	arrow_services_ids=fields.One2many('lubon_qlan.arrowservices_o365','contract_line_id')
+	conunterdefs_ids=fields.One2many('lubon_qlan.arrowservices_o365','contract_line_id')
