@@ -145,6 +145,9 @@
                 <xpath expr='//field[@name="price_subtotal"]' position="replace">
 
                     <field name="price_subtotal" sum="Total calculated"/>
+                    <field name="partner_id" invisible="True"/>
+
+                    <field name="counterdef_id" domain="[('partner_id','=',partner_id)]"/>
                     <field name="add_to_prepaid"/>
                     <field name="invoice_analytic_account_id"/>
                     <field name="product_type"/>
@@ -177,7 +180,9 @@
 			<field name="model">account.analytic.invoice.line</field>
 			<field name="arch" type="xml">
 				<tree string="Invoice" editable="top">
-                                            <field name="analytic_account_id" readonly="True"/>
+                                            <field name="analytic_account_id" domain="[('partner_id','=',partner_id)]" zreadonly="True"/>
+                                            <field name="partner_id"/>
+                                            <field name="source"/>
                                             <field name="name" readonly="True"/>
                                             <field name="product_id"/>
                                             <field name="quantity"/>
@@ -188,6 +193,7 @@
                                             <field name="usage_mandatory"/>
                                             <field name="price_unit"/>
                                             <field name="next_report_date"/>
+                                            <field name="counterdef_id" domain="[('partner_id','=',partner_id)]"/>
 				</tree>
 			</field>
 		</record> 
@@ -197,6 +203,8 @@
 						<field name="arch" type="xml">
 							<search>
                                 <field name="product_id"/>
+                                <!-- field name="partner_id"/ -->
+                                <field name="counterdef_id"/>
 								<field name="analytic_account_id"/>
                                 <field name="next_report_date"/>
                                 <filter name="billing_check" string="Check quantity"	domain="[('billing_check', '=', True)]"/>

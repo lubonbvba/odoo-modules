@@ -1,13 +1,11 @@
 {
-    "folders": [
+	"folders": [
 		{
 			"path": "."
 		},
 		{
 			"path": "../odoo-projects"
-		},
-		{
-			"path": ".."
 		}
-	]
+	],
+	"settings": {}
 }
