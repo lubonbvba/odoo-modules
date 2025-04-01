@@ -958,7 +958,9 @@ class lubon_counterdefs_account_analytic_invoice_line(models.Model):
 	#counterdefs_ids=fields.One2many('lubon_qlan.counterdefs','contract_line_id')
 #	counterdef_id=fields.Many2one('lubon_qlan.counterdefs', string="Counter",domain="[('partner_id','=',partner_id)]" ) #   ,('productcode','ilike',product_id)]" )
 	counterdef_id=fields.Many2one('lubon_qlan.counterdefs', string="Counter",domain="[('contract_line_id','=',False)]" )
-	partner_id=fields.Many2one(related="analytic_account_id.partner_id", zreadonly=True)
+	zpartner_id=fields.Many2one(related="analytic_account_id.partner_id", zreadonly=True)
+	partner_id=fields.Integer()
+	
 
 	@api.depends('counterdef_id')
 	@api.onchange('counterdef_id')
