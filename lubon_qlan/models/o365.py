@@ -949,7 +949,12 @@ class lubon_qlan_counterdef_partner(models.Model):
 	_name='res.partner'
 	_inherit='res.partner'
 	counterdefs_ids=fields.One2many('lubon_qlan.counterdefs','partner_id')
+	
 
+class account_analytic_account(models.Model):
+	_name = "account.analytic.account"
+	_inherit = "account.analytic.account"
+	counterdefs_ids=fields.One2many('lubon_qlan.counterdefs','partner_id')
 
 
 class lubon_counterdefs_account_analytic_invoice_line(models.Model):
