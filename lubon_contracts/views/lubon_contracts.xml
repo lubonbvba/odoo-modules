@@ -9,46 +9,6 @@
         </record>     
 
 
-<!-- 		<record model="ir.ui.view" id="billing_history_search_view">
-			<field name="name">billing_history.search</field>
-			<field name="model">lubon_qlan.billing_history</field>
-			<field name="arch" type="xml">
-				<search>
-					<field name="contract_id"/>
-              		<field name="contract_line_id"/>
-   					<field name="owner"/>
-
-						<group string="Group By">
-							<filter name="by_owner" string="Owner" context="{'group_by': 'owner'}"/>
-   							<filter name="by_contract_line" string="Contract_line" context="{'group_by': 'contract_line_id'}"/>
-							</group>
-
-						</search>
-					</field>
-				</record>
-
- -->
-
-<!-- 
-        <record model="ir.ui.view" id="billing_history_tree_view">
-			<field name="name">billing_history.tree</field>
-			<field name="model">lubon_qlan.billing_history</field>
-			<field name="arch" type="xml">
-				<tree string="Billing lines" zeditable="top">
-                                            <field name="contract_id"/>
-                                            <field name="active"/>
-                                            <field name="date_start"/>
-                                            <field name="date_end"/>
-                                            <field name="owner"/>
-                                            <field name="contract_line_id"/>
-                                            <field name="description"/>
-											<field name="related_model"/>
-                                            <field name="related_user_model"/>
-				</tree>
-			</field>
-		</record> 
-
- -->
     <record model="ir.ui.view" id="lubon_contracts_lubon_contracts_tree">
             <field name="name">lubon_contracts_tree</field>
             <field name="model">account.analytic.account</field>
@@ -70,24 +30,7 @@
                 <field name="remaining_hours" position="replace"/>
             </field>
         </record>
-<!-- 
-       <record model="ir.ui.view" id="lubon_contracts_users_o365_form">
-			<field name="name">lubon_contracts_users_o365.form</field>
-			<field name="model">lubon_qlan.users_o365</field>
-            <field name="inherit_id" ref="lubon_qlan.users_o365_form_view"/>
-            <field name="arch" type="xml">
-                <xpath expr='//page[@name="billing"]' position="inside">
-			        <field name="billing_history_ids">
-				        <tree>
-				  	        <field name="related_model"/>
-				  	        <field name="related_user_model"/>
-				  	        <field name="description"/>
-				        </tree>
-				    </field>
-                </xpath>
-            </field>
-        </record>
- -->
+
 
 
         <record model="ir.ui.view" id="lubon_contracts_lubon_contracts">
@@ -98,8 +41,15 @@
                <field name="partner_id" position="after">
                     <field name="partner_related_ids" widget="many2many_tags"/>
                 </field> 
+                <field name="recurring_invoice_line_ids" position="attributes">
+                    <attribute name="context">{'default_line_partner_id': partner_id}</attribute>
+                </field>
                 <xpath expr='//tree' position="attributes">
                     <attribute name="default_order">sequence</attribute>
+                </xpath>
+                <xpath expr="//div[@name='buttons']" position="inside">
+                <button type="action" class="oe_stat_button" string='All Counterdefs' name="%(lubon_contracts.counterdefs_action)d" icon="fa-calculator" context="{'search_default_partner_id': [partner_id], 'default_partner_id': [partner_id]}"/>
+                <button type="action" class="oe_stat_button" string='Contract Counterdefs' name="%(lubon_contracts.counterdefs_action)d" icon="fa-list" context="{'search_default_line_contract_id': active_id}"/>
                 </xpath>
                 <xpath expr='//field[@name="date_start"]' position="after">
                     <field name="date_cutoff"/>
@@ -145,22 +95,22 @@
                 <xpath expr='//field[@name="price_subtotal"]' position="replace">
 
                     <field name="price_subtotal" sum="Total calculated"/>
-                    <field name="partner_id" invisible="True"/>
+                    <field name="line_partner_id" invisible="True"/>
 
-                    <field name="counterdef_id" domain="[('partner_id','=',partner_id)]"/>
-                    <field name="add_to_prepaid"/>
+                    <field name="counterdef_id" domain="['&amp;',('partner_id','=',line_partner_id),('contract_line_id','=',False)]"/>
+                    <button string="v" name="update_counter_from_contract_line" type="object" help="Update counterdef with contractline id (legacy)"/>
+                    <!-- field name="add_to_prepaid"/>
                     <field name="invoice_analytic_account_id"/>
-                    <field name="product_type"/>
+                    <field name="product_type"/ -->
                 </xpath>
-                <xpath expr='//page[@name="contract_page"]' position="after">
+                <!-- xpath expr='//page[@name="contract_page"]' position="after">
                     <page name="invoiced_lines" string="Invoiced lines">
                         <field name="invoiced_lines"/>
                     </page>
-                    <page name="Billing" string="Billing">
-                        <button name='check_billing_lines' string="Check" type="object"/>
-<!--                         <field name='billing_history_lines_ids'/>
- -->                    </page>
-                </xpath> 
+                    <page name="Counters" string="Counters">
+                         <field name='counterdef_ids'/>
+                    </page>
+                </xpath --> 
 
             </field>
         </record>
@@ -180,8 +130,8 @@
 			<field name="model">account.analytic.invoice.line</field>
 			<field name="arch" type="xml">
 				<tree string="Invoice" editable="top">
-                                            <field name="analytic_account_id" domain="[('partner_id','=',partner_id)]" zreadonly="True"/>
-                                            <field name="partner_id"/>
+                                            <field name="analytic_account_id" domain="[('partner_id','=',line_partner_id)]" zreadonly="True"/>
+                                            <field name="line_partner_id"/>
                                             <field name="source"/>
                                             <field name="name" readonly="True"/>
                                             <field name="product_id"/>
@@ -193,7 +143,7 @@
                                             <field name="usage_mandatory"/>
                                             <field name="price_unit"/>
                                             <field name="next_report_date"/>
-                                            <field name="counterdef_id" domain="[('partner_id','=',partner_id)]"/>
+                                            <field name="counterdef_id" domain="[('partner_id','=',line_partner_id)]"/>
 				</tree>
 			</field>
 		</record> 
@@ -203,7 +153,8 @@
 						<field name="arch" type="xml">
 							<search>
                                 <field name="product_id"/>
-                                <!-- field name="partner_id"/ -->
+                                <field name="line_partner_id"/>
+
                                 <field name="counterdef_id"/>
 								<field name="analytic_account_id"/>
                                 <field name="next_report_date"/>
@@ -217,6 +168,156 @@
 						</field>
 		</record>
 
+        <record model="ir.ui.view" id="lubon_qlan_counterdefs_tree_view">
+			<field name="name">lubon_qlan_counterdefs.tree</field>
+			<field name="model">lubon_qlan.counterdefs</field>
+			<field name="arch" type="xml">
+				<tree string="Counterdefs" editable="top" order="productcode">
+
+
+									<field name="valid_contract_ids" invisible="True" />  
+									<field name="valid_contract_line_ids" invisible="True" />  
+									<!-- field name="o365_tenant_id" zinvisible="True" / -->
+									<field name="erp_collection"/>
+									<field name="partner_id"/>
+									<field name='active'/>
+									<field name='new_checked'/>
+                                    <field name='line_contract_id'/>
+									<field name='contract_line_id'/>
+									<!--button name='update_counterdef' string="Upd" type="object"/ -->
+									<!-- button name='del_counterdef' string="X" type="object" attrs="{'invisible': [('contract_line_id','!=', False)]}"/-->
+									<field name='productcode'/>
+									<field name='current_counter_value'/>
+									<field name='counter_offset'/>
+									<field name='counter_to_bill'/>
+									<field name='current_quantity'/>
+									<field name='counter_last_billed'/>									
+									<field name='counterdef_id'/>
+									<field name='ExternalRef1'/>
+									<field name='ExternalRef2'/>
+									<field name='friendly_name'/>
+									<field name='start_date'/>
+									<field name='renewal_date'/>
+									<field name='autorenew'/>
+									<field name='counter_date'/>
+
+
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="lubon_qlan_counterdefs_search_view">
+				<field name="name">lubon_qlan_counterdefs.search</field>
+				<field name="model">lubon_qlan.counterdefs</field>
+				<field name="arch" type="xml">
+					<search>
+						<field name="partner_id"/>
+                        <field name="line_contract_id"/>
+
+						<field name="productcode"/>
+						<!-- field name="o365_tenant_id"/-->
+						<field name="friendly_name"  string="Friendly name" filter_domain="[('friendly_name','ilike',self)]"/>
+						<field name="erp_collection"  string="ERP Collection" filter_domain="[('erp_collection','ilike',self)]"/>
+
+						<filter string="new" name="new_checked" domain="[('new_checked','=',False)]"/>
+						<filter string="No contract" name="filter_no_contract" domain="[('contract_line_id','=', False)]"/>
+						<filter string="No customer" name="filter_no_customer" domain="[('partner_id','=', False)]"/>
+						<filter string="No Entra Tenant" name="filter_no_entra_tenant" domain="[('o365_tenant_id','=', False)]"/>
+
+					<group string="Group By">
+						<filter name="by_o365_tenant_id" string="O365 Tenant" context="{'group_by': 'o365_tenant_id'}"/>
+						<filter name="by_productcode" string="By product code" context="{'group_by': 'productcode'}"/>
+
+
+					</group>
+
+					</search>
+				</field>
+		</record> 
+        <record id="lubon_qlan_counterdefs_lookup_invoiceline" model="ir.actions.server">
+
+            <field name="name">Lookup Contract Invoice Line</field>
+
+            <field name="model_id" ref="model_lubon_qlan_counterdefs"/>
+            <field name="state">code</field>
+            <field name="code">self.lookupinvoiceline(cr, uid, context.get('active_ids', []), context=context)</field>
+        </record>
+        <record id="lubon_qlan_counterdefs_lookup_invoiceline" model="ir.values">
+            <field eval="'client_action_multi'" name="key2"/>
+            <field eval="'lubon_qlan.counterdefs'" name="model"/>
+            <field name="name">Lookup Entra Invoice Line Item</field>
+            <field eval="'ir.actions.server,%d'%lubon_qlan_counterdefs_lookup_invoiceline" name="value"/>
+        </record>
+
+        <record id="lubon_qlan_counterdefs_lookup_tenant" model="ir.actions.server">
+
+            <field name="name">Lookup Entra Tenant</field>
+
+            <field name="model_id" ref="model_lubon_qlan_counterdefs"/>
+            <field name="state">code</field>
+            <field name="code">self.lookuptenant(cr, uid, context.get('active_ids', []), context=context)</field>
+        </record>
+        <record id="lubon_qlan_counterdefs_lookup_tenant_item" model="ir.values">
+            <field eval="'client_action_multi'" name="key2"/>
+            <field eval="'lubon_qlan.counterdefs'" name="model"/>
+            <field name="name">Lookup Entra tenant Item</field>
+            <field eval="'ir.actions.server,%d'%lubon_qlan_counterdefs_lookup_tenant" name="value"/>
+        </record>
+        <record id="lubon_qlan_counterdefs_refresh" model="ir.actions.server">
+
+            <field name="name">Refresh counterdefs</field>
+
+            <field name="model_id" ref="model_lubon_qlan_counterdefs"/>
+            <field name="state">code</field>
+            <field name="code">self.refresh_counterdefs(cr, uid, context.get('active_ids', []), context=context)</field>
+        </record>
+        <record id="lubon_qlan_counterdefs_refresh_item" model="ir.values">
+            <field eval="'client_action_multi'" name="key2"/>
+            <field eval="'lubon_qlan.counterdefs'" name="model"/>
+            <field name="name">Refresh counterdef Item</field>
+            <field eval="'ir.actions.server,%d'%lubon_qlan_counterdefs_refresh" name="value"/>
+        </record>
+        <record id="lubon_qlan_counterdefs_update" model="ir.actions.server">
+
+            <field name="name">Update counterdef</field>
+
+            <field name="model_id" ref="model_lubon_qlan_counterdefs"/>
+            <field name="state">code</field>
+            <field name="code">self.update_counterdef(cr, uid, context.get('active_ids', []), context=context)</field>
+        </record>
+        <record id="lubon_qlan_counterdefs_update_item" model="ir.values">
+            <field eval="'client_action_multi'" name="key2"/>
+            <field eval="'lubon_qlan.counterdefs'" name="model"/>
+            <field name="name">Update counterdef Item</field>
+            <field eval="'ir.actions.server,%d'%lubon_qlan_counterdefs_update" name="value"/>
+        </record>
+
+
+
+
+        <record model="ir.ui.view" id="partner_counterdefs">
+            <field name="name">lubon_partner.counterdefs</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Counters">
+					<field name="counterdefs_ids" filter="[('hidden','=',True)]">
+					</field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+    <record model="ir.actions.act_window" id="counterdefs_action">
+      <field name="name">Counterdefs</field>
+      <field name="res_model">lubon_qlan.counterdefs</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+
     <record model="ir.actions.act_window" id="lubon_contracts.account_analytic_invoice_line_action">
       <field name="name">Contract Invoice lines</field>
       <field name="res_model">account.analytic.invoice.line</field>
@@ -224,14 +325,6 @@
       <field name="view_mode">tree,form</field>
       <field name="context">{'search_default_billing_check':1 }</field>
     </record>  
-<!-- 
-    <record model="ir.actions.act_window" id="billing_history_tree_view_action">
-      <field name="name">Billing history lines</field>
-      <field name="res_model">lubon_qlan.billing_history</field>
-      <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
-    </record>     
- -->
         <record id="lub_contracts_lookup_prices" model="ir.actions.server">
 
             <field name="name">Lookup current prices</field>
@@ -239,7 +332,6 @@
             <field name="model_id" ref="model_account_analytic_invoice_line"/>
             <field name="state">code</field>
             <field name="code">self.lookup_prices(cr, uid, context.get('active_ids', []), context=context)</field>
-            <!-- field name="code">action = self.encrypt(cr, uid, context.get('active_ids', []), context=context)</field-->
         </record>
         <record id="lub_contracts_lookup_prices_item" model="ir.values">
             <field eval="'client_action_multi'" name="key2"/>

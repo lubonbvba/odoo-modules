@@ -20,7 +20,7 @@
     'version': '8.0.0.4.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','pad', 'analytic','stock','hr_timesheet_invoice', 'lubon_base','lubon_credentials','lubon_partners', 'cmd_execute','aws'],
+    'depends': ['base','pad', 'analytic','stock','hr_timesheet_invoice', 'lubon_base','lubon_credentials','lubon_partners', 'cmd_execute','aws','lubon_contracts'],
 
     # always loaded
     'data': [

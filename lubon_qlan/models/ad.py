@@ -433,3 +433,9 @@ class lubon_qlan_billingconfig_tenant_ad(models.Model):
     def report_usage(self):
         if self.contract_line_id:
             self.contract_line_id.current_usage=self.users_license_ad_ids_count
+
+
+class account_analytic_invoice_line(models.Model):
+    _name = 'account.analytic.invoice.line'
+    _inherit = 'account.analytic.invoice.line'
+    adaccount_ids=fields.One2many('lubon_qlan.adaccounts','contract_line_id')

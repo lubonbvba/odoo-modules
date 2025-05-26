@@ -44,7 +44,7 @@
 							<!-- field zname="assets_count" string="Signins " widget="statinfo"/ -->
 							
 						</button>
-						<button type="action" class="oe_stat_button" string='Counterdefs' name="%(lubon_qlan_counterdefs_action)d" icon="fa-calculator" context="{'search_default_o365_tenant_id': active_id, 'default_o365_tenant_id': active_id}"/>
+						<button type="action" class="oe_stat_button" string='Counterdefs' name="%(lubon_contracts.counterdefs_action)d" icon="fa-calculator" context="{'search_default_erp_collection': entra_tenant_id}"/>
 
 					</div>	
 					<group>
@@ -336,80 +336,6 @@
 				</tree>
 			</field>
 		</record>
-        <record model="ir.ui.view" id="lubon_qlan_counterdefs_tree_view">
-			<field name="name">lubon_qlan_counterdefs.tree</field>
-			<field name="model">lubon_qlan.counterdefs</field>
-			<field name="arch" type="xml">
-				<tree string="Counterdefs" editable="top" order="productcode">
-
-
-									<field name="valid_contract_ids" invisible="True" />  
-									<field name="valid_contract_line_ids" invisible="True" />  
-									<field name="o365_tenant_id" zinvisible="True" />
-									<field name="erp_collection"/>
-									<field name="partner_id"/>
-									<field name='active'/>
-									<field name='new_checked'/>
-									<field name='contract_line_id'/>
-									<!--button name='update_counterdef' string="Upd" type="object"/ -->
-									<!-- button name='del_counterdef' string="X" type="object" attrs="{'invisible': [('contract_line_id','!=', False)]}"/-->
-									<field name='productcode'/>
-									<field name='current_counter_value'/>
-									<field name='counter_offset'/>
-									<field name='counter_to_bill'/>
-									<field name='current_quantity'/>
-									<field name='counter_last_billed'/>									
-									<field name='counterdef_id'/>
-									<field name='ExternalRef1'/>
-									<field name='ExternalRef2'/>
-									<field name='friendly_name'/>
-									<field name='start_date'/>
-									<field name='renewal_date'/>
-									<field name='autorenew'/>
-									<field name='counter_date'/>
-
-
-				</tree>
-			</field>
-		</record>
-		<record model="ir.ui.view" id="lubon_qlan_counterdefs_search_view">
-				<field name="name">lubon_qlan_counterdefs.search</field>
-				<field name="model">lubon_qlan.counterdefs</field>
-				<field name="arch" type="xml">
-					<search>
-						<field name="partner_id"/>
-						<field name="productcode"/>
-						<field name="o365_tenant_id"/>
-						<field name="friendly_name"  string="Friendly name" filter_domain="[('friendly_name','ilike',self)]"/>
-						<field name="erp_collection"  string="ERP Collection" filter_domain="[('erp_collection','ilike',self)]"/>
-
-						<filter string="new" name="new_checked" domain="[('new_checked','=',False)]"/>
-						<filter string="No contract" name="filter_no_contract" domain="[('contract_line_id','=', False)]"/>
-						<filter string="No customer" name="filter_no_customer" domain="[('partner_id','=', False)]"/>
-
-					<group string="Group By">
-						<filter name="by_o365_tenant_id" string="O365 Tenant" context="{'group_by': 'o365_tenant_id'}"/>
-						<filter name="by_productcode" string="By product code" context="{'group_by': 'productcode'}"/>
-
-
-					</group>
-
-					</search>
-				</field>
-		</record> 
-        <record model="ir.ui.view" id="partner_counterdefs">
-            <field name="name">lubon_partner.counterdefs</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
-            <field name="arch" type="xml">
-                <notebook position="inside">
-                    <page string="Counters">
-					<field name="counterdefs_ids" filter="[('hidden','=',True)]">
-					</field>
-                    </page>
-                </notebook>
-            </field>
-        </record>
 
 
         <record model="ir.ui.view" id="lubon_qlan_arrowservices_o365_tree_view">
@@ -477,12 +403,7 @@
 		</record>		
 
 
-    <record model="ir.actions.act_window" id="lubon_qlan_counterdefs_action">
-      <field name="name">Counterdefs</field>
-      <field name="res_model">lubon_qlan.counterdefs</field>
-      <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
-    </record>
+
     <record model="ir.actions.act_window" id="lubon_qlan_arrowservices_o365_action">
       <field name="name">Arrow services</field>
       <field name="res_model">lubon_qlan.arrowservices_o365</field>
@@ -541,7 +462,7 @@
 	<menuitem id="lubon_qlan_arrowservices_o365_menu" name="Arrow services O365" parent="lubon_qlan_tables_menu"
           action="lubon_qlan_arrowservices_o365_action"/>	
 	<menuitem id="lubon_qlan_counterdefs_menu" name="Counterdefs" parent="lubon_qlan_tables_menu"
-          action="lubon_qlan_counterdefs_action"/>		  	  
+          action="lubon_contracts.counterdefs_action"/>		  	  
 	<menuitem id="qlan_signin_azure_menu" name="Azure AD Signin log" parent="lubon_qlan_tables_menu"
           action="qlan_signin_azure_action"/>	
 
